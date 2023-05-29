@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+         <loc>Nonefaq/</loc>
+         <lastmod>2023-05-29</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/faq/"/>
+         <xhtml:link rel="alternate" hreflang="de" href="Nonede/faq/"/>
+         
+    </url>
+    <url>
+         <loc>None./</loc>
+         <lastmod>2023-05-29</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/"/>
+         <xhtml:link rel="alternate" hreflang="de" href="Nonede/"/>
+         
+    </url>
+    <url>
+         <loc>Nonetroubleshooting/</loc>
+         <lastmod>2023-05-29</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/troubleshooting/"/>
+         <xhtml:link rel="alternate" hreflang="de" href="Nonede/troubleshooting/"/>
+         
+    </url>
+    <url>
+         <loc>Noneguides/reverse-proxy/</loc>
+         <lastmod>2023-05-29</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/guides/reverse-proxy/"/>
+         <xhtml:link rel="alternate" hreflang="de" href="Nonede/guides/reverse-proxy/"/>
+         
+    </url>
+    <url>
+         <loc>Noneinstructions/main/</loc>
+         <lastmod>2023-05-29</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/instructions/main/"/>
+         <xhtml:link rel="alternate" hreflang="de" href="Nonede/instructions/main/"/>
+         
+    </url>
+    <url>
+         <loc>Noneinstructions/settings/</loc>
+         <lastmod>2023-05-29</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/instructions/settings/"/>
+         <xhtml:link rel="alternate" hreflang="de" href="Nonede/instructions/settings/"/>
+         
+    </url>
+    <url>
+         <loc>Nonesetup/linux/</loc>
+         <lastmod>2023-05-29</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/setup/linux/"/>
+         <xhtml:link rel="alternate" hreflang="de" href="Nonede/setup/linux/"/>
+         
+    </url>
+    <url>
+         <loc>Nonesetup/windows/</loc>
+         <lastmod>2023-05-29</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/setup/windows/"/>
+         <xhtml:link rel="alternate" hreflang="de" href="Nonede/setup/windows/"/>
+         
+    </url>
+</urlset>
