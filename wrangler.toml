@@ -1,0 +1,7 @@
+name = "Speedtest"
+account_id = "47f002bdb244bb8e566c085423e74c7f"
+main = "index.html"
+workers_dev = true
+
+[build]
+command = "cd client && npm install && npm run build && cd .. && mv client/build ."
