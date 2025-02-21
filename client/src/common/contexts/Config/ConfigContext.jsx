@@ -1,14 +1,18 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
 import {InputDialogContext} from "../InputDialog";
 import {request} from "@/common/utils/RequestUtil";
-import {acceptDialog, apiErrorDialog, passwordRequiredDialog} from "@/common/contexts/Config/dialog";
+import {apiErrorDialog, passwordRequiredDialog} from "@/common/contexts/Config/dialog";
+import WelcomeDialog from "@/common/components/WelcomeDialog";
+import {useNavigate} from "react-router-dom";
 
 export const ConfigContext = createContext({});
 
 export const ConfigProvider = (props) => {
     const [config, setConfig] = useState({});
     const [setDialog] = useContext(InputDialogContext);
-    const [dialogShown, setDialogShown] = useState(false);
+    const [welcomeShown, setWelcomeShown] = useState(false);
+    const navigate = useNavigate();
+
 
     const reloadConfig = () => {
         request("/config").then(async res => {
@@ -23,26 +27,25 @@ export const ConfigProvider = (props) => {
         }).then(result => {
             if (config !== result)
                 result.viewMode && localStorage.getItem("currentNode") !== null && localStorage.getItem("currentNode") !== "0"
-                    ? props.showNodePage(true) : setConfig(result);
+                    ? navigate("/nodes") : setConfig(result);
         }).catch((code) => {
             localStorage.getItem("currentNode") !== null && localStorage.getItem("currentNode") !== "0"
-                ? props.showNodePage(true) : setDialog(code === 1 ? passwordRequiredDialog() : apiErrorDialog());
+                ? navigate("/nodes") : setDialog(code === 1 ? passwordRequiredDialog() : apiErrorDialog());
         });
     }
 
     const checkConfig = async () => (await request("/config")).json();
 
-    useEffect(() => {
-        if (config.acceptOoklaLicense !== undefined && config.acceptOoklaLicense === "false" && !dialogShown) {
-            setDialogShown(true);
-            setDialog(acceptDialog());
-        }
-    }, [config]);
-
     useEffect(reloadConfig, []);
+
+    useEffect(() => {
+        if (config.previewMode && !localStorage.getItem("welcomeShown")) setWelcomeShown(true);
+        if (!config.previewMode && config.provider === "none") setWelcomeShown(true);
+    }, [config]);
 
     return (
         <ConfigContext.Provider value={[config, reloadConfig, checkConfig]}>
+            {welcomeShown && <WelcomeDialog onClose={() => setWelcomeShown(false)}/>}
             {props.children}
         </ConfigContext.Provider>
     )

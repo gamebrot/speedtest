@@ -1,6 +1,6 @@
 {
   "name": "myspeed",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "scripts": {
     "client": "cd client && npm run dev",
     "server": "nodemon server",
@@ -8,20 +8,25 @@
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
   },
   "dependencies": {
-    "axios": "^1.6.7",
+    "@resvg/resvg-js": "^2.6.2",
+    "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "cron-validator": "^1.3.1",
     "decompress": "^4.2.1",
     "decompress-targz": "^4.1.1",
     "decompress-unzip": "^4.0.1",
-    "express": "^4.18.3",
+    "express": "^4.21.1",
+    "mysql2": "^3.11.3",
     "node-schedule": "^2.1.1",
-    "sequelize": "^6.37.1",
+    "prom-client": "^15.1.3",
+    "satori": "^0.11.2",
+    "satori-html": "^0.3.2",
+    "sequelize": "^6.37.5",
     "sqlite3": "^5.1.7",
     "tmp": "^0.2.3"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
-    "nodemon": "^3.1.0"
+    "concurrently": "^9.1.1",
+    "nodemon": "^3.1.7"
   }
 }

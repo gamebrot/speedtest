@@ -6,56 +6,34 @@ import {
     faCalendarDays,
     faCircleNodes,
     faClock,
-    faClose,
-    faFileExport,
-    faChartSimple,
-    faGear,
     faGlobeEurope,
     faInfo,
     faKey,
     faPause,
     faPingPongPaddleBall,
     faPlay,
-    faServer,
     faWandMagicSparkles,
     faCheck,
-    faExclamationTriangle
+    faExclamationTriangle, faSliders, faHardDrive
 } from "@fortawesome/free-solid-svg-icons";
 import {ConfigContext} from "@/common/contexts/Config";
 import {StatusContext} from "@/common/contexts/Status";
 import {InputDialogContext} from "@/common/contexts/InputDialog";
 import {SpeedtestContext} from "@/common/contexts/Speedtests";
-import {baseRequest, downloadRequest, jsonRequest, patchRequest, postRequest} from "@/common/utils/RequestUtil";
-import {creditsInfo, healthChecksInfo, recommendationsInfo} from "@/common/components/Dropdown/utils/infos";
-import {
-    exportOptions, languageOptions, levelOptions,
-    selectOptions, timeOptions
-} from "@/common/components/Dropdown/utils/options";
+import {baseRequest, jsonRequest, patchRequest, postRequest} from "@/common/utils/RequestUtil";
+import {creditsInfo, recommendationsInfo} from "@/common/components/Dropdown/utils/infos";
+import {levelOptions, selectOptions, timeOptions} from "@/common/components/Dropdown/utils/options";
 import {parseCron, stringifyCron} from "@/common/components/Dropdown/utils/utils";
-import {changeLanguage, t} from "i18next";
-import ViewDialog from "@/common/components/ViewDialog";
+import {t} from "i18next";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {ToastNotificationContext} from "@/common/contexts/ToastNotification";
 import {NodeContext} from "@/common/contexts/Node";
 import {IntegrationDialog} from "@/common/components/IntegrationDialog";
+import LanguageDialog from "@/common/components/LanguageDialog";
+import ProviderDialog from "@/common/components/ProviderDialog";
+import StorageDialog from "@/common/components/StorageDialog";
 
-let icon;
-
-export const isOpen = () => !document.getElementById("dropdown").classList.contains("dropdown-invisible");
-
-export const toggleDropdown = (setIcon) => {
-    if (setIcon) icon = setIcon;
-    let classList = document.getElementById("dropdown").classList;
-    if (classList.contains("dropdown-invisible")) {
-        classList.remove("dropdown-invisible");
-        icon(faClose);
-    } else {
-        classList.add("dropdown-invisible");
-        icon(faGear);
-    }
-}
-
-function DropdownComponent() {
+const DropdownComponent = ({isOpen, switchDropdown}) => {
     const [config, reloadConfig] = useContext(ConfigContext);
     const [status, updateStatus] = useContext(StatusContext);
     const findNode = useContext(NodeContext)[4];
@@ -64,29 +42,33 @@ function DropdownComponent() {
     const updateTests = useContext(SpeedtestContext)[1];
     const updateToast = useContext(ToastNotificationContext);
     const [setDialog] = useContext(InputDialogContext);
-    const [showViewDialog, setShowViewDialog] = useState(false);
     const [showIntegrationDialog, setShowIntegrationDialog] = useState(false);
+    const [showLanguageDialog, setShowLanguageDialog] = useState(false);
+    const [showProviderDialog, setShowProviderDialog] = useState(false);
+    const [showStorageDialog, setShowStorageDialog] = useState(false);
     const ref = useRef();
 
     useEffect(() => {
         const onPress = event => {
-            if (event.code === "Escape" && isOpen())
-                toggleDropdown(icon);
+            if (event.code === "Escape" && isOpen) {
+                switchDropdown();
+            }
         }
-        document.addEventListener("keyup", onPress);
-        return () => document.removeEventListener("keyup", onPress);
-    }, []);
 
-    useEffect(() => {
         const onClick = event => {
             let headerIcon = event.composedPath()[1].id || event.composedPath()[2].id;
-            if (isOpen() && !ref.current.contains(event.target) && headerIcon !== "open-header")
-                toggleDropdown(icon);
+            if (isOpen && !ref.current.contains(event.target) && headerIcon !== "open-header") {
+                switchDropdown();
+            }
         }
-        document.addEventListener("mousedown", onClick);
-        return () => document.removeEventListener("mousedown", onClick);
-    }, []);
 
+        document.addEventListener("mousedown", onClick);
+        document.addEventListener("keyup", onPress);
+        return () => {
+            document.removeEventListener("keyup", onPress);
+            document.removeEventListener("mousedown", onClick);
+        }
+    }, [isOpen]);
     const showFeedback = (customText = "dropdown.changes_applied", reload = true) => {
         updateToast(t(customText), customText === "dropdown.changes_unsaved" ? "red" : "green",
             customText === "dropdown.changes_unsaved" ? faExclamationTriangle : faCheck);
@@ -130,19 +112,6 @@ function DropdownComponent() {
             });
         } else setDialog({title: t("update.recommendations_title"), description: t("info.recommendations_error"), buttonText: t("dialog.okay")});
     }
-
-    const updateServer = () => patchDialog("serverId", async (value) => ({
-        title: t("update.server_title"),
-        select: true,
-        selectOptions: await jsonRequest("/info/server"),
-        unsetButton: t("update.manually"),
-        onClear: updateServerManually,
-        value
-    }));
-
-    const updateServerManually = () => patchDialog("serverId", (value) => ({
-        title: t("update.manual_server_title"), placeholder: t("update.manual_server_id"), type: "number", value: value,
-    }));
 
     const updatePassword = async () => {
         const passwordSet = currentNode !== 0 ? findNode(currentNode).password : localStorage.getItem("password") != null;
@@ -205,17 +174,6 @@ function DropdownComponent() {
         });
     }
 
-    function exportDialog() {
-        setDialog({
-            select: true,
-            title: t("update.export_title"),
-            buttonText: t("update.download"),
-            value: "json",
-            selectOptions: exportOptions(),
-            onSuccess: value => downloadRequest("/export/" + value)
-        });
-    }
-
     const togglePause = () => {
         if (!status.paused) {
             setDialog({
@@ -230,17 +188,9 @@ function DropdownComponent() {
         } else postRequest("/speedtests/continue").then(updateStatus);
     }
 
-    const updateLanguage = () => {
-        setDialog({
-            title: t("update.language"),
-            select: true,
-            selectOptions: languageOptions,
-            value: localStorage.getItem("language") || "en",
-            onSuccess: value => changeLanguage(value, () => showFeedback())
-        });
-    }
-
     const showCredits = () => setDialog({title: "MySpeed", description: creditsInfo(), buttonText: t("dialog.close")});
+
+    const showProviderDetails = () => setDialog({title: t("dropdown.provider"), description: config.previewMessage, buttonText: t("dialog.close")});
 
     const options = [
         {run: updatePing, icon: faPingPongPaddleBall, text: t("dropdown.ping")},
@@ -248,32 +198,36 @@ function DropdownComponent() {
         {run: updateDownload, icon: faArrowDown, text: t("dropdown.download")},
         {run: recommendedSettings, icon: faWandMagicSparkles, text: t("dropdown.recommendations")},
         {hr: true, key: 1},
-        {run: updateServer, icon: faServer, text: t("dropdown.server")},
-        {run: updatePassword, icon: faKey, text: t("dropdown.password")},
+        {run: () => setShowProviderDialog(true), icon: faSliders, text: t("dropdown.change_provider")},
+        {run: () => setShowStorageDialog(true), icon: faHardDrive, text: t("dropdown.storage")},
+        {run: updatePassword, icon: faKey, text: t("dropdown.password"), previewHidden: true},
         {run: updateCron, icon: faClock, text: t("dropdown.cron")},
-        {run: updateTime, icon: faCalendarDays, text: t("dropdown.time"), allowView: true},
-        {run: exportDialog, icon: faFileExport, text: t("dropdown.export")},
         {run: togglePause, icon: status.paused ? faPlay : faPause, text: t("dropdown." + (status.paused ? "resume_tests" : "pause_tests"))},
         {run: () => setShowIntegrationDialog(true), icon: faCircleNodes, text: t("dropdown.integrations")},
         {hr: true, key: 2},
-        {run: updateLanguage, icon: faGlobeEurope, text: t("dropdown.language"), allowView: true},
-        {run: () => setShowViewDialog(true), icon: faChartSimple, allowView: true, text: t("dropdown.view")},
-        {run: showCredits, icon: faInfo, text: t("dropdown.info"), allowView: true}
+        {run: () => setShowLanguageDialog(true), icon: faGlobeEurope, text: t("dropdown.language"), allowView: true},
+        {run: updateTime, icon: faCalendarDays, text: t("dropdown.time"), allowView: true},
+        {run: showCredits, icon: faInfo, text: t("dropdown.info"), allowView: true, previewHidden: true},
+        {run: showProviderDetails, icon: faInfo, text: t("dropdown.provider"), previewShown: true}
     ];
 
     return (
         <>
-            {showViewDialog && <ViewDialog onClose={() => setShowViewDialog(false)}/>}
             {showIntegrationDialog && <IntegrationDialog onClose={() => setShowIntegrationDialog(false)}/>}
-            <div className="dropdown dropdown-invisible" id="dropdown" ref={ref}>
+            {showLanguageDialog && <LanguageDialog onClose={() => setShowLanguageDialog(false)}/>}
+            {showProviderDialog && <ProviderDialog onClose={() => setShowProviderDialog(false)}/>}
+            {showStorageDialog && <StorageDialog onClose={() => setShowStorageDialog(false)}/>}
+            <div className={`dropdown ${isOpen ? '' : 'dropdown-invisible'}`} ref={ref}>
                 <div className="dropdown-content">
                     <h2>{t("dropdown.settings")}</h2>
                     <div className="dropdown-entries">
                         {options.map(entry => {
+                            if (entry.previewHidden && config.previewMode) return;
+                            if (entry.previewShown && !config.previewMode) return;
                             if (!config.viewMode || (config.viewMode && entry.allowView)) {
                                 if (!entry.hr) {
                                     return (<div className="dropdown-item" onClick={() => {
-                                        toggleDropdown();
+                                        switchDropdown();
                                         entry.run();
                                     }} key={entry.run}>
                                         <FontAwesomeIcon icon={entry.icon}/>

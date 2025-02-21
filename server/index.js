@@ -7,7 +7,7 @@ const app = express();
 
 app.disable('x-powered-by');
 
-const port = process.env.port || 5216;
+const port = process.env.SERVER_PORT || 5216;
 
 require('./util/createFolders');
 require('./util/loadServers');
@@ -20,10 +20,12 @@ app.use(require('./middlewares/error'));
 app.use("/api/config", require('./routes/config'));
 app.use("/api/speedtests", require('./routes/speedtests'));
 app.use("/api/info", require('./routes/system'));
-app.use("/api/export", require('./routes/export'));
+app.use("/api/storage", require('./routes/storage'));
 app.use("/api/recommendations", require('./routes/recommendations'));
 app.use("/api/nodes", require('./routes/nodes'));
 app.use("/api/integrations", require('./routes/integrations'));
+app.use("/api/prometheus", require('./routes/prometheus'));
+app.use('/api/opengraph', require('./routes/opengraph'));
 app.use("/api*", (req, res) => res.status(404).json({message: "Route not found"}));
 
 if (process.env.NODE_ENV === 'production') {
@@ -43,7 +45,10 @@ const run = async () => {
 
     await require('./controller/integrations').initialize();
 
-    await require('./util/loadCli').load();
+    await require('./util/loadInterfaces').requestInterfaces();
+    setInterval(() => require('./util/loadInterfaces').requestInterfaces(), 3600000);
+
+    if (process.env.PREVIEW_MODE !== "true") await require('./util/loadCli').load();
 
     await config.insertDefaults();
 
@@ -59,7 +64,7 @@ const run = async () => {
 }
 
 db.authenticate().then(() => {
-    console.log("Successfully connected to the database file");
+    console.log("Successfully connected to the database " + (process.env.DB_TYPE === "mysql" ? "server" : "file"));
     run().then(undefined);
 }).catch(err => {
     console.error("Could not open the database file. Maybe it is damaged?: " + err.message);

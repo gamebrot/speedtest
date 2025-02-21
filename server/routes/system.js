@@ -2,10 +2,13 @@ const app = require('express').Router();
 const version = require('../../package.json').version;
 const remote_url = "https://api.github.com/repos/gnmyt/myspeed/releases/latest";
 const axios = require('axios');
-const fs = require("fs");
 const password = require('../middlewares/password');
+const serverController = require('../controller/servers');
+const interfaces = require('../util/loadInterfaces');
 
 app.get("/version", password(false), async (req, res) => {
+    if (process.env.PREVIEW_MODE === "true") return res.json({local: version, remote: "0"});
+
     try {
         res.json({local: version, remote: ((await axios.get(remote_url)).data.tag_name).replace("v", "")});
     } catch (e) {
@@ -13,11 +16,15 @@ app.get("/version", password(false), async (req, res) => {
     }
 });
 
-app.get("/server", password(false), (req, res) => {
-    fs.readFile("./data/servers.json", "utf8", (err, data) => {
-        if (err) return res.status(500).json({message: "Could not read servers"});
-        res.json(JSON.parse(data.toString()));
-    });
+app.get("/server/:provider", password(false), (req, res) => {
+    if (!["ookla", "libre"].includes(req.params.provider))
+        return res.status(400).json({message: "Invalid provider"});
+
+    res.json(serverController.getByMode(req.params.provider));
+});
+
+app.get("/interfaces", password(false), async (req, res) => {
+    res.json(interfaces.interfaces);
 });
 
 module.exports = app;

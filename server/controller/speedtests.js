@@ -2,8 +2,8 @@ const tests = require('../models/Speedtests');
 const {Op, Sequelize} = require("sequelize");
 const {mapFixed, mapRounded, calculateTestAverages} = require("../util/helpers");
 
-module.exports.create = async (ping, download, upload, time, type = "auto", error = null) => {
-    return (await tests.create({ping, download, upload, error, type, time})).id;
+module.exports.create = async (ping, download, upload, time, serverId, type = "auto", resultId = null, error = null) => {
+    return (await tests.create({ping, download, upload, error, serverId, type, resultId, time, created: new Date().toISOString()})).id;
 }
 
 module.exports.getOne = async (id) => {
@@ -13,14 +13,27 @@ module.exports.getOne = async (id) => {
     return speedtest
 }
 
+module.exports.listAll = async () => {
+    let dbEntries = await tests.findAll({order: [["created", "DESC"]]});
+    for (let dbEntry of dbEntries) {
+        if (dbEntry.error === null) delete dbEntry.error;
+        if (dbEntry.resultId === null) delete dbEntry.resultId;
+    }
+
+    return dbEntries;
+}
+
 module.exports.listTests = async (hours = 24, start, limit) => {
+    limit = parseInt(limit) || 10;
     const whereClause = start ? {id: {[Op.lt]: start}} : undefined;
 
     let dbEntries = (await tests.findAll({where: whereClause, order: [["created", "DESC"]], limit}))
         .filter((entry) => new Date(entry.created) > new Date().getTime() - hours * 3600000);
 
-    for (let dbEntry of dbEntries)
+    for (let dbEntry of dbEntries) {
         if (dbEntry.error === null) delete dbEntry.error;
+        if (dbEntry.resultId === null) delete dbEntry.resultId;
+    }
 
     return dbEntries;
 }
@@ -58,11 +71,36 @@ module.exports.listAverage = async (days) => {
             time: Math.round(avgNumbers["time"]),
             type: "average",
             amount: currentDay.length,
-            created: created.getFullYear() + "-" + (created.getMonth() + 1) + "-" + created.getDate()
+            created: created.toISOString()
         });
     }
 
     return result;
+}
+
+module.exports.deleteTests = async () => {
+    await tests.destroy({where: {}});
+    return true;
+}
+
+module.exports.importTests = async (data) => {
+    if (!Array.isArray(data)) return false;
+
+    for (let entry of data) {
+        if (entry.error === null) delete entry.error;
+        if (entry.resultId === null) delete entry.resultId;
+
+        if (!["custom", "auto"].includes(entry.type)) continue;
+        if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(entry.created)) continue;
+
+        try {
+            console.log(entry)
+            await tests.create(entry);
+        } catch (e) {
+        }
+    }
+
+    return true;
 }
 
 module.exports.listStatistics = async (days) => {
@@ -74,8 +112,11 @@ module.exports.listStatistics = async (days) => {
 
     let notFailed = dbEntries.filter((entry) => entry.error === null);
 
-    let data = ["ping", "download", "upload", "time"]
-        .map((item) => days >= 3 ? avgEntries.map(entry => entry[item]) : notFailed.map(entry => entry[item]));
+    let data = {};
+    ["ping", "download", "upload", "time"].forEach(item => {
+        data[item] = days >= 3 ? avgEntries.map(entry => entry[item]) : notFailed.map(entry => entry[item]);
+    });
+
 
     return {
         tests: {
@@ -88,8 +129,8 @@ module.exports.listStatistics = async (days) => {
         upload: mapFixed(notFailed, "upload"),
         time: mapRounded(notFailed, "time"),
         data,
-        labels: days >= 3 ? avgEntries.map((entry) => new Date(entry.created).toLocaleDateString())
-            : notFailed.map((entry) => new Date(entry.created).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"}))
+        labels: days >= 3 ? avgEntries.map((entry) => new Date(entry.created).toISOString())
+            : notFailed.map((entry) => new Date(entry.created).toISOString())
     };
 }
 
@@ -102,10 +143,25 @@ module.exports.deleteOne = async (id) => {
 module.exports.removeOld = async () => {
     await tests.destroy({
         where: {
-            created: {
-                [Op.lte]: Sequelize.literal(`datetime('now', '-30 days')`)
-            }
+            created: process.env.DB_TYPE === "mysql"
+                ? {[Op.lte]: new Date(new Date().getTime() - 30 * 24 * 3600000)} // MySQL
+                : {[Op.lte]: Sequelize.literal(`datetime('now', '-30 days')`)} // SQLite
         }
     });
     return true;
+}
+
+module.exports.getLatest = async () => {
+    let latest = await tests.findOne({order: [["created", "DESC"]]});
+    if (latest.error === null) delete latest.error;
+    if (latest.resultId === null) delete latest.resultId;
+    return latest;
+}
+
+module.exports.getLatest = async () => {
+    let latest = await tests.findOne({order: [["created", "DESC"]]});
+    if (latest === null) return undefined;
+    if (latest.error === null) delete latest.error;
+    if (latest.resultId === null) delete latest.resultId;
+    return latest;
 }

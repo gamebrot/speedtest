@@ -1,10 +1,10 @@
 @import "@/common/styles/colors"
 
 .integration-item
-  border: 2px solid $gray
+  border: 2px solid $light-gray
   border-radius: 0.8rem
   padding: 0.5rem 1.5rem
-  color: $darker-white
+  color: $subtext
   transition: border-color 0.3s
 
 .green-border
@@ -32,16 +32,16 @@
 
 .integration-field-input
   background-color: $darker-gray
-  border: 2px solid transparent
+  border: 1px solid $light-gray
   border-radius: 0.5rem
   padding: 0.1rem 0.8rem
-  color: $darker-white
+  color: $subtext
   font-size: 12pt
   height: 2rem
   width: 50%
 
 .item-error-border
-  border: 2px solid $red
+  border: 1px solid $red
 
 .text-area
   font-family: "Inter", sans-serif
@@ -50,6 +50,7 @@
 
 input[type="checkbox"]
   appearance: none
+  border: 1px solid $light-gray
   width: 2rem
   height: 2rem
   border-radius: 0.5rem
@@ -60,7 +61,7 @@ input[type="checkbox"]
 
   &:checked
     content: "\2713"
-    color: #45C65A
+    color: $green
     display: flex
     justify-content: center
     align-items: center
@@ -68,7 +69,7 @@ input[type="checkbox"]
     font-size: 18pt
 
   &::before
-    color: #45C65A
+    color: $green
 
   &:checked::before
     content: "\2713"

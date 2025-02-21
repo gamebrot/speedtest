@@ -7,6 +7,10 @@ module.exports = db.define("speedtests", {
         primaryKey: true,
         autoIncrement: true,
     },
+    serverId: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
     ping: {
         type: Sequelize.INTEGER,
         allowNull: false
@@ -27,8 +31,16 @@ module.exports = db.define("speedtests", {
         type: Sequelize.STRING,
         defaultValue: "auto"
     },
+    resultId: {
+        type: Sequelize.STRING,
+        allowNull: true
+    },
     time: {
         type: Sequelize.INTEGER,
         defaultValue: 0
+    },
+    created: {
+        type: process.env.DB_TYPE === "mysql" ? Sequelize.STRING : Sequelize.TIME,
+        defaultValue: Sequelize.NOW
     }
-}, {createdAt: "created", updatedAt: false});
+}, {createdAt: false, updatedAt: false});

@@ -6,7 +6,7 @@ const testTask = require("../tasks/speedtest");
 const password = require('../middlewares/password');
 
 app.get("/", password(true), async (req, res) => {
-    if (req.query.limit && isNaN(req.query.limit))
+    if (req.query.limit && /[^0-9]/.test(req.query.limit))
         return res.status(400).json({message: "You need to provide a correct number in the limit parameter"});
 
     res.json(await tests.listTests(req.query.hours || 24, req.query.start, req.query.limit));
@@ -22,8 +22,7 @@ app.get("/statistics", password(true), async (req, res) => {
 
 app.post("/run", password(false), async (req, res) => {
     if (pauseController.currentState) return res.status(410).json({message: "The speedtests are currently paused"});
-    if (await config.getValue("acceptOoklaLicense") === "false")
-        return res.status(410).json({message: "You need to accept the ookla license first"});
+    if (await config.getValue("provider") === "none") return res.status(410).json({message: "No provider selected"});
     let speedtest = await testTask.create("custom");
     if (speedtest !== undefined) return res.status(409).json({message: "An speedtest is already running"});
     res.json({message: "Speedtest successfully created"});
