@@ -9,7 +9,7 @@ import {faFileExport, faFileImport, faTrashCan} from "@fortawesome/free-solid-sv
 export default ({tests}) => {
     const close = useContext(DialogContext);
     const [deleteWarning, setDeleteWarning] = useState(false);
-    const updateTests = useContext(SpeedtestContext)[1];
+    const {updateTests} = useContext(SpeedtestContext);
     const updateToast = useContext(ToastNotificationContext);
 
     const deleteHistory = () => {

@@ -14,11 +14,11 @@ import {t} from "i18next";
 import {ConfigContext} from "@/common/contexts/Config";
 import {ToastNotificationContext} from "@/common/contexts/ToastNotification";
 
-function SpeedtestComponent(props) {
+const SpeedtestComponent = (props) => {
     const [setDialog] = useContext(InputDialogContext);
     const updateToast = useContext(ToastNotificationContext);
     const [config] = useContext(ConfigContext);
-    const updateTests = useContext(SpeedtestContext)[1];
+    const {deleteTest} = useContext(SpeedtestContext);
 
     const ref = useRef();
 
@@ -45,7 +45,7 @@ function SpeedtestComponent(props) {
         if (ref.current == null) return;
         ref.current.classList.add("speedtest-hidden");
         updateToast(t("test.deleted"), "green", faTrashCan);
-        setTimeout(() => updateTests(), 300);
+        setTimeout(() => deleteTest(props.id), 300);
     }
 
     const showInfoDialog = () => {

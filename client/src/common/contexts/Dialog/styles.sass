@@ -1,4 +1,4 @@
-@import "@/common/styles/colors"
+@use "@/common/styles/colors" as *
 
 .dialog-area
   position: fixed
@@ -11,7 +11,7 @@
   background-color: rgba(0, 0, 0, 0.6)
   display: flex
   align-items: center
-  z-index: 10
+  z-index: 999
   justify-content: center
   backdrop-filter: blur(2px)
   transition: all 0.2s

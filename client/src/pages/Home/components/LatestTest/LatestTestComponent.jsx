@@ -11,16 +11,16 @@ import {getIconBySpeed} from "@/common/utils/TestUtil";
 import {downloadInfo, latestTestInfo, pingInfo, uploadInfo} from "@/pages/Home/components/LatestTest/utils/dialogs";
 import {t} from "i18next";
 
-function LatestTestComponent() {
+const LatestTestComponent = () => {
     const status = useContext(StatusContext)[0];
     const [latest, setLatest] = useState(null);
     const [latestTestTime, setLatestTestTime] = useState("N/A");
     const [setDialog] = useContext(InputDialogContext);
-    const [speedtests] = useContext(SpeedtestContext);
+    const {speedtests} = useContext(SpeedtestContext);
     const config = useContext(ConfigContext)[0];
 
     useEffect(() => {
-        setLatest(Object.keys(speedtests).length !== 0 ? speedtests[0] : {ping: "N/A", download: "N/A", upload: "N/A"});
+        setLatest(speedtests.length !== 0 ? speedtests[0] : {ping: "N/A", download: "N/A", upload: "N/A"});
     }, [speedtests]);
 
     useEffect(() => {

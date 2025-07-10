@@ -9,11 +9,10 @@ app.get("/", password(true), async (req, res) => {
     if (req.query.limit && /[^0-9]/.test(req.query.limit))
         return res.status(400).json({message: "You need to provide a correct number in the limit parameter"});
 
-    res.json(await tests.listTests(req.query.hours || 24, req.query.start, req.query.limit));
-});
+    if (req.query.afterId && /[^0-9]/.test(req.query.afterId))
+        return res.status(400).json({message: "You need to provide a correct number in the afterId parameter"});
 
-app.get("/averages", password(true), async (req, res) => {
-    res.json(await tests.listAverage(req.query.days || 7));
+    res.json(await tests.listTests(req.query.afterId, req.query.limit));
 });
 
 app.get("/statistics", password(true), async (req, res) => {

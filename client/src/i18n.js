@@ -13,6 +13,8 @@ import PortugueseBrazilFlag from "@/common/assets/languages/br.webp";
 import RussianFlag from "@/common/assets/languages/ru.webp";
 import SpanishFlag from "@/common/assets/languages/es.webp";
 import TurkishFlag from "@/common/assets/languages/tr.webp";
+import DanishFlag from "@/common/assets/languages/da.webp";
+import PolishFlag from "@/common/assets/languages/pl.webp";
 
 if (localStorage.getItem('language') === null)
     localStorage.setItem('language', navigator.language.split('-')[0]);
@@ -28,6 +30,8 @@ export const languages = [
     {name: 'Português do Brasil', code: 'pt', flag: PortugueseBrazilFlag},
     {name: 'Русский', code: 'ru', flag: RussianFlag},
     {name: 'Español', code: 'es', flag: SpanishFlag},
+    {name: 'Dansk', code: 'da', flag: DanishFlag},
+    {name: 'Polski', code: 'pl', flag: PolishFlag},
     {name: 'Türkçe', code: 'tr', flag: TurkishFlag}
 ]
 

@@ -1,6 +1,6 @@
 const tests = require('../models/Speedtests');
 const {Op, Sequelize} = require("sequelize");
-const {mapFixed, mapRounded, calculateTestAverages} = require("../util/helpers");
+const {mapFixed, mapRounded} = require("../util/helpers");
 
 module.exports.create = async (ping, download, upload, time, serverId, type = "auto", resultId = null, error = null) => {
     return (await tests.create({ping, download, upload, error, serverId, type, resultId, time, created: new Date().toISOString()})).id;
@@ -23,12 +23,18 @@ module.exports.listAll = async () => {
     return dbEntries;
 }
 
-module.exports.listTests = async (hours = 24, start, limit) => {
+module.exports.listTests = async (afterId, limit) => {
     limit = parseInt(limit) || 10;
-    const whereClause = start ? {id: {[Op.lt]: start}} : undefined;
 
-    let dbEntries = (await tests.findAll({where: whereClause, order: [["created", "DESC"]], limit}))
-        .filter((entry) => new Date(entry.created) > new Date().getTime() - hours * 3600000);
+    let whereClause = {};
+    
+    if (afterId) whereClause.id = {[Op.lt]: afterId};
+
+    let dbEntries = await tests.findAll({
+        where: Object.keys(whereClause).length > 0 ? whereClause : undefined, 
+        order: [["created", "DESC"]], 
+        limit
+    });
 
     for (let dbEntry of dbEntries) {
         if (dbEntry.error === null) delete dbEntry.error;
@@ -36,46 +42,6 @@ module.exports.listTests = async (hours = 24, start, limit) => {
     }
 
     return dbEntries;
-}
-
-module.exports.listByDays = async (days) => {
-    let dbEntries = (await tests.findAll({order: [["created", "DESC"]]})).filter((entry) => entry.error === null)
-        .filter((entry) => new Date(entry.created) > new Date().getTime() - days * 24 * 3600000);
-
-    let averages = {};
-    dbEntries.forEach((entry) => {
-        const day = new Date(entry.created).toLocaleDateString();
-        if (!averages[day]) averages[day] = [];
-        averages[day].push(entry);
-    });
-
-    return averages;
-}
-
-module.exports.listAverage = async (days) => {
-    const averages = await this.listByDays(days);
-    let result = [];
-
-    if (Object.keys(averages).length !== 0)
-        result.push(averages[Object.keys(averages)[0]][0]);
-
-    for (let day in averages) {
-        let currentDay = averages[day];
-        let avgNumbers = calculateTestAverages(currentDay);
-
-        const created = new Date(currentDay[0].created);
-        result.push({
-            ping: Math.round(avgNumbers["ping"]),
-            download: parseFloat((avgNumbers["down"]).toFixed(2)),
-            upload: parseFloat((avgNumbers["up"]).toFixed(2)),
-            time: Math.round(avgNumbers["time"]),
-            type: "average",
-            amount: currentDay.length,
-            created: created.toISOString()
-        });
-    }
-
-    return result;
 }
 
 module.exports.deleteTests = async () => {
@@ -107,16 +73,12 @@ module.exports.listStatistics = async (days) => {
     let dbEntries = (await tests.findAll({order: [["created", "DESC"]]}))
         .filter((entry) => new Date(entry.created) > new Date().getTime() - (days <= 30 ? days : 30 ) * 24 * 3600000);
 
-    let avgEntries = [];
-    if (days >= 3) avgEntries = await this.listAverage(days);
-
     let notFailed = dbEntries.filter((entry) => entry.error === null);
 
     let data = {};
     ["ping", "download", "upload", "time"].forEach(item => {
-        data[item] = days >= 3 ? avgEntries.map(entry => entry[item]) : notFailed.map(entry => entry[item]);
+        data[item] = notFailed.map(entry => entry[item]);
     });
-
 
     return {
         tests: {
@@ -129,8 +91,7 @@ module.exports.listStatistics = async (days) => {
         upload: mapFixed(notFailed, "upload"),
         time: mapRounded(notFailed, "time"),
         data,
-        labels: days >= 3 ? avgEntries.map((entry) => new Date(entry.created).toISOString())
-            : notFailed.map((entry) => new Date(entry.created).toISOString())
+        labels: notFailed.map((entry) => new Date(entry.created).toISOString())
     };
 }
 
@@ -149,13 +110,6 @@ module.exports.removeOld = async () => {
         }
     });
     return true;
-}
-
-module.exports.getLatest = async () => {
-    let latest = await tests.findOne({order: [["created", "DESC"]]});
-    if (latest.error === null) delete latest.error;
-    if (latest.resultId === null) delete latest.resultId;
-    return latest;
 }
 
 module.exports.getLatest = async () => {

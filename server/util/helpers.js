@@ -15,20 +15,3 @@ module.exports.mapRounded = (entries, type) => ({
     max: Math.max(...entries.map((entry) => entry[type])),
     avg: Math.round(entries.reduce((a, b) => a + b[type], 0) / entries.length)
 });
-
-module.exports.calculateTestAverages = (tests) => {
-    let avgNumbers = {ping: 0, down: 0, up: 0, time: 0};
-
-    tests.forEach((current) => {
-        avgNumbers.ping += current.ping;
-        avgNumbers.down += current.download;
-        avgNumbers.up += current.upload;
-        avgNumbers.time += current.time;
-    });
-
-    Object.keys(avgNumbers).forEach((key) => {
-        avgNumbers[key] = avgNumbers[key] / tests.length;
-    });
-
-    return avgNumbers;
-}

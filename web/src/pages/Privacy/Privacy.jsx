@@ -43,12 +43,11 @@ export const Privacy = () => {
                 l&uuml;ckenloser Schutz der Daten vor dem Zugriff durch Dritte ist nicht m&ouml;glich.</p>
                 <h3>Hinweis zur verantwortlichen Stelle</h3> <p>Die verantwortliche Stelle f&uuml;r die
                 Datenverarbeitung auf dieser Website ist:</p> <p>Mathias Wagner<br/>
-                c/o IP-Management #14358<br/>
-                Ludwig-Erhard-Str. 18<br/>
-                20459 Hamburg</p>
-
+                c/o COCENTER<br/>
+                Koppoldstr. 1<br/>
+                86551 Aichach</p>
                 <p>
-                        E-Mail: mathias@gnmyt.dev</p>
+                        E-Mail: mathias@gnm.dev</p>
                 <p>Verantwortliche Stelle ist die nat&uuml;rliche oder juristische Person, die allein oder gemeinsam mit
                         anderen &uuml;ber die Zwecke und Mittel der Verarbeitung von personenbezogenen Daten (z.&nbsp;B.
                         Namen, E-Mail-Adressen o. &Auml;.) entscheidet.</p>

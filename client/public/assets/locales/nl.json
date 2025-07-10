@@ -46,7 +46,6 @@
     "changes_applied": "De wijzigingen zijn opgeslagen.",
     "language_changed": "De taal is veranderd.",
     "provider_changed": "De provider is gewijzigd.",
-    "view_changed": "Het uitzicht was veranderd.",
     "changes_unsaved": "Je wijzigingen zijn niet geaccepteerd. Controleer je invoer.",
     "invalid": "Invoer ongeldig",
     "ping": "Optimale ping",
@@ -61,18 +60,15 @@
     "pause_tests": "Pauzetests",
     "resume_tests": "Doorgaan met testen",
     "language": "Taal wijzigen",
-    "view": "Weergave wijzigen",
+    "light_mode": "Lichtmodus",
+    "dark_mode": "Donkere modus",
+    "theme_switched_light": "Overgeschakeld op lichtmodus",
+    "theme_switched_dark": "Overgeschakeld naar donkere modus",
     "info": "Info over het project",
     "provider": "Over de provider",
     "integrations": "Integraties"
   },
   "options": {
-    "time": {
-      "24hours": "24 uur (standaard)",
-      "2days": "2 dagen (totaal)",
-      "7days": "7 dagen (gemiddeld)",
-      "30days": "30 dagen (gemiddeld)"
-    },
     "cron": {
       "continuous": "Continu (elke minuut)",
       "frequent": "Zeer vaak (elke 30 minuten)",
@@ -84,6 +80,10 @@
       "no_access": "Geen toegang",
       "read_access": "Alleen-lezen toegang"
     }
+  },
+  "page": {
+    "overview": "Overzicht",
+    "statistics": "Statistieken"
   },
   "update": {
     "ping_title": "Optimale ping instellen (ms)",
@@ -199,6 +199,8 @@
   "test": {
     "not_available": "Er zijn momenteel geen tests beschikbaar",
     "no_latest": "Er is geen huidige test. Voer een test uit of wacht tot de volgende test is uitgevoerd.",
+    "loading_more": "Meer tests laden...",
+    "no_more_tests": "Geen tests meer om te laden",
     "unknown_error": "Onbekende fout:",
     "failed": "Test mislukt",
     "recheck": "Controleer voor zover mogelijk of dit vaker gebeurt.",
@@ -213,15 +215,6 @@
       "description": "<Link>Deze test</Link> behaalde een maximale downloadsnelheid van <Bold>{{down}} Mbps</Bold> en een maximale uploadsnelheid van <Bold>{{up}} Mbps</Bold>. Hij werd gemaakt <Bold>{{type}}</Bold> en duurde <Bold>{{duration}} Seconden</Bold>.",
       "from_you": "van jou",
       "automatic": "automatisch"
-    },
-    "tooltips": {
-      "custom": "Aangepast",
-      "average": "Gemiddeld",
-      "auto": "Geautomatiseerd"
-    },
-    "views": {
-      "list": "Overzicht test",
-      "statistic": "Teststatistieken"
     },
     "overview": {
       "title": "Testoverzicht van de laatste {{amount}}",
@@ -396,5 +389,8 @@
         "send_config_updates": "Configuratie-updates verzenden"
       }
     }
+  },
+  "common": {
+    "back_to_top": "Terug naar boven"
   }
 }

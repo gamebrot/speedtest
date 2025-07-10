@@ -3,7 +3,6 @@ import "./styles.sass";
 import {
     faArrowDown,
     faArrowUp,
-    faCalendarDays,
     faCircleNodes,
     faClock,
     faGlobeEurope,
@@ -14,15 +13,19 @@ import {
     faPlay,
     faWandMagicSparkles,
     faCheck,
-    faExclamationTriangle, faSliders, faHardDrive
+    faExclamationTriangle, 
+    faSliders, 
+    faHardDrive,
+    faMoon,
+    faSun
 } from "@fortawesome/free-solid-svg-icons";
 import {ConfigContext} from "@/common/contexts/Config";
 import {StatusContext} from "@/common/contexts/Status";
 import {InputDialogContext} from "@/common/contexts/InputDialog";
-import {SpeedtestContext} from "@/common/contexts/Speedtests";
+import {ThemeContext} from "@/common/contexts/Theme";
 import {baseRequest, jsonRequest, patchRequest, postRequest} from "@/common/utils/RequestUtil";
 import {creditsInfo, recommendationsInfo} from "@/common/components/Dropdown/utils/infos";
-import {levelOptions, selectOptions, timeOptions} from "@/common/components/Dropdown/utils/options";
+import {levelOptions, selectOptions} from "@/common/components/Dropdown/utils/options";
 import {parseCron, stringifyCron} from "@/common/components/Dropdown/utils/utils";
 import {t} from "i18next";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -36,10 +39,10 @@ import StorageDialog from "@/common/components/StorageDialog";
 const DropdownComponent = ({isOpen, switchDropdown}) => {
     const [config, reloadConfig] = useContext(ConfigContext);
     const [status, updateStatus] = useContext(StatusContext);
+    const [isDarkMode, toggleTheme] = useContext(ThemeContext);
     const findNode = useContext(NodeContext)[4];
     const updateNodes = useContext(NodeContext)[1];
     const currentNode = useContext(NodeContext)[2];
-    const updateTests = useContext(SpeedtestContext)[1];
     const updateToast = useContext(ToastNotificationContext);
     const [setDialog] = useContext(InputDialogContext);
     const [showIntegrationDialog, setShowIntegrationDialog] = useState(false);
@@ -160,20 +163,6 @@ const DropdownComponent = ({isOpen, switchDropdown}) => {
         description: <>{t("update.cron_next_test")} <span className="dialog-value">{parseCron(value)}</span></>
     }), (val) => stringifyCron(val));
 
-    const updateTime = async () => {
-        setDialog({
-            title: t("update.time_title"),
-            select: true,
-            selectOptions: timeOptions(),
-            value: localStorage.getItem("testTime") || 1,
-            onSuccess: value => {
-                localStorage.setItem("testTime", value);
-                updateTests();
-                showFeedback(undefined, false);
-            }
-        });
-    }
-
     const togglePause = () => {
         if (!status.paused) {
             setDialog({
@@ -192,6 +181,11 @@ const DropdownComponent = ({isOpen, switchDropdown}) => {
 
     const showProviderDetails = () => setDialog({title: t("dropdown.provider"), description: config.previewMessage, buttonText: t("dialog.close")});
 
+    const handleThemeToggle = () => {
+        toggleTheme();
+        updateToast(t(isDarkMode ? "dropdown.theme_switched_light" : "dropdown.theme_switched_dark"), "green", isDarkMode ? faSun : faMoon);
+    };
+
     const options = [
         {run: updatePing, icon: faPingPongPaddleBall, text: t("dropdown.ping")},
         {run: updateUpload, icon: faArrowUp, text: t("dropdown.upload")},
@@ -205,8 +199,8 @@ const DropdownComponent = ({isOpen, switchDropdown}) => {
         {run: togglePause, icon: status.paused ? faPlay : faPause, text: t("dropdown." + (status.paused ? "resume_tests" : "pause_tests"))},
         {run: () => setShowIntegrationDialog(true), icon: faCircleNodes, text: t("dropdown.integrations")},
         {hr: true, key: 2},
+        {run: handleThemeToggle, icon: isDarkMode ? faSun : faMoon, text: t(isDarkMode ? "dropdown.light_mode" : "dropdown.dark_mode"), allowView: true},
         {run: () => setShowLanguageDialog(true), icon: faGlobeEurope, text: t("dropdown.language"), allowView: true},
-        {run: updateTime, icon: faCalendarDays, text: t("dropdown.time"), allowView: true},
         {run: showCredits, icon: faInfo, text: t("dropdown.info"), allowView: true, previewHidden: true},
         {run: showProviderDetails, icon: faInfo, text: t("dropdown.provider"), previewShown: true}
     ];

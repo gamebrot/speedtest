@@ -12,6 +12,7 @@ import {SpeedtestProvider} from "./common/contexts/Speedtests";
 import {ConfigProvider} from "./common/contexts/Config";
 import {StatusProvider} from "./common/contexts/Status";
 import {InputDialogProvider} from "@/common/contexts/InputDialog/InputDialog";
+import {ThemeProvider} from "@/common/contexts/Theme";
 import i18n from './i18n';
 import Loading from "@/pages/Loading";
 import Error from "@/pages/Error";
@@ -29,19 +30,21 @@ library.add(fas, fab);
 library.add(PushOverIcon);
 
 const Providers = ({children}) => (
-    <InputDialogProvider>
-        <ToastNotificationProvider>
-            <ConfigProvider>
-                <NodeProvider>
-                    <SpeedtestProvider>
-                        <StatusProvider>
-                            {children}
-                        </StatusProvider>
-                    </SpeedtestProvider>
-                </NodeProvider>
-            </ConfigProvider>
-        </ToastNotificationProvider>
-    </InputDialogProvider>
+    <ThemeProvider>
+        <InputDialogProvider>
+            <ToastNotificationProvider>
+                <ConfigProvider>
+                    <NodeProvider>
+                        <SpeedtestProvider>
+                            <StatusProvider>
+                                {children}
+                            </StatusProvider>
+                        </SpeedtestProvider>
+                    </NodeProvider>
+                </ConfigProvider>
+            </ToastNotificationProvider>
+        </InputDialogProvider>
+    </ThemeProvider>
 );
 
 const App = () => {

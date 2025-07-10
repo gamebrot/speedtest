@@ -1,13 +1,41 @@
-$background: #232835
+$dark-background: #232835
+$dark-light-gray: #353A47
+$dark-dark-gray: #1d2128
+$dark-darker-gray: #20252F
+$dark-white: #F1F1F1
+$dark-subtext: #C8C8C8
 
-$light-gray: #353A47
-$dark-gray: #1d2128
-$darker-gray: #20252F
-
-$white: #F1F1F1
-$subtext: #C8C8C8
+$light-background: #F5F5F5
+$light-light-gray: #E0E0E0
+$light-dark-gray: #FFFFFF
+$light-darker-gray: #F0F0F0
+$light-white: #2C2C2C
+$light-subtext: #666666
 
 $blue: #456AC6
 $orange: #E58A00
 $green: #45C65A
 $red: #C64545
+
+:root
+  --background: #{$dark-background}
+  --light-gray: #{$dark-light-gray}
+  --dark-gray: #{$dark-dark-gray}
+  --darker-gray: #{$dark-darker-gray}
+  --white: #{$dark-white}
+  --subtext: #{$dark-subtext}
+
+[data-theme="light"]
+  --background: #{$light-background}
+  --light-gray: #{$light-light-gray}
+  --dark-gray: #{$light-dark-gray}
+  --darker-gray: #{$light-darker-gray}
+  --white: #{$light-white}
+  --subtext: #{$light-subtext}
+
+$background: var(--background)
+$light-gray: var(--light-gray)
+$dark-gray: var(--dark-gray)
+$darker-gray: var(--darker-gray)
+$white: var(--white)
+$subtext: var(--subtext)

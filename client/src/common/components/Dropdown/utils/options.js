@@ -1,12 +1,5 @@
 import {t} from "i18next";
 
-export const timeOptions = () => ({
-    1: t("options.time.24hours"),
-    2: t("options.time.2days"),
-    3: t("options.time.7days"),
-    4: t("options.time.30days")
-});
-
 export const levelOptions = () => ({
     "none": t("options.level.no_access"),
     "read": t("options.level.read_access")

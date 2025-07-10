@@ -26,14 +26,14 @@ app.use("/api/nodes", require('./routes/nodes'));
 app.use("/api/integrations", require('./routes/integrations'));
 app.use("/api/prometheus", require('./routes/prometheus'));
 app.use('/api/opengraph', require('./routes/opengraph'));
-app.use("/api*", (req, res) => res.status(404).json({message: "Route not found"}));
+app.use("/api*all", (req, res) => res.status(404).json({message: "Route not found"}));
 
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../build')));
 
-    app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../build', 'index.html')));
+    app.get('*all', (req, res) => res.sendFile(path.join(__dirname, '../build', 'index.html')));
 } else {
-    app.get("*", (req, res) => res.status(500).sendFile(path.join(__dirname, 'templates', 'env.html')));
+    app.get("*all", (req, res) => res.status(500).sendFile(path.join(__dirname, 'templates', 'env.html')));
 }
 
 let db = require("./config/database");

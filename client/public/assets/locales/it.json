@@ -46,7 +46,6 @@
     "changes_applied": "Le modifiche sono state salvate.",
     "language_changed": "La lingua è stata modificata.",
     "provider_changed": "Il fornitore è stato cambiato.",
-    "view_changed": "Il panorama è cambiato.",
     "changes_unsaved": "Le modifiche non sono state accettate. Verificare l'inserimento.",
     "invalid": "Ingresso non valido",
     "ping": "Ping ottimale",
@@ -61,18 +60,15 @@
     "pause_tests": "Test di pausa",
     "resume_tests": "Continua i test",
     "language": "Cambiare la lingua",
-    "view": "Cambia vista",
+    "light_mode": "Modalità luce",
+    "dark_mode": "Modalità scura",
+    "theme_switched_light": "Passato alla modalità luce",
+    "theme_switched_dark": "Passa alla modalità scura",
     "info": "Informazioni sul progetto",
     "provider": "Informazioni sul fornitore",
     "integrations": "Integrazioni"
   },
   "options": {
-    "time": {
-      "24hours": "24 ore (standard)",
-      "2days": "2 giorni (totale)",
-      "7days": "7 giorni (media)",
-      "30days": "30 giorni (media)"
-    },
     "cron": {
       "continuous": "Continuo (ogni minuto)",
       "frequent": "Molto spesso (ogni 30 minuti)",
@@ -84,6 +80,10 @@
       "no_access": "Nessun accesso",
       "read_access": "Accesso in sola lettura"
     }
+  },
+  "page": {
+    "overview": "Panoramica",
+    "statistics": "Statistiche"
   },
   "update": {
     "ping_title": "Impostazione del ping ottimale (ms)",
@@ -199,6 +199,8 @@
   "test": {
     "not_available": "Al momento non sono disponibili test",
     "no_latest": "Non c'è nessun test in corso. Eseguire un test o attendere l'esecuzione del test successivo.",
+    "loading_more": "Caricamento di altri test...",
+    "no_more_tests": "Non ci sono più test da caricare",
     "unknown_error": "Errore sconosciuto:",
     "failed": "Test fallito",
     "recheck": "Si prega di controllare il più possibile se ciò accade più spesso.",
@@ -213,15 +215,6 @@
       "description": "<Link>Questo test</Link> ha raggiunto una velocità massima di download di <Bold>{{down}} Mbps</Bold> e una velocità massima di upload di <Bold>{{up}} Mbps</Bold>. È stato creato <Bold>{{type}}</Bold> e ha richiesto <Bold>{{duration}} secondi</Bold>.",
       "from_you": "da parte vostra",
       "automatic": "automatico"
-    },
-    "tooltips": {
-      "custom": "Personalizzato",
-      "average": "Media",
-      "auto": "Automatizzato"
-    },
-    "views": {
-      "list": "Panoramica del test",
-      "statistic": "Statistiche del test"
     },
     "overview": {
       "title": "Panoramica dei test dell'ultimo {{amount}}",
@@ -396,5 +389,8 @@
         "send_config_updates": "Inviare gli aggiornamenti della configurazione"
       }
     }
+  },
+  "common": {
+    "back_to_top": "Torna all'inizio"
   }
 }

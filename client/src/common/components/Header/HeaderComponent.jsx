@@ -34,7 +34,7 @@ const HeaderComponent = () => {
     const [icon, setIcon] = useState(faGear);
     const [status, updateStatus] = useContext(StatusContext);
     const [startedManually, setStartedManually] = useState(false);
-    const updateTests = useContext(SpeedtestContext)[1];
+    const {updateTests} = useContext(SpeedtestContext);
     const [config, reloadConfig, checkConfig] = useContext(ConfigContext);
     const [updateAvailable, setUpdateAvailable] = useState("");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);

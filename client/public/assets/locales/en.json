@@ -60,17 +60,15 @@
     "pause_tests": "Pause tests",
     "resume_tests": "Resume tests",
     "language": "Change language",
+    "light_mode": "Light mode",
+    "dark_mode": "Dark mode",
+    "theme_switched_light": "Switched to light mode",
+    "theme_switched_dark": "Switched to dark mode",
     "info": "About the project",
     "provider": "About the provider",
     "integrations": "Integrations"
   },
   "options": {
-    "time": {
-      "24hours": "24 hours (default)",
-      "2days": "2 days (Total)",
-      "7days": "7 days (average)",
-      "30days": "30 days (average)"
-    },
     "cron": {
       "continuous": "Continuous (every minute)",
       "frequent": "Very often (every 30 minutes)",
@@ -201,6 +199,8 @@
   "test": {
     "not_available": "There are currently no tests available",
     "no_latest": "There is no current test available. Please perform a test or wait until the next test is performed.",
+    "loading_more": "Loading more tests...",
+    "no_more_tests": "No more tests to load",
     "unknown_error": "Unknown error:",
     "failed": "Test failed",
     "recheck": "Please check as far as possible if this happens often.",
@@ -389,5 +389,8 @@
         "send_config_updates": "Send configuration updates"
       }
     }
+  },
+  "common": {
+    "back_to_top": "Back to top"
   }
 }

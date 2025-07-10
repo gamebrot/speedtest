@@ -1,9 +1,10 @@
-@import "@/common/styles/colors"
+@use "@/common/styles/colors" as *
 
 .dropdown
   visibility: visible
   opacity: 1
-  transition: opacity 0.1s linear
+  transition: all 0.15s ease-in-out
+  transform: translateX(0) translateY(0) scale(1)
   user-select: none
 
 .dropdown-content
@@ -24,7 +25,7 @@
 .dropdown-invisible
   visibility: hidden
   opacity: 0
-  transition: visibility 0s 0.1s, opacity 0.1s linear
+  transform: translateX(20px) translateY(-10px) scale(0.98)
 
 .dropdown-content h2
   color: $subtext
@@ -54,7 +55,7 @@
   font-weight: 500
 
 .dropdown-item:hover
-    color: $green
+  color: $green
 
 .dropdown-item svg
   width: 25px

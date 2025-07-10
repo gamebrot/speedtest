@@ -70,7 +70,7 @@ app.patch("/:nodeId/password", password(false), async (req, res) => {
     });
 });
 
-app.all("/:nodeId/*", password(false), async (req, res) => {
+app.all("/:nodeId/*route", password(false), async (req, res) => {
     const node = await nodes.getOne(req.params.nodeId);
     if (node === null) return res.status(404).json({message: "Node not found"});
 

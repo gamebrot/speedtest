@@ -1,14 +1,16 @@
-@import "@/common/styles/colors"
+@use "@/common/styles/colors" as *
 
 .header-main
   margin-top: 3rem
-  display: flex
+  display: grid
+  grid-template-columns: 1fr auto 1fr
   align-items: center
-  justify-content: space-between
   color: $white
+  padding: 0 10%
 
 .header-right
   display: flex
+  justify-content: flex-end
 
 .header-right svg
   margin-left: 15px
@@ -17,11 +19,10 @@
   font-size: 24pt
 
 .header-left
-  margin-left: 10%
   display: flex
   gap: 0.5rem
   align-items: center
-  justify-content: center
+  justify-content: flex-start
   overflow: hidden
   text-overflow: ellipsis
 
@@ -53,9 +54,6 @@
 .header-main .h2-click:hover
   color: $green
   background-color: $dark-gray
-
-.header-right
-  margin-right: 10%
 
 .header-icon
   cursor: pointer
@@ -90,13 +88,15 @@
   100%
     box-shadow: 0 0 0 0 #CCA92C00
 
+@media (max-width: 768px)
+  .header-main
+    grid-template-columns: 1fr 1fr
+
 @media screen and (max-width: 650px)
   .header-left
     flex-direction: column
 
 @media (max-width: 530px)
-  .header-main
-    justify-content: center
   .header-left div
     margin-right: 0
   .header-left .h2-click

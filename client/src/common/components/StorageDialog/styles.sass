@@ -1,10 +1,10 @@
-@import "@/common/styles/colors"
+@use "@/common/styles/colors" as *
 
 .storage-dialog
   display: flex
   margin-left: 0.5rem
   margin-right: 0.5rem
-  gap: 1rem
+  gap: 2rem
   width: 45rem
   margin-top: 1rem
   height: 14rem
@@ -21,7 +21,7 @@
   gap: 0.5rem
   user-select: none
   overflow-x: hidden
-  overflow-y: scroll
+  overflow-y: hidden
 
 .storage-tab
   display: flex
@@ -86,6 +86,4 @@
   .storage-top
     flex-direction: row
     justify-content: center
-    overflow-x: scroll
-    overflow-y: hidden
     gap: 0.5rem
