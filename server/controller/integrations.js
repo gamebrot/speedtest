@@ -1,6 +1,10 @@
-const path = require("path");
-const {readdirSync} = require("fs");
-const IntegrationData = require("../models/IntegrationData");
+import IntegrationData from '../models/IntegrationData.js';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const integrations = {};
 
 const events = {};
@@ -21,7 +25,7 @@ const triggerActivity = async (id, error = false) => {
     await IntegrationData.update({lastActivity: new Date().toISOString(), activityFailed: error}, {where: {id: id}});
 }
 
-module.exports.triggerEvent = async (name, data) => {
+export const triggerEvent = async (name, data) => {
     if (!events[name]) return;
 
     for (const module of events[name]) {
@@ -31,24 +35,31 @@ module.exports.triggerEvent = async (name, data) => {
     }
 }
 
-module.exports.initialize = () => readdirSync(path.join(__dirname, "../integrations")).forEach(async (file) => {
-    if (file.endsWith(".js")) {
-        const integrationName = file.replace(".js", "");
-        integrations[integrationName] = require(path.join(__dirname, "../integrations", file))(registerEvent(integrationName));
+export const initialize = async () => {
+    const integrationsDir = path.join(__dirname, '..', 'integrations');
+
+    for await (const entry of Deno.readDir(integrationsDir)) {
+        if (!entry.isFile || !entry.name.endsWith('.js')) continue;
+
+        const integrationName = entry.name.replace('.js', '');
+        const filePath = path.join(integrationsDir, entry.name);
+
+        const module = await import(`file://${filePath}`);
+        integrations[integrationName] = module.default(registerEvent(integrationName));
         console.log(`Integration "${integrationName}" loaded successfully`);
     }
-});
+};
 
-module.exports.getActive = async () => {
+export const getActive = async () => {
     const data = await IntegrationData.findAll();
     if (!data) return null;
 
     return data.map((item) => ({...item, data: JSON.parse(item.data)}));
 }
 
-module.exports.getIntegrationById = (id) => IntegrationData.findOne({where: {id: id}});
+export const getIntegrationById = (id) => IntegrationData.findOne({where: {id: id}});
 
-module.exports.delete = async (id) => {
+export const deleteIntegration = async (id) => {
     const data = await IntegrationData.findOne({where: {id}});
     if (!data) return null;
 
@@ -56,7 +67,7 @@ module.exports.delete = async (id) => {
     return true;
 }
 
-module.exports.create = async (name, data) => {
+export const create = async (name, data) => {
     const integration = integrations[name];
     if (!integration) return null;
 
@@ -68,7 +79,7 @@ module.exports.create = async (name, data) => {
     return created.id;
 }
 
-module.exports.patch = async (id, data) => {
+export const patch = async (id, data) => {
     const item = await IntegrationData.findOne({where: {id: id}});
     if (!item) return null;
 
@@ -79,7 +90,7 @@ module.exports.patch = async (id, data) => {
     return true;
 }
 
-module.exports.getIntegrations = () => {
+export const getIntegrations = () => {
     const result = {};
 
     for (const [name, integration] of Object.entries(integrations)) {
@@ -95,9 +106,9 @@ module.exports.getIntegrations = () => {
     return result;
 };
 
-module.exports.getIntegration = (name) => integrations[name];
+export const getIntegration = (name) => integrations[name];
 
-module.exports.validateInput = (module, data) => {
+export const validateInput = (module, data) => {
     const integration = integrations[module];
     if (!integration) return false;
 

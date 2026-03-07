@@ -15,12 +15,14 @@
   width: auto
   overflow: auto
   border-radius: 10px
-  box-shadow: 0 8px 16px 0 $dark-gray
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.3)
   border: 1px solid $light-gray
   right: 0
-  z-index: 1
+  z-index: 200
   padding: 15px
   background-color: $dark-gray
+  backdrop-filter: blur(4px)
+  -webkit-backdrop-filter: blur(4px)
 
 .dropdown-invisible
   visibility: hidden
@@ -55,7 +57,7 @@
   font-weight: 500
 
 .dropdown-item:hover
-  color: $green
+  color: $accent-primary
 
 .dropdown-item svg
   width: 25px

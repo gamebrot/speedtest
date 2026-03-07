@@ -5,6 +5,8 @@ export const downloadInfo = () => ({title: t("info.down.title"), description: t(
 
 export const pingInfo = () => ({title: t("info.ping.title"), description: t("info.ping.description"), buttonText: t("dialog.okay")});
 
+export const jitterInfo = () => ({title: t("info.jitter.title"), description: t("info.jitter.description"), buttonText: t("dialog.okay")});
+
 export const uploadInfo = () => ({title: t("info.up.title"), description: t("info.up.description"), buttonText: t("dialog.okay")});
 
 export const latestTestInfo = (latest) => ({

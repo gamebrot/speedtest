@@ -1,10 +1,10 @@
-import React, {useContext, useRef} from "react";
+import React, {forwardRef, useContext, useRef, useImperativeHandle} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
     faArrowDown, faArrowUp, faClockRotateLeft, faClose,
-    faInfo, faPingPongPaddleBall, faTrashCan
+    faInfo, faPingPongPaddleBall, faTrashCan, faWaveSquare
 } from "@fortawesome/free-solid-svg-icons";
-import {InputDialogContext} from "@/common/contexts/InputDialog";
+import {useAlert} from "@/common/contexts/Alert";
 import {SpeedtestContext} from "@/common/contexts/Speedtests";
 import {deleteRequest} from "@/common/utils/RequestUtil";
 import "./styles.sass";
@@ -14,13 +14,15 @@ import {t} from "i18next";
 import {ConfigContext} from "@/common/contexts/Config";
 import {ToastNotificationContext} from "@/common/contexts/ToastNotification";
 
-const SpeedtestComponent = (props) => {
-    const [setDialog] = useContext(InputDialogContext);
+const SpeedtestComponent = forwardRef((props, forwardedRef) => {
+    const alert = useAlert();
     const updateToast = useContext(ToastNotificationContext);
     const [config] = useContext(ConfigContext);
     const {deleteTest} = useContext(SpeedtestContext);
 
     const ref = useRef();
+
+    useImperativeHandle(forwardedRef, () => ref.current);
 
     let errorMessage = t("test.unknown_error") + " " + props.error;
 
@@ -33,14 +35,6 @@ const SpeedtestComponent = (props) => {
             if (props.error.includes(errorsKey)) errorMessage = errors()[errorsKey];
     }
 
-    const showErrorDialog = () => setDialog({
-        title: t("test.failed"),
-        description: errorMessage + ". " + t("test.recheck"),
-        buttonText: t("dialog.okay"),
-        unsetButton: t("test.delete"),
-        onClear: () => deleteRequest(`/speedtests/${props.id}`).then(fadeOut)
-    });
-
     const fadeOut = () => {
         if (ref.current == null) return;
         ref.current.classList.add("speedtest-hidden");
@@ -48,19 +42,37 @@ const SpeedtestComponent = (props) => {
         setTimeout(() => deleteTest(props.id), 300);
     }
 
-    const showInfoDialog = () => {
-        if (props.type === "average") {
-            setDialog({title: t("test.average.title"), buttonText: t("dialog.okay"), description: averageResultDialog(timeString, props)});
-        } else {
-            setDialog({
-                title: t("test.result.title"),
-                description: resultDialog(props),
+    const showErrorDialog = async () => {
+        await alert.openAlert(
+            t("test.failed"),
+            errorMessage + ". " + t("test.recheck"),
+            {
                 buttonText: t("dialog.okay"),
-                unsetButton: !config.viewMode ? t("test.delete") : undefined,
+                clearButton: t("test.delete"),
                 onClear: () => deleteRequest(`/speedtests/${props.id}`).then(fadeOut)
-            });
+            }
+        );
+    };
+
+    const showInfoDialog = async () => {
+        if (props.type === "average") {
+            await alert.openAlert(
+                t("test.average.title"),
+                averageResultDialog(timeString, props),
+                {buttonText: t("dialog.okay")}
+            );
+        } else {
+            await alert.openAlert(
+                t("test.result.title"),
+                resultDialog(props),
+                {
+                    buttonText: t("dialog.okay"),
+                    clearButton: !config.viewMode ? t("test.delete") : undefined,
+                    onClear: () => deleteRequest(`/speedtests/${props.id}`).then(fadeOut)
+                }
+            );
         }
-    }
+    };
 
     return (
         <div className="speedtest" ref={ref} onClick={props.error ? showErrorDialog : showInfoDialog}>
@@ -72,7 +84,12 @@ const SpeedtestComponent = (props) => {
             <div className="speedtest-row">
                 <FontAwesomeIcon icon={props.error ? faClose : faPingPongPaddleBall}
                                  className={"speedtest-icon icon-" + props.pingLevel}/>
-                <h2 className="speedtest-text">{props.error ? "" : props.ping}</h2>
+                <h2 className="speedtest-text">
+                    {props.error ? "" : props.ping}
+                    {!props.error && props.jitter !== null && props.jitter !== undefined && (
+                        <span className="jitter-suffix"><FontAwesomeIcon icon={faWaveSquare} className="jitter-icon" />{props.jitter}</span>
+                    )}
+                </h2>
             </div>
             <div className="speedtest-row">
                 <FontAwesomeIcon icon={props.error ? faClose : faArrowDown}
@@ -86,6 +103,6 @@ const SpeedtestComponent = (props) => {
             </div>
         </div>
     );
-}
+});
 
 export default SpeedtestComponent;

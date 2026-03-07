@@ -1,5 +1,5 @@
-import React, {createContext, useContext, useEffect, useState} from "react";
-import {InputDialogContext} from "../InputDialog";
+import React, {createContext, useEffect, useState} from "react";
+import {useAlert} from "../Alert";
 import {request} from "@/common/utils/RequestUtil";
 import {apiErrorDialog, passwordRequiredDialog} from "@/common/contexts/Config/dialog";
 import WelcomeDialog from "@/common/components/WelcomeDialog";
@@ -9,7 +9,7 @@ export const ConfigContext = createContext({});
 
 export const ConfigProvider = (props) => {
     const [config, setConfig] = useState({});
-    const [setDialog] = useContext(InputDialogContext);
+    const alert = useAlert();
     const [welcomeShown, setWelcomeShown] = useState(false);
     const navigate = useNavigate();
 
@@ -30,9 +30,30 @@ export const ConfigProvider = (props) => {
                     ? navigate("/nodes") : setConfig(result);
         }).catch((code) => {
             localStorage.getItem("currentNode") !== null && localStorage.getItem("currentNode") !== "0"
-                ? navigate("/nodes") : setDialog(code === 1 ? passwordRequiredDialog() : apiErrorDialog());
+                ? navigate("/nodes") : showErrorDialog(code);
         });
     }
+
+    const showErrorDialog = async (code) => {
+        const dialogConfig = code === 1 ? passwordRequiredDialog() : apiErrorDialog();
+        
+        if (code === 1) {
+            const result = await alert.openInput(dialogConfig.title, {
+                placeholder: dialogConfig.placeholder,
+                description: dialogConfig.description,
+                inputType: dialogConfig.type,
+                buttonText: dialogConfig.buttonText,
+                disableClose: dialogConfig.disableCloseButton
+            });
+            if (result) dialogConfig.onSuccess(result);
+        } else {
+            await alert.openAlert(dialogConfig.title, dialogConfig.description, {
+                buttonText: dialogConfig.buttonText,
+                disableClose: dialogConfig.disableCloseButton
+            });
+            dialogConfig.onSuccess();
+        }
+    };
 
     const checkConfig = async () => (await request("/config")).json();
 
@@ -45,7 +66,7 @@ export const ConfigProvider = (props) => {
 
     return (
         <ConfigContext.Provider value={[config, reloadConfig, checkConfig]}>
-            {welcomeShown && <WelcomeDialog onClose={() => setWelcomeShown(false)}/>}
+            <WelcomeDialog open={welcomeShown} onClose={() => setWelcomeShown(false)}/>
             {props.children}
         </ConfigContext.Provider>
     )

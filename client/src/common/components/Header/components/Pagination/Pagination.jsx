@@ -2,55 +2,59 @@ import "./styles.sass";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartArea, faListUl } from "@fortawesome/free-solid-svg-icons";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, memo } from "react";
 import {t} from "i18next";
 
-export const Pagination = () => {
+export const Pagination = memo(() => {
     const navigate = useNavigate();
     const location = useLocation();
     const [activeIndex, setActiveIndex] = useState(location.pathname === "/" ? 0 : 1);
     const paginationRef = useRef(null);
-    const activeItemRef = useRef(null);
+    const itemRefs = useRef([]);
 
     useEffect(() => {
         const currentIndex = location.pathname === "/" ? 0 : 1;
         setActiveIndex(currentIndex);
     }, [location.pathname]);
 
-    useEffect(() => {
-        const updateActiveBackground = () => {
-            if (paginationRef.current && activeItemRef.current) {
-                const { offsetLeft, offsetWidth } = activeItemRef.current;
-                paginationRef.current.style.setProperty('--active-left', `${offsetLeft}px`);
-                paginationRef.current.style.setProperty('--active-width', `${offsetWidth}px`);
-            }
-        };
+    const updateActiveBackground = useCallback(() => {
+        if (paginationRef.current && itemRefs.current[activeIndex]) {
+            const { offsetLeft, offsetWidth } = itemRefs.current[activeIndex];
+            paginationRef.current.style.setProperty('--active-left', `${offsetLeft}px`);
+            paginationRef.current.style.setProperty('--active-width', `${offsetWidth}px`);
+        }
+    }, [activeIndex]);
 
+    useEffect(() => {
         updateActiveBackground();
+
+        if (document.fonts?.ready) {
+            document.fonts.ready.then(updateActiveBackground);
+        }
+        
         window.addEventListener('resize', updateActiveBackground);
         return () => window.removeEventListener('resize', updateActiveBackground);
-    }, [activeIndex]);
+    }, [updateActiveBackground]);
+
+    const handleNavigation = useCallback((path, index) => {
+        setActiveIndex(index);
+        navigate(path);
+    }, [navigate]);
 
     return (
         <div className="pagination" ref={paginationRef}>
             <div
                 className={`pagination-item${activeIndex === 0 ? " page-active" : ""}`}
-                onClick={() => {
-                    navigate("/");
-                    setActiveIndex(0);
-                }}
-                ref={activeIndex === 0 ? activeItemRef : null}
+                onClick={() => handleNavigation("/", 0)}
+                ref={el => itemRefs.current[0] = el}
             >
                 <FontAwesomeIcon icon={faListUl}/>
                 <p>{t("page.overview")}</p>
             </div>
             <div
                 className={`pagination-item${activeIndex === 1 ? " page-active" : ""}`}
-                onClick={() => {
-                    navigate("/statistics");
-                    setActiveIndex(1);
-                }}
-                ref={activeIndex === 1 ? activeItemRef : null}
+                onClick={() => handleNavigation("/statistics", 1)}
+                ref={el => itemRefs.current[1] = el}
             >
                 <FontAwesomeIcon icon={faChartArea}/>
                 <p>{t("page.statistics")}</p>
@@ -58,4 +62,4 @@ export const Pagination = () => {
             <div className="pagination-active-background"></div>
         </div>
     );
-};
+});

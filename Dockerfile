@@ -1,33 +1,42 @@
-FROM node:22-alpine AS build
-RUN apk add --no-cache g++ make cmake python3 py3-setuptools
+FROM node:20-alpine AS client-build
+
+WORKDIR /client
+COPY ./client/package*.json ./
+RUN npm install --force
+COPY ./client ./
+RUN npm run build
+
+FROM denoland/deno:debian AS server-build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ nodejs npm \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /myspeed
 
-COPY ./client ./client
-COPY ./server ./server
-COPY ./package.json ./package.json
+COPY ./server /myspeed/server
+COPY ./deno.json /myspeed/deno.json
 
-RUN yarn install
-RUN cd client && yarn install --force
-RUN npm run build
-RUN mv /myspeed/client/build /myspeed
+RUN deno install --allow-scripts
 
-FROM node:22-alpine
+FROM denoland/deno:debian
 
-RUN apk add --no-cache tzdata
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tzdata \
+    && rm -rf /var/lib/apt/lists/*
 
-ENV NODE_ENV=production
 ENV TZ=Etc/UTC
 
 WORKDIR /myspeed
 
-COPY --from=build /myspeed/build /myspeed/build
-COPY --from=build /myspeed/server /myspeed/server
-COPY --from=build /myspeed/node_modules /myspeed/node_modules
-COPY --from=build /myspeed/package.json /myspeed/package.json
+COPY --from=server-build /myspeed/server /myspeed/server
+COPY --from=server-build /myspeed/deno.json /myspeed/deno.json
+COPY --from=server-build /myspeed/node_modules /myspeed/node_modules
+COPY --from=server-build /deno-dir /deno-dir
+COPY --from=client-build /client/build /myspeed/build
 
 VOLUME ["/myspeed/data"]
 
 EXPOSE 5216
 
-CMD ["node", "server"]
+CMD ["deno", "run", "--allow-all", "server/index.js"]

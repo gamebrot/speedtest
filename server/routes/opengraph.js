@@ -1,7 +1,8 @@
-const express = require("express");
+import express from 'express';
+import passwordWrapper from '../middlewares/passwordWrapper.js';
+import generateOpenGraphImage from '../controller/opengraph.js';
+
 const app = express.Router();
-const passwordWrapper = require('../middlewares/passwordWrapper');
-const generateOpenGraphImage = require("../controller/opengraph");
 
 app.get("/image", passwordWrapper(true, (req, res) => {
   // If there is a password set and the user does not want others to view their test data, return the project banner
@@ -21,4 +22,4 @@ app.get("/image", passwordWrapper(true, (req, res) => {
   }
 });
 
-module.exports = app;
+export default app;

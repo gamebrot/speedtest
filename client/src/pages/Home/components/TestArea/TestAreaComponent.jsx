@@ -146,24 +146,25 @@ const TestArea = () => {
                     const isLast = index === speedtests.length - 1;
 
                     return (
-                        <div key={test.id} ref={isLast ? lastElementRef : null}>
-                            <Speedtest
-                                time={date}
-                                ping={test.ping}
-                                pingLevel={getIconBySpeed(test.ping, config.ping, false)}
-                                down={test.download}
-                                downLevel={getIconBySpeed(test.download, config.download, true)}
-                                up={test.upload}
-                                upLevel={getIconBySpeed(test.upload, config.upload, true)}
-                                error={test.error}
-                                url={test.url}
-                                type={test.type}
-                                duration={test.time}
-                                amount={test.amount}
-                                resultId={test.resultId}
-                                id={test.id}
-                            />
-                        </div>
+                        <Speedtest
+                            key={test.id}
+                            ref={isLast ? lastElementRef : null}
+                            time={date}
+                            ping={test.ping}
+                            pingLevel={getIconBySpeed(test.ping, config.ping, false)}
+                            jitter={test.jitter}
+                            down={test.download}
+                            downLevel={getIconBySpeed(test.download, config.download, true)}
+                            up={test.upload}
+                            upLevel={getIconBySpeed(test.upload, config.upload, true)}
+                            error={test.error}
+                            url={test.url}
+                            type={test.type}
+                            duration={test.time}
+                            amount={test.amount}
+                            resultId={test.resultId}
+                            id={test.id}
+                        />
                     );
                 })}
 

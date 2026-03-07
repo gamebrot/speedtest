@@ -1,12 +1,12 @@
-const axios = require("axios");
+import axios from "axios";
 
 const postWebhook = async (url, event, data, triggerActivity) => {
     axios.post(url, {event, data}, {headers: {"user-agent": "MySpeed/WebhookAgent"}})
         .then(() => triggerActivity())
         .catch(() => triggerActivity(true));
-}
+};
 
-module.exports = (registerEvent) => {
+export default (registerEvent) => {
     registerEvent('testStarted', async (integration, data, activity) => {
         if (integration.data.send_started) await postWebhook(integration.data.url, "TEST_STARTED", undefined, activity);
     });
@@ -43,4 +43,4 @@ module.exports = (registerEvent) => {
             {name: "send_config_updates", type: "boolean", required: false}
         ]
     };
-}
+};

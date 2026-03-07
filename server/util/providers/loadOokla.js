@@ -1,30 +1,31 @@
-const fs = require('fs');
-const {get} = require('https');
-const decompress = require("decompress");
-const {file} = require("tmp");
-const decompressTarGz = require('decompress-targz');
-const decompressUnzip = require('decompress-unzip');
-const binaries = require('../../config/binaries');
+import fs from 'node:fs';
+import { get } from 'node:https';
+import decompress from "decompress";
+import { file } from "tmp";
+import decompressTarGz from 'decompress-targz';
+import decompressUnzip from 'decompress-unzip';
+import { ooklaVersion, ooklaList } from '../../config/binaries.js';
+import path from 'node:path';
 
 const binaryRegex = /speedtest(.exe)?$/;
-const binaryDirectory = __dirname + "/../../../bin/";
-const binaryPath = `${binaryDirectory}/ookla` + (process.platform === "win32" ? ".exe" : "");
+const binaryDirectory = path.join(process.cwd(), "bin");
+const binaryPath = path.join(binaryDirectory, "speedtest" + (process.platform === "win32" ? ".exe" : ""));
 
-const downloadPath = `https://install.speedtest.net/app/cli/ookla-speedtest-${binaries.ooklaVersion}-`;
+const downloadPath = `https://install.speedtest.net/app/cli/ookla-speedtest-${ooklaVersion}-`;
 
-module.exports.fileExists = async () => fs.existsSync(binaryPath);
+export const fileExists = async () => fs.existsSync(binaryPath);
 
-module.exports.downloadFile = async () => {
-    const binary = binaries.ooklaList.find(b => b.os === process.platform && b.arch === process.arch);
+export const downloadFile = async () => {
+    const binary = ooklaList.find(b => b.os === process.platform && b.arch === process.arch);
 
     if (!binary)
         throw new Error(`Your platform (${process.platform}-${process.arch}) is not supported by the Speedtest CLI`);
 
     await new Promise((resolve) => {
-        file({postfix: binary.suffix}, async (err, path) => {
+        file({postfix: binary.suffix}, async (err, tmpPath) => {
             get(downloadPath + binary.suffix, async resp => {
-                resp.pipe(fs.createWriteStream(path)).on('finish', async () => {
-                    await decompress(path, binaryDirectory, {
+                resp.pipe(fs.createWriteStream(tmpPath)).on('finish', async () => {
+                    await decompress(tmpPath, binaryDirectory, {
                         plugins: [decompressTarGz(), decompressUnzip()],
                         filter: file => binaryRegex.test(file.path),
                         map: file => {
@@ -37,9 +38,9 @@ module.exports.downloadFile = async () => {
             });
         });
     });
-}
+};
 
-module.exports.load = async () => {
-    if (!await this.fileExists())
-        await this.downloadFile();
-}
+export const load = async () => {
+    if (!await fileExists())
+        await downloadFile();
+};

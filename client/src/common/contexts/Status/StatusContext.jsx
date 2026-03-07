@@ -9,6 +9,8 @@ export const StatusProvider = (props) => {
 
     const updateStatus = () => jsonRequest("/speedtests/status").then(status => setStatus(status));
 
+    const setRunning = (running) => setStatus(prev => ({...prev, running}));
+
     useEffect(() => {
         updateStatus();
         const interval = setInterval(() => updateStatus(), 5000);
@@ -16,7 +18,7 @@ export const StatusProvider = (props) => {
     }, []);
 
     return (
-        <StatusContext.Provider value={[status, updateStatus]}>
+        <StatusContext.Provider value={[status, updateStatus, setRunning]}>
             {props.children}
         </StatusContext.Provider>
     )

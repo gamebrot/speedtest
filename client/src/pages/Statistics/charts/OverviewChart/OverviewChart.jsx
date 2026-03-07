@@ -5,8 +5,14 @@ import {faCircleExclamation, faGaugeHigh, faStopwatch} from "@fortawesome/free-s
 import "./styles.sass";
 
 export const OverviewChart = (props) => {
+    const formatDateForTitle = (date) => {
+        return date.toLocaleDateString(undefined, { day: "2-digit", month: "short" });
+    };
 
-    const title = t("test.overview.title", {replace: {amount: t("test.overview." + (localStorage.getItem("testTime") || 1))}});
+    const title = t("test.overview.title_range", { 
+        from: formatDateForTitle(props.dateRange.from), 
+        to: formatDateForTitle(props.dateRange.to) 
+    });
 
     const items = [
         {
@@ -30,7 +36,7 @@ export const OverviewChart = (props) => {
     ];
 
     return (
-        <StatisticContainer title={title} size="large">
+        <StatisticContainer title={title} size="large" onClick={props.onClick}>
             <div className="overview-items">
                 {items.map((item, index) => (
                     <div className="overview-item" key={index}>

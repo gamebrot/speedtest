@@ -1,12 +1,12 @@
-const os = require('os');
-const https = require('https');
-const config = require('../controller/config');
+import os from 'node:os';
+import https from 'node:https';
+import * as config from '../controller/config.js';
 
-let usableInterfaces = {};
+export let interfaces = {};
 
-const requestInterfaces = async () => {
+export const requestInterfaces = async () => {
     let interfacesNode = os.networkInterfaces();
-    let interfaces = {};
+    let interfacesResult = {};
 
     console.log("Looking for network interfaces...");
     for (let i in interfacesNode) {
@@ -24,8 +24,8 @@ const requestInterfaces = async () => {
             await new Promise((resolve) => {
 
                 const req = https.request(options, () => {
-                    if (!interfaces[i]) interfaces[i] = [];
-                    interfaces[i].push(address.address);
+                    if (!interfacesResult[i]) interfacesResult[i] = [];
+                    interfacesResult[i].push(address.address);
                     req.destroy();
                     resolve();
                 });
@@ -37,35 +37,32 @@ const requestInterfaces = async () => {
             });
         }
 
-        if (!interfaces[i]) delete interfaces[i];
+        if (!interfacesResult[i]) delete interfacesResult[i];
     }
 
-    for (let i in interfaces) {
-        for (let j in interfaces[i]) {
-            if (interfaces[i][j].includes(".")) {
-                usableInterfaces[i] = interfaces[i][j];
+    for (let i in interfacesResult) {
+        for (let j in interfacesResult[i]) {
+            if (interfacesResult[i][j].includes(".")) {
+                interfaces[i] = interfacesResult[i][j];
                 break;
             }
         }
 
-        if (!usableInterfaces[i]) usableInterfaces[i] = interfaces[i][0];
+        if (!interfaces[i]) interfaces[i] = interfacesResult[i][0];
     }
 
-    for (let i in usableInterfaces) {
-        console.log(`Found interface ${i} with IP ${usableInterfaces[i]}`);
+    for (let i in interfaces) {
+        console.log(`Found interface ${i} with IP ${interfaces[i]}`);
     }
 
     const currentInterface = await config.getValue("interface");
 
-    if (!usableInterfaces[currentInterface]) {
+    if (!interfaces[currentInterface]) {
         if (!currentInterface) {
             console.warn("No interface set. Falling back to default.");
         } else {
             console.warn(`Interface ${currentInterface} not found. Falling back to default.`);
         }
-        await config.updateValue("interface", Object.keys(usableInterfaces)[0]);
+        await config.updateValue("interface", Object.keys(interfaces)[0]);
     }
-}
-
-module.exports.requestInterfaces = requestInterfaces;
-module.exports.interfaces = usableInterfaces;
+};

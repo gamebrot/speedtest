@@ -1,7 +1,7 @@
-const fs = require("fs");
+import fs from "node:fs";
 const filePath = process.cwd() + "/data/logs/error.log";
 
-module.exports = (error) => {
+export default (error) => {
     const date = new Date().toLocaleString();
     const lineStarter = fs.existsSync(filePath) ? "\n\n" : "# Found a bug? Report it here: https://github.com/gnmyt/myspeed/issues\n\n";
 
@@ -12,4 +12,4 @@ module.exports = (error) => {
 
         process.exit(1);
     });
-}
+};

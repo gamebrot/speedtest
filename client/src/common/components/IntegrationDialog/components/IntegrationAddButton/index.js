@@ -1,1 +1,0 @@
-export {IntegrationAddButton as default} from "./IntegrationAddButton";

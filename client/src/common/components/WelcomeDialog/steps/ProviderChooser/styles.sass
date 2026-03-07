@@ -3,41 +3,53 @@
 .provider-chooser
 
   h2
-    margin: 0 0 0.5rem
+    margin: 0 0 0.75rem
+    font-size: 1.15rem
+    font-weight: 500
     color: $subtext
 
   p
     margin: 0
+    font-size: 1rem
     color: $subtext
 
   .provider-list
-    margin-top: 1rem
-    display: flex
-    gap: 1rem
-    flex-wrap: wrap
+    margin-top: 1.25rem
+    display: grid
+    grid-template-columns: repeat(3, 1fr)
+    gap: 0.5rem
 
   .provider-item
     display: flex
     align-items: center
-    padding: 0.2rem 1rem
-    gap: 0.5rem
-    border-radius: 0.8rem
-    border: 2px solid $light-gray
+    padding: 0.75rem 1rem
+    gap: 0.75rem
+    border-radius: 0.75rem
+    border: 1px solid $light-gray
     color: $subtext
     cursor: pointer
+    transition: all 0.15s ease
 
     img
-      width: 3rem
-      height: 3rem
+      width: 2.25rem
+      height: 2.25rem
+      border-radius: 0.5rem
+      flex-shrink: 0
 
     h2
       margin: 0
+      font-size: 1.05rem
+      font-weight: 500
 
     &:hover
       background-color: $darker-gray
 
   .provider-item-active
     background-color: $light-gray
+    border-color: $accent-primary
+
+    h2
+      color: $white
 
     &:hover
       background-color: $light-gray

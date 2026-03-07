@@ -1,10 +1,10 @@
-const axios = require("axios");
-const {replaceVariables} = require("../util/helpers");
+import axios from "axios";
+import { replaceVariables } from "../util/helpers.js";
 
 const defaults = {
-    finished: ":sparkles: **A speedtest is finished**\n > :ping_pong: `Ping`: %ping% ms\n > :arrow_up: `Upload`: %upload% Mbps\n > :arrow_down: `Download`: %download% Mbps",
+    finished: ":sparkles: **A speedtest is finished**\n > :ping_pong: `Ping`: %ping% ms (±%jitter% ms)\n > :arrow_up: `Upload`: %upload% Mbps\n > :arrow_down: `Download`: %download% Mbps",
     failed: ":x: **A speedtest has failed**\n > `Reason`: %error%"
-}
+};
 
 const postWebhook = async (url, username, color, message, triggerActivity) => {
     axios.post(url, {
@@ -13,9 +13,9 @@ const postWebhook = async (url, username, color, message, triggerActivity) => {
     })
         .then(() => triggerActivity())
         .catch(() => triggerActivity(true));
-}
+};
 
-module.exports = (registerEvent) => {
+export default (registerEvent) => {
     registerEvent('testFinished', async (integration, data, activity) => {
         if (integration.data.send_finished)
             await postWebhook(integration.data.url, integration.data.display_name || "MySpeed", 4572762,
@@ -39,4 +39,4 @@ module.exports = (registerEvent) => {
             {name: "error_message", type: "textarea", required: false}
         ]
     };
-}
+};

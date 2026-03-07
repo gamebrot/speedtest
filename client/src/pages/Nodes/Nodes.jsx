@@ -6,18 +6,18 @@ import {NodeContext} from "@/common/contexts/Node";
 import {t} from "i18next";
 import CreateNodeDialog from "@/pages/Nodes/components/CreateNodeDialog";
 import {ConfigContext} from "@/common/contexts/Config";
-import {InputDialogContext} from "@/common/contexts/InputDialog";
+import {useAlert} from "@/common/contexts/Alert";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons";
 
 export const Nodes = () => {
     const [config] = useContext(ConfigContext);
     const [nodes, updateNodes] = useContext(NodeContext);
-    const [setDialog] = useContext(InputDialogContext);
+    const alert = useAlert();
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
     const openPreviewInfoDialog = () => {
-        setDialog({title: t("preview.title"), description: t("nodes.preview_active"), buttonText: t("dialog.close")});
+        alert.openAlert(t("preview.title"), t("nodes.preview_active"), {buttonText: t("dialog.close")});
     }
 
     useEffect(() => {
@@ -26,7 +26,7 @@ export const Nodes = () => {
 
     return (
         <div className="node-page">
-            {createDialogOpen && <CreateNodeDialog onClose={() => setCreateDialogOpen(false)}/>}
+            <CreateNodeDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)}/>
             <NodeHeader/>
             <div className="node-area">
                 <NodeContainer name={t("nodes.this_server")} url={location.host} currentNode={true} id={0}/>

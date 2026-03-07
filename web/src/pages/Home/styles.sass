@@ -1,131 +1,127 @@
 @use "@/common/styles/colors" as *
 
 .home-page
-  display: flex
-  flex-direction: column
-  height: 100vh
-  position: relative
   overflow-x: hidden
 
-  .info-area
-    user-select: none
-    pointer-events: none
-    display: flex
-    align-items: center
-    gap: 1rem
-    padding: 5rem
+.hero
+  min-height: 100vh
+  display: flex
+  align-items: center
+  padding: 120px 6rem 80px
+  position: relative
 
-    img
-      width: 5.5rem
-      height: 5.5rem
+.hero-grid
+  display: grid
+  grid-template-columns: 1fr 1.2fr
+  gap: 4rem
+  align-items: center
+  width: 100%
+  max-width: 1400px
+  margin: 0 auto
 
-    h1
-      font-size: 2.5rem
+.hero-content
+  display: flex
+  flex-direction: column
+  gap: 1.5rem
 
-    h2
-      font-size: 1.3rem
+.hero-title
+  font-size: 3.5rem
+  font-weight: 800
+  color: $text
+  line-height: 1.1
+  letter-spacing: -0.02em
 
-    h1, h2
-      margin: 0
+  .highlight
+    position: relative
+    display: inline-block
+    color: $primary
+    
+  .underline-scribble
+    position: absolute
+    bottom: -4px
+    left: -5%
+    width: 110%
+    height: 16px
+    overflow: visible
+    
+    path
+      fill: none
+      stroke: $primary
+      stroke-width: 3
+      stroke-linecap: round
+      stroke-dasharray: 200
+      stroke-dashoffset: 200
+      animation: draw-underline 1s ease-out 0.5s forwards
 
+@keyframes draw-underline
+  to
+    stroke-dashoffset: 0
 
-.interface-image
-  margin-left: 30vw
-  margin-top: 16vh
-  animation: fadeIn 1s ease-in-out
-  z-index: 0
+.hero-description
+  font-size: 1.125rem
+  color: $text-secondary
+  line-height: 1.7
+  max-width: 480px
 
-  img
-    width: 61vw
-    transform: rotate(12deg)
-    pointer-events: none
-    user-select: none
-
-.flying-icons
-  position: absolute
-  transform: rotate(-25deg)
+.hero-actions
   display: flex
   gap: 1rem
-  animation: spawn 1s ease-in-out
+  margin-top: 0.5rem
 
-  svg
-    font-size: 4vh
-    animation: flyAround 16s linear infinite
+.hero-visual
+  position: relative
+  display: flex
+  justify-content: center
+  align-items: center
+  perspective: 1000px
 
-.flying-icons:nth-child(2)
-  top: 70%
-  left: 10%
+.interface-preview
+  position: relative
+  z-index: 2
+  width: 100%
+  max-width: 650px
+  transform: rotateY(-8deg) rotateX(4deg)
+  transform-style: preserve-3d
 
-.flying-icons:nth-child(3)
-  top: 30%
-  right: 10%
+  img
+    width: 100%
+    border-radius: 12px
 
-.flying-icons:nth-child(4)
-  bottom: 50%
-  left: 12%
+@media (max-width: 1100px)
+  .hero
+    padding: 120px 3rem 60px
 
-.flying-icons:nth-child(5)
-  top: 25%
-  right: 25%
+  .hero-grid
+    grid-template-columns: 1fr
+    gap: 3rem
+    text-align: center
 
-.flying-icons:nth-child(6)
-  bottom: 30%
-  left: 20%
+  .hero-content
+    align-items: center
 
+  .hero-description
+    max-width: 600px
 
-@keyframes fadeIn
-  from
-    transform: translateY(10rem)
-    opacity: 0
-  to
-    transform: translateY(0)
-    opacity: 1
+  .hero-title
+    font-size: 3rem
 
-@keyframes spawn
-  from
-    transform: rotate(-25deg) scale(0.2)
-    opacity: 0
-  to
-    transform: rotate(-25deg)
-    opacity: 1
+  .hero-actions
+    justify-content: center
 
-@keyframes flyAround
-  0%, 100%
-    transform: translate(0, 0)
+@media (max-width: 640px)
+  .hero
+    padding: 100px 1.5rem 40px
 
-  25%
-    transform: translate(0.5rem, -0.5rem)
+  .hero-title
+    font-size: 2.25rem
 
-  50%
-    transform: translate(-0.5rem, 0.5rem)
+  .hero-description
+    font-size: 1rem
 
-  75%
-    transform: translate(-0.5rem, -0.5rem)
+  .hero-actions
+    flex-direction: column
+    width: 100%
 
-
-@media screen and (max-width: 1800px)
-  .flying-icons:nth-child(6)
-    display: none
-
-@media screen and (max-width: 1650px)
-  .flying-icons:nth-child(4)
-    display: none
-  .flying-icons:nth-child(2)
-    display: none
-
-@media screen and (max-width: 1250px)
-  .interface-image
-    margin-left: 20vw
-    margin-top: 10vh
-
-@media screen and (max-width: 1000px)
-  .flying-icons:nth-child(3)
-    display: none
-  .flying-icons:nth-child(5)
-    right: 10rem
-    top: 20rem
-
-@media screen and (max-width: 500px)
-  .flying-icons:nth-child(5)
-    right: 5rem
-    top: 15rem
+    .btn
+      width: 100%
+      justify-content: center

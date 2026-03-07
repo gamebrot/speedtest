@@ -1,160 +1,208 @@
 @use "@/common/styles/colors" as *
 
 nav
-  display: flex
-  justify-content: space-between
-  padding: 0.5rem 2rem
-  background-color: rgba($background-lighter, 0.3)
-  backdrop-filter: blur(15px)
-  user-select: none
   position: fixed
   top: 0
   left: 0
   right: 0
-  height: 3rem
-  z-index: 10
-
-nav .logo-area
+  z-index: 100
   display: flex
   align-items: center
-  gap: 1rem
-  cursor: pointer
-  padding: 0.2rem 0.6rem
-  border: 2px solid transparent
-  border-radius: 1rem
-  transition: all 0.3s
+  justify-content: space-between
+  padding: 1.25rem 4rem
+  background: transparent
+  transition: all 0.3s ease
+
+nav.nav-scrolled
+  padding: 1rem 4rem
+  background: rgba($background, 0.9)
+  backdrop-filter: blur(20px)
+  border-bottom: 1px solid $border-color
+
+.logo-area
+  display: flex
+  align-items: center
+  gap: 0.625rem
   text-decoration: none
-  color: $text
-  -webkit-user-drag: none
+  transition: opacity 0.2s ease
+
+  &:hover
+    opacity: 0.8
 
   img
-    width: 2.5rem
-    height: 2.5rem
+    width: 1.75rem
+    height: 1.75rem
 
-  h1
-    margin: 0
+  span
+    font-size: 1.125rem
+    font-weight: 700
+    color: $text
 
-nav .logo-area:hover
-  border: 2px solid $text
-
-nav .logo-area:active
-  transform: scale(0.95)
-
-nav .nav-area
+.nav-center
+  position: absolute
+  left: 50%
+  transform: translateX(-50%)
   display: flex
   align-items: center
-  gap: 2rem
-
-  ul
-    display: flex
-    gap: 2rem
-    list-style: none
+  gap: 0.5rem
+  padding: 0.375rem
+  border-radius: 12px
 
   a
-    text-decoration: none
-    color: $text
-    font-size: 1.2rem
-    font-weight: 700
-    transition: color 0.3s
-    -webkit-user-drag: none
+    position: relative
+    display: flex
+    align-items: center
+    gap: 0.375rem
+    padding: 0.5rem 1rem
+    font-size: 0.875rem
+    font-weight: 500
+    color: $text-secondary
+    border-radius: 8px
+    transition: color 0.2s ease
+    z-index: 1
 
-  a:hover
-    color: $primary
+    &:hover
+      color: $text
 
-nav .mobile-toggle
-  display: none
+  .external-icon
+    font-size: 0.625rem
+    opacity: 0.7
+
+.nav-indicator
+  position: absolute
+  top: 0.375rem
+  height: calc(100% - 0.75rem)
+  background: $background-card
+  border-radius: 8px
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease
+  z-index: 0
+
+.github-link
+  display: flex
   align-items: center
   justify-content: center
-  cursor: pointer
+  width: 2.5rem
+  height: 2.5rem
+  background: transparent
+  border: 1px solid $border-color
+  border-radius: 10px
+  color: $text-secondary
+  transition: all 0.2s ease
 
-nav .mobile-toggle svg
-  font-size: 22pt
-  transition: all 0.3s
-  fill: $text
+  &:hover
+    background: $background-lighter
+    border-color: $border-hover
+    color: $text
+
+  svg
+    font-size: 1.125rem
+
+.mobile-toggle
+  display: none
+  background: none
+  border: none
+  color: $text
+  font-size: 1.25rem
+  cursor: pointer
+  padding: 0.5rem
 
 .mobile-nav
-  display: flex
   position: fixed
   top: 0
-  left: 0
-  width: 100vw
-  height: 100%
-  -webkit-backdrop-filter: blur(1rem)
-  backdrop-filter: blur(1rem)
-  background: #00000080
-  z-index: 10
-  flex-direction: column
-  align-items: center
-  justify-content: center
-  gap: 2rem
-  animation: navOpen .3s forwards ease-in-out
+  right: 0
+  width: 100%
+  max-width: 320px
+  height: 100vh
+  background: $background-lighter
+  z-index: 150
+  transform: translateX(100%)
+  transition: transform 0.3s ease
+  border-left: 1px solid $border-color
 
-.mobile-nav-closed
-  animation: navClose .3s forwards ease-in-out
+.mobile-nav.mobile-open
+  transform: translateX(0)
 
-.mobile-nav .logo
+.mobile-header
   display: flex
   align-items: center
+  justify-content: space-between
+  padding: 1.25rem 1.5rem
+  border-bottom: 1px solid $border-color
+
+.mobile-logo
+  display: flex
+  align-items: center
+  gap: 0.625rem
   text-decoration: none
-  gap: 1rem
 
   img
-    width: 3rem
-    height: 3rem
+    width: 1.75rem
+    height: 1.75rem
 
-  h1
-    margin: 0
-    font-size: 2rem
+  span
+    font-size: 1.125rem
+    font-weight: 700
     color: $text
 
+.mobile-close
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 2.25rem
+  height: 2.25rem
+  background: $background-card
+  border: 1px solid $border-color
+  border-radius: 8px
+  color: $text-secondary
+  cursor: pointer
+  transition: all 0.2s ease
 
-.logo-pulse
-  animation: logoPulse 1s infinite
+  &:hover
+    color: $text
+    border-color: $border-hover
 
-.mobile-nav .mobile-links
-  text-align: center
+.mobile-links
   display: flex
   flex-direction: column
-  list-style: none
+  padding: 1rem
 
   a
-    text-decoration: none
-    color: $text
-    font-size: 1.7rem
-    font-weight: 700
-    transition: color 0.3s
-    -webkit-user-drag: none
-
-  a:hover
-    color: $primary
-
-
-@keyframes navOpen
-  from
-    transform: translateY(100%)
-    visibility: hidden
-  to
-    transform: translateY(0)
-    visibility: visible
-
-@keyframes navClose
-  from
-    transform: translateY(0)
-    visibility: visible
-  to
-    transform: translateY(-100%)
-    visibility: hidden
-
-@keyframes logoPulse
-    0%
-        transform: scale(1)
-    50%
-        transform: scale(1.1)
-    100%
-        transform: scale(1)
-
-@media (max-width: 814px)
-  nav .nav-area
-    display: none
-  nav .mobile-toggle
     display: flex
+    align-items: center
+    gap: 0.5rem
+    padding: 1rem 1rem
+    font-size: 1rem
+    font-weight: 500
+    color: $text-secondary
+    border-radius: 10px
+    transition: all 0.2s ease
+
+    &:hover, &.active
+      background: $background-card
+      color: $text
+
+    .external-icon
+      font-size: 0.75rem
+      opacity: 0.7
+
+.mobile-overlay
+  position: fixed
+  inset: 0
+  background: rgba(0, 0, 0, 0.6)
+  backdrop-filter: blur(4px)
+  z-index: 140
+
+@media (max-width: 900px)
+  nav
+    padding: 1rem 1.5rem
+
+  nav.nav-scrolled
+    padding: 1rem 1.5rem
+
+  .nav-center, .github-link
+    display: none
+
+  .mobile-toggle
+    display: flex
+    align-items: center
+    justify-content: center

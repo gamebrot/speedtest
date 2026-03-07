@@ -1,12 +1,11 @@
 import "./styles.sass";
 import Button from "@/common/components/Button/index.js";
-import {faHome, faPaperPlane, faThumbtack} from "@fortawesome/free-solid-svg-icons";
+import {faHome, faPaperPlane, faCheckCircle, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 import {useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export const TutorialSubmission = () => {
-
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -17,6 +16,7 @@ export const TutorialSubmission = () => {
     const [contentUrl, setContentUrl] = useState("");
     const [message, setMessage] = useState("");
     const [success, setSuccess] = useState(false);
+    const [agreed, setAgreed] = useState(false);
 
     const postTutorial = async (ev) => {
         ev.preventDefault();
@@ -39,78 +39,120 @@ export const TutorialSubmission = () => {
         }
     }
 
+    if (success) {
+        return (
+            <div className="submission-page">
+                <div className="success-state">
+                    <div className="success-icon">
+                        <FontAwesomeIcon icon={faCheckCircle}/>
+                    </div>
+                    <h1>Submission Received</h1>
+                    <p>Thank you for your contribution! We'll review your {type} and get back to you soon.</p>
+                    <Button 
+                        icon={faHome} 
+                        text="Back to Home" 
+                        color="primary"
+                        onClick={() => navigate("/")}
+                    />
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <form className="tutorial-submission-page" onSubmit={postTutorial}>
-            {success && <div className="submission-success">
-                <h2>Thank you for your submission!</h2>
-                <Button icon={faHome} text="Back to home" color="blue"
-                        onClick={() => navigate("/")}/>
-            </div>}
-            {!success && <div className="submission-area">
-                <h1>Submit a tutorial</h1>
-
-                <input type="hidden" name="honeypot" style={{display: "none !important"}}/>
-                <div className="input-group">
-                    <label htmlFor="type">Type *</label>
-                    <select id="type" value={type} onChange={(e) => setType(e.target.value)} name="type"
-                            required>
-                        <option value="video">Video</option>
-                        <option value="blog">Blog</option>
-                    </select>
+        <div className="submission-page">
+            <div className="submission-container">
+                <div className="submission-header">
+                    <h1>Submit a Tutorial</h1>
+                    <p>Share your MySpeed content with the community</p>
                 </div>
 
-                <div className="input-group">
-                    <label htmlFor="email">Email *</label>
-                    <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                           placeholder="Your email address" name="email" required/>
+                <div className="submission-content">
+                    <form className="submission-form" onSubmit={postTutorial}>
+                        <input type="hidden" name="honeypot" style={{display: "none"}}/>
+                        
+                        <div className="form-group">
+                            <label htmlFor="type">Content Type</label>
+                            <select 
+                                id="type" 
+                                value={type} 
+                                onChange={(e) => setType(e.target.value)}
+                            >
+                                <option value="video">Video</option>
+                                <option value="blog">Blog Post</option>
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="email">Email Address</label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                value={email} 
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="your@email.com"
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="content-url">Content URL</label>
+                            <input 
+                                type="url" 
+                                id="content-url" 
+                                value={contentUrl}
+                                onChange={(e) => setContentUrl(e.target.value)}
+                                placeholder={type === "blog" ? "https://example.com/your-blog-post" : "https://youtube.com/watch?v=..."}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="message">Additional Notes <span className="optional">(optional)</span></label>
+                            <textarea 
+                                id="message" 
+                                value={message} 
+                                onChange={(e) => setMessage(e.target.value)}
+                                placeholder="Anything you'd like us to know?"
+                                rows={4}
+                            />
+                        </div>
+
+                        <div className="form-checkbox">
+                            <input 
+                                type="checkbox" 
+                                id="terms" 
+                                checked={agreed}
+                                onChange={(e) => setAgreed(e.target.checked)}
+                                required
+                            />
+                            <label htmlFor="terms">I confirm this is my original content and follows the guidelines</label>
+                        </div>
+
+                        <Button 
+                            icon={faPaperPlane} 
+                            text="Submit Tutorial" 
+                            color="primary"
+                            size="lg"
+                            disabled={!agreed}
+                        />
+                    </form>
+
+                    <aside className="guidelines">
+                        <div className="guidelines-header">
+                            <FontAwesomeIcon icon={faInfoCircle}/>
+                            <h3>Submission Guidelines</h3>
+                        </div>
+                        
+                        <ul>
+                            <li>Provide a valid email address for follow-up communication</li>
+                            <li>Content must be publicly accessible</li>
+                            <li>Must be related to MySpeed (tutorial, review, guide, etc.)</li>
+                            <li>You must be the original creator of the content</li>
+                        </ul>
+                    </aside>
                 </div>
-
-                <div className="input-group">
-                    <label htmlFor="content-url">Content URL *</label>
-                    <input type="url" id="content-url" value={contentUrl}
-                           onChange={(e) => setContentUrl(e.target.value)}
-                           placeholder={"URL to your " + (type === "blog" ? "blog post" : "video") + " (e.g. " + (type === "blog" ? "https://example.com/blog-post" : "https://youtube.com/watch?v=example") + ")"}
-                           name="content-url" required/>
-                </div>
-
-                <div className="input-group">
-                    <label htmlFor="message">Message</label>
-                    <textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)}
-                              placeholder="Anything you want to tell us?" name="message"/>
-                </div>
-
-                <Button icon={faPaperPlane} text="Submit tutorial" color="green"/>
-
-            </div>}
-
-            {!success && <div className="info-area">
-                <div className="info-title">
-                    <FontAwesomeIcon icon={faThumbtack}/>
-                    <h1>Submission guidelines</h1>
-                </div>
-
-                <ul>
-                    <li>You need to provide a valid email address so we can contact you if there are any issues with
-                        your submission.
-                    </li>
-                    <li>The content URL should be a direct link to your content. In your case, this would be a link to
-                        your {type === "blog" ? " blog post" : " video"}. This link should be publicly accessible.
-                    </li>
-                    <li>
-                        Your content needs to be related to MySpeed. This can be a tutorial on how to use MySpeed, a
-                        review, or anything else that is related to MySpeed.
-                    </li>
-                    <li>
-                        You need to be the creator of the content you are submitting. If you are submitting someone
-                        else's content, please ask them to submit it.
-                    </li>
-                </ul>
-
-                <input type="checkbox" id="terms_read" required/>
-                <label htmlFor="terms_read">I have read and understood the guidelines</label>
-
-            </div>}
-
-        </form>
+            </div>
+        </div>
     );
 }

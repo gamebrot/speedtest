@@ -1,29 +1,53 @@
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import "./styles.sass";
-import NotFoundImage from "@/common/assets/not_found.svg";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
+import {faHome, faArrowLeft} from "@fortawesome/free-solid-svg-icons";
+import {useNavigate} from "react-router-dom";
+import Button from "@/common/components/Button";
 
 export const NotFound = () => {
+    const navigate = useNavigate();
+    const [countdown, setCountdown] = useState(5);
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            window.location.href = "/";
-        }, 2000);
+        const timer = setInterval(() => {
+            setCountdown((prev) => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    navigate("/");
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
 
-        return () => clearTimeout(timeout);
-    }, []);
+        return () => clearInterval(timer);
+    }, [navigate]);
 
     return (
-        <div className="page-404">
-            <div className="info-area">
-                <div className="logo-container">
-                    <FontAwesomeIcon icon={faQuestionCircle} size="3x" />
-                    <h1>Page not found</h1>
+        <div className="not-found-page">
+            <div className="not-found-content">
+                <div className="error-code">404</div>
+                <h1>Page Not Found</h1>
+                <p>The page you're looking for doesn't exist or has been moved.</p>
+                <p className="redirect-notice">Redirecting to home in {countdown} seconds...</p>
+                
+                <div className="not-found-actions">
+                    <Button 
+                        text="Go Home" 
+                        icon={faHome} 
+                        color="primary"
+                        onClick={() => navigate("/")}
+                    />
+                    <Button 
+                        text="Go Back" 
+                        icon={faArrowLeft} 
+                        color="primary"
+                        variant="outline"
+                        onClick={() => navigate(-1)}
+                    />
                 </div>
-                <p>You will be redirected to the home page in a few seconds.</p>
             </div>
-            <img src={NotFoundImage} alt="Interface" />
         </div>
     );
 }

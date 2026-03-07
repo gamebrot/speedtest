@@ -1,5 +1,5 @@
-const axios = require('axios');
-const fs = require('fs');
+import axios from 'axios';
+import fs from 'node:fs';
 
 // Load servers from ookla
 if (!fs.existsSync("data/servers/ookla.json")) {

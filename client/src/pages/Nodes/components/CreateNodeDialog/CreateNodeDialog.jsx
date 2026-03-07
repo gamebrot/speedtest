@@ -1,102 +1,84 @@
-import {DialogContext, DialogProvider} from "@/common/contexts/Dialog";
+import {Dialog, DialogHeader, DialogBody, DialogFooter} from "@/common/contexts/Dialog";
+import {useAlert} from "@/common/contexts/Alert";
 import React, {useContext, useState} from "react";
 import "./styles.sass";
 import {t} from "i18next";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCircleInfo, faClose, faServer} from "@fortawesome/free-solid-svg-icons";
+import {faCircleInfo, faServer} from "@fortawesome/free-solid-svg-icons";
 import {baseRequest} from "@/common/utils/RequestUtil";
 import {ToastNotificationContext} from "@/common/contexts/ToastNotification";
-import {InputDialogContext} from "@/common/contexts/InputDialog";
 import {NodeContext} from "@/common/contexts/Node";
 
-export const Dialog = () => {
-    const close = useContext(DialogContext);
-
-    const [invalidUrl, setInvalidUrl] = useState(false);
-
+export const CreateNodeDialog = ({open, onClose}) => {
+    const alert = useAlert();
     const updateNodes = useContext(NodeContext)[1];
-    const [setDialog] = useContext(InputDialogContext);
     const updateToast = useContext(ToastNotificationContext);
-
+    const [invalidUrl, setInvalidUrl] = useState(false);
     const [serverName, setServerName] = useState("");
     const [serverUrl, setServerUrl] = useState("");
 
-    const runPasswordProcess = (wrong = false) => {
-        setDialog({
-            title: t("dialog.password.title"),
-            type: "password",
+    const runPasswordProcess = async (wrong = false) => {
+        const password = await alert.openInput(t("dialog.password.title"), {
+            inputType: "password",
             description: wrong ? <span className="icon-red">{t("dialog.password.wrong")}</span> : t("nodes.password_required"),
             placeholder: t("dialog.password.placeholder"),
-            buttonText: t("nodes.create"),
-            onSuccess: async (password) => {
-                const res = await (await baseRequest("/nodes", "PUT", {
-                    name: serverName, url: serverUrl,
-                    password: password
-                })).json();
-
-                if (res.type === "PASSWORD_REQUIRED") {
-                    runPasswordProcess(true);
-                } else if (res.type === "NODE_CREATED") {
-                    updateNodes();
-                    updateToast(t("nodes.created"), "green", faServer);
-                }
-            }
+            buttonText: t("nodes.create")
         });
-    }
+        if (password) {
+            const res = await (await baseRequest("/nodes", "PUT", {
+                name: serverName, url: serverUrl, password
+            })).json();
+            if (res.type === "PASSWORD_REQUIRED") runPasswordProcess(true);
+            else if (res.type === "NODE_CREATED") {
+                updateNodes();
+                updateToast(t("nodes.created"), "green", faServer);
+            }
+        }
+    };
 
-    const createNode = async () => {
-        const response = await (await baseRequest("/nodes", "PUT", {
-            name: serverName,
-            url: serverUrl
-        })).json();
-
-        const type = await response.type;
-
-        if (type === "INVALID_URL") {
-            setInvalidUrl(true);
-        } else if (type === "PASSWORD_REQUIRED") {
+    const createNode = async (close) => {
+        const response = await (await baseRequest("/nodes", "PUT", {name: serverName, url: serverUrl})).json();
+        if (response.type === "INVALID_URL") setInvalidUrl(true);
+        else if (response.type === "PASSWORD_REQUIRED") {
             close();
             runPasswordProcess();
-        } else if (type === "NODE_CREATED") {
+        } else if (response.type === "NODE_CREATED") {
             updateNodes();
             close();
             updateToast(t("nodes.created"), "green", faServer);
         }
-    }
+    };
 
     return (
-        <>
-            <div className="dialog-header">
-                <h4 className="dialog-text">{t("nodes.add")}</h4>
-                <FontAwesomeIcon icon={faClose} className="dialog-text dialog-icon" onClick={() => close()}/>
-            </div>
-            <div className="server-dialog">
-                <div className="server-group">
-                    <h2><FontAwesomeIcon icon={faCircleInfo}/> {t("nodes.group.name")}</h2>
-                    <input type="text" className="server-input" placeholder={t("nodes.placeholder.name")} value={serverName}
-                           onChange={(event) => setServerName(event.target.value)}/>
-                </div>
-                <div className={"server-group" + (invalidUrl ? " server-error" : "")}>
-                    <h2><FontAwesomeIcon icon={faServer}/> {t("nodes.group.url")}</h2>
-                    <input type="text" className="server-input" placeholder={t("nodes.placeholder.url")} value={serverUrl}
-                           onChange={(event) => {
-                               setServerUrl(event.target.value);
-                               setInvalidUrl(false);
-                           }}/>
-                </div>
-            </div>
-            <div className="dialog-buttons">
-                <button className="dialog-btn" onClick={createNode}>{t("nodes.create")}</button>
-            </div>
-        </>
-    );
-
-}
-
-export const CreateNodeDialog = (props) => {
-    return (
-        <DialogProvider close={props.onClose}>
-            <Dialog/>
-        </DialogProvider>
+        <Dialog open={open} onClose={onClose} className="create-node-dialog">
+            {({close}) => (
+                <>
+                    <DialogHeader onClose={close}>{t("nodes.add")}</DialogHeader>
+                    <DialogBody>
+                        <div className="server-dialog">
+                            <div className="server-group">
+                                <div className="server-label">
+                                    <FontAwesomeIcon icon={faCircleInfo}/>
+                                    <h3>{t("nodes.group.name")}</h3>
+                                </div>
+                                <input type="text" className="dialog-input server-input" placeholder={t("nodes.placeholder.name")} value={serverName}
+                                       onChange={(e) => setServerName(e.target.value)}/>
+                            </div>
+                            <div className={"server-group" + (invalidUrl ? " server-error" : "")}>
+                                <div className="server-label">
+                                    <FontAwesomeIcon icon={faServer}/>
+                                    <h3>{t("nodes.group.url")}</h3>
+                                </div>
+                                <input type="text" className="dialog-input server-input" placeholder={t("nodes.placeholder.url")} value={serverUrl}
+                                       onChange={(e) => { setServerUrl(e.target.value); setInvalidUrl(false); }}/>
+                            </div>
+                        </div>
+                    </DialogBody>
+                    <DialogFooter>
+                        <button className="dialog-btn" onClick={() => createNode(close)}>{t("nodes.create")}</button>
+                    </DialogFooter>
+                </>
+            )}
+        </Dialog>
     );
 }

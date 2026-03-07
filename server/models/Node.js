@@ -1,7 +1,7 @@
-const Sequelize = require('sequelize');
-const db = require("../config/database");
+import Sequelize from 'sequelize';
+import db from '../config/database.js';
 
-module.exports = db.define("nodes", {
+export default db.define("nodes", {
     name: {
         type: Sequelize.STRING,
         defaultValue: "MySpeed Server"

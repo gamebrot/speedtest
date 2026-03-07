@@ -7,7 +7,7 @@ import "./styles.sass";
 export const AverageChart = (props) => {
 
     return (
-        <StatisticContainer title={props.title} size="small" center={true}>
+        <StatisticContainer title={props.title} size="small" center={true} onClick={props.onClick}>
             <div className="value-container">
                 <div className="value-item">
                     <div className="value-info">

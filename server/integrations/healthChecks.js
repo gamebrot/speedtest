@@ -1,4 +1,4 @@
-const axios = require("axios");
+import axios from "axios";
 
 const sendPing = async (url, path, error, triggerActivity) => {
     if (url == null) return;
@@ -7,9 +7,9 @@ const sendPing = async (url, path, error, triggerActivity) => {
     await axios.post(url, error, {headers: {"user-agent": "MySpeed/HealthAgent"}})
         .then(() => triggerActivity())
         .catch(() => triggerActivity(true));
-}
+};
 
-module.exports = (registerEvent) => {
+export default (registerEvent) => {
     registerEvent('minutePassed', async (integration, data, triggerActivity) => {
         if (integration.data.url) await sendPing(integration.data.url, undefined, undefined, triggerActivity);
     });
@@ -32,4 +32,4 @@ module.exports = (registerEvent) => {
             {name: "url", type: "text", required: true, regex: /https?:\/\/.+/},
         ]
     };
-}
+};

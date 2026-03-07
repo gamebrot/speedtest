@@ -1,6 +1,8 @@
-const app = require('express').Router();
-const recommendations = require('../controller/recommendations');
-const password = require('../middlewares/password');
+import express from 'express';
+import * as recommendations from '../controller/recommendations.js';
+import password from '../middlewares/password.js';
+
+const app = express.Router();
 
 app.get("/", password(false), async (req, res) => {
     let currentRecommendations = await recommendations.getCurrent();
@@ -9,4 +11,4 @@ app.get("/", password(false), async (req, res) => {
     return res.json(currentRecommendations);
 });
 
-module.exports = app;
+export default app;

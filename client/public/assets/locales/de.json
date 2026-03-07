@@ -37,6 +37,8 @@
       "interface": "Schnittstelle",
       "server": "Server",
       "server_id": "Server-ID",
+      "custom_url": "Eigene URL",
+      "custom_url_placeholder": "https://speed.test/backend/",
       "choose_automatically": "Automatisch wählen",
       "ookla_license": "Ich habe die <Eula>EULA</Eula>, die <GDPR>Datenschutzrichtlinie</GDPR> und die <TOS>Nutzungsbedingungen</TOS> von Ookla gelesen und akzeptiere sie."
     }
@@ -158,6 +160,8 @@
   "latest": {
     "ping": "Ping",
     "ping_unit": "ms",
+    "jitter": "Jitter",
+    "jitter_unit": "ms",
     "down": "Download",
     "speed_unit": "Mbit/s",
     "up": "Upload",
@@ -176,6 +180,10 @@
     "ping": {
       "title": "Ping",
       "description": "Der Ping zeigt dir, wie schnell der jeweilige Anbieter antwortet. Umso kürzer die Zeit, desto besser."
+    },
+    "jitter": {
+      "title": "Jitter",
+      "description": "Der Jitter ist die Schwankung der Ping-Antwortzeiten. Ein niedriger Jitter bedeutet eine stabilere Verbindung, was wichtig ist für Echtzeitanwendungen wie Videoanrufe und Gaming."
     },
     "up": {
       "title": "Upload-Geschwindigkeit",
@@ -213,6 +221,7 @@
     "result": {
       "title": "Testergebnis",
       "description": "<Link>Bei diesem Test</Link> wurde eine maximale Download-Geschwindigkeit von <Bold>{{down}} Mbps</Bold> und eine maximale Upload-Geschwindigkeit von <Bold>{{up}} Mbps</Bold> erreicht. Er wurde erstellt <Bold>{{type}}</Bold> und dauerte <Bold>{{duration}} Sekunden</Bold>.",
+      "jitter": " Der Verbindungs-Jitter betrug <Bold>{{jitter}} ms</Bold>.",
       "from_you": "von dir",
       "automatic": "automatisch"
     },
@@ -236,6 +245,9 @@
     "invalid_view": "Ungültige Ansicht"
   },
   "statistics": {
+    "export": {
+      "button": "Exportieren"
+    },
     "overview": {
       "total_title": "Insgesamte Tests",
       "total_description": "Die Anzahl der ausgeführten Tests",
@@ -293,6 +305,11 @@
       "description": "Der Server <Bold>{{name}}</Bold> (#{{id}}) wird gelöscht. Diese Aktion kann nicht rückgängig gemacht werden. Möchtest du fortfahren?",
       "yes": "Ja, löschen",
       "success": "Der Server wurde erfolgreich gelöscht"
+    },
+    "rename": {
+      "title": "Server umbenennen",
+      "placeholder": "Neuer Servername",
+      "success": "Der Server wurde erfolgreich umbenannt"
     },
     "messages": {
       "not_reachable": "Server ist nicht erreichbar",

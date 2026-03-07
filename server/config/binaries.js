@@ -1,5 +1,5 @@
-module.exports.ooklaVersion = "1.2.0";
-module.exports.ooklaList = [
+export const ooklaVersion = "1.2.0";
+export const ooklaList = [
     // MacOS
     {os: 'darwin', arch: 'x64', suffix: 'macosx-x86_64.tgz'},
 
@@ -16,8 +16,8 @@ module.exports.ooklaList = [
     {os: 'freebsd', arch: 'x64', suffix: 'freebsd12-x86_64.pkg'}
 ];
 
-module.exports.libreVersion = "1.0.10";
-module.exports.libreList = [
+export const libreVersion = "1.0.10";
+export const libreList = [
     // MacOS
     {os: 'darwin', arch: 'x64', suffix: 'darwin_amd64.tar.gz'},
     {os: 'darwin', arch: 'arm64', suffix: 'darwin_arm64.tar.gz'},
@@ -38,4 +38,19 @@ module.exports.libreList = [
     {os: 'freebsd', arch: 'ia32', suffix: 'freebsd_386.tar.gz'},
     {os: 'freebsd', arch: 'arm', suffix: 'freebsd_armv7.tar.gz'},
     {os: 'freebsd', arch: 'arm64', suffix: 'freebsd_arm64.tar.gz'}
-]
+];
+
+export const cloudflareVersion = "2.1.0";
+export const cloudflareList = [
+    // MacOS
+    {os: 'darwin', arch: 'x64', suffix: 'cfspeedtest-x86_64-apple-darwin.tar.gz'},
+    {os: 'darwin', arch: 'arm64', suffix: 'cfspeedtest-aarch64-apple-darwin.tar.gz'},
+    {os: 'darwin', arch: 'universal', suffix: 'cfspeedtest-universal-apple-darwin.tar.gz'},
+
+    // Windows
+    {os: 'win32', arch: 'x64', suffix: 'cfspeedtest-x86_64-pc-windows-msvc.zip'},
+
+    // Linux
+    {os: 'linux', arch: 'x64', suffix: 'cfspeedtest-x86_64-unknown-linux-gnu.tar.gz'},
+    {os: 'linux', arch: 'arm64', suffix: 'cfspeedtest-aarch64-unknown-linux-gnu.tar.gz'}
+];

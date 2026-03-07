@@ -1,10 +1,13 @@
-const app = require('express').Router();
-const version = require('../../package.json').version;
+import express from 'express';
+import denoConfig from '../../deno.json' with { type: 'json' };
+import axios from 'axios';
+import password from '../middlewares/password.js';
+import * as serverController from '../controller/servers.js';
+import * as interfaces from '../util/loadInterfaces.js';
+
+const version = denoConfig.version;
 const remote_url = "https://api.github.com/repos/gnmyt/myspeed/releases/latest";
-const axios = require('axios');
-const password = require('../middlewares/password');
-const serverController = require('../controller/servers');
-const interfaces = require('../util/loadInterfaces');
+const app = express.Router();
 
 app.get("/version", password(false), async (req, res) => {
     if (process.env.PREVIEW_MODE === "true") return res.json({local: version, remote: "0"});
@@ -27,4 +30,4 @@ app.get("/interfaces", password(false), async (req, res) => {
     res.json(interfaces.interfaces);
 });
 
-module.exports = app;
+export default app;

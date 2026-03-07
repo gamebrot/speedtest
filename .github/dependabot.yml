@@ -1,10 +1,10 @@
 version: 2
 updates:
   - package-ecosystem: 'npm'
-    directory: '/'
+    directory: '/client'
     schedule:
       interval: 'daily'
   - package-ecosystem: 'npm'
-    directory: '/client'
+    directory: '/web'
     schedule:
       interval: 'daily'

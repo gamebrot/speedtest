@@ -24,17 +24,29 @@ if [ $EUID -ne 0 ]; then
   exit
 fi
 
+ARCH=$(uname -m)
+case "$ARCH" in
+    x86_64)
+        BINARY_NAME="MySpeed-linux-x64"
+        ;;
+    aarch64|arm64)
+        BINARY_NAME="MySpeed-linux-arm64"
+        ;;
+    *)
+        echo -e "$RED✗ Unsupported architecture: $ARCH"
+        echo -e "$NORMAL MySpeed only supports x64 and arm64 architectures."
+        exit 1
+        ;;
+esac
+
 echo -e "$GREEN ---------$BLUE Automatic Installation$GREEN ---------"
 echo -e "$BLUE MySpeed$YELLOW is now being installed."
-if [ "$1" == "--beta" ]; then
-  echo -e "$YELLOW Version:$BLUE MySpeed$PURPLE Beta"
-else
-  echo -e "$YELLOW Version:$BLUE MySpeed Release"
-fi
+echo -e "$YELLOW Version:$BLUE MySpeed Release"
+echo -e "$YELLOW Architecture:$BLUE $ARCH ($BINARY_NAME)"
 echo -e "$YELLOW Location:$BLUE $INSTALLATION_PATH"
 echo -e "$GREEN Installation will start in 5 seconds..."
 echo -e "$GREEN ----------------------------------------------"
-sleep 10
+sleep 5
 clear
 
 if [ -d "$INSTALLATION_PATH" ]; then
@@ -50,12 +62,11 @@ if [ -d "$INSTALLATION_PATH" ]; then
     sleep 5
 fi
 
-if command -v systemctl &> /dev/null && systemctl --all --type service | grep -n "myspeed.service"; then
+if command -v systemctl &> /dev/null && systemctl --all --type service | grep -q "myspeed.service"; then
   clear
   echo -e "$YELLOWℹ MySpeed Service is being stopped..."
   systemctl stop myspeed
 fi
-
 
 clear
 echo -e ""
@@ -70,7 +81,7 @@ apt-get update -y
 
 clear
 echo -e "$GREENℹ Info:$NORMAL Installation is now being prepared. This may take a moment..."
-sleep 5
+sleep 3
 
 function check() {
   clear
@@ -89,83 +100,40 @@ function check() {
 }
 
 check "wget"
-check "unzip"
 check "curl"
 
 clear
+
 echo -e "$BLUE🔎 STATUS MESSAGE"
-echo -e "$NORMAL Checking if node is present..."
-if ! command -v node &> /dev/null
-then
-    echo -e "$YELLOWℹ \"node\" is not installed.$NORMAL Installation will proceed..."
-    sleep 2
-    clear
-    echo -e "$PURPLEℹ Downloading...$NORMAL"
-    curl -sSL https://deb.nodesource.com/setup_20.x | bash
-    clear
-    echo -e "$PURPLEℹ Installing...$NORMAL"
-    apt-get install nodejs -y
+echo -e "$NORMAL Fetching latest release information..."
+RELEASE_URL=$(curl -s https://api.github.com/repos/gnmyt/myspeed/releases/latest | grep "browser_download_url.*$BINARY_NAME" | cut -d '"' -f 4)
+
+if [ -z "$RELEASE_URL" ]; then
+    echo -e "$RED✗ Could not find release for $BINARY_NAME"
+    exit 1
 fi
+
+echo -e "$GREEN✓ Found release:$NORMAL $RELEASE_URL"
+sleep 2
 
 clear
-
-if [ "$1" == "--beta" ]; then
-  RELEASE_URL=https://github.com/gnmyt/myspeed/archive/refs/heads/development.zip
-else
-  RELEASE_URL=$(curl -s https://api.github.com/repos/gnmyt/myspeed/releases/latest | grep browser_download_url | cut -d '"' -f 4)
-fi
-
-
 echo -e "$GREEN✓ Preparation completed:$NORMAL Installation of MySpeed will now commence..."
 sleep 3
 
 clear
-if [ ! -d "$INSTALLATION_PATH" ]
-then
-    clear
+if [ ! -d "$INSTALLATION_PATH" ]; then
     echo -e "$BLUEℹ Info: $NORMAL MySpeed will be installed under directory $INSTALLATION_PATH. Creating the folder now."
     sleep 2
-    mkdir "$INSTALLATION_PATH"
+    mkdir -p "$INSTALLATION_PATH"
 fi
 
 cd "$INSTALLATION_PATH"
 
 clear
-echo -e "$BLUEℹ Info: $NORMAL The current MySpeed instance is being downloaded. Please wait..."
+echo -e "$BLUEℹ Info: $NORMAL Downloading MySpeed binary. Please wait..."
 sleep 2
-wget "$RELEASE_URL"
-
-echo -e "$BLUEℹ Info: $NORMAL Download completed. Unpacking..."
-sleep 2
-if [ "$1" == "--beta" ]; then
-  unzip -qo development.zip
-  rm -R server client docs cli
-  mv myspeed-*/* .
-  rm development.zip
-  rm -R myspeed-development
-else
-  unzip -qo MySpeed*.zip
-  rm MySpeed-*.zip
-fi
-
-
-clear
-echo -e "$BLUEℹ Info: $NORMAL Necessary dependencies are being installed..."
-sleep 2
-rm -rf "$INSTALLATION_PATH/node_modules"
-npm install --force
-
-if [ "$1" == "--beta" ]; then
-  clear
-  echo -e "$BLUEℹ Info: $NORMAL Web interface is being compiled..."
-  sleep 2
-  cd client && npm install --
-
-force
-  cd .. && npm run build
-  cp -r client/build .
-  rm -rf client/build
-fi
+wget -O myspeed "$RELEASE_URL"
+chmod +x myspeed
 
 clear
 echo -e "$BLUE🔎 STATUS MESSAGE"
@@ -173,42 +141,42 @@ echo -e "$NORMAL Registering MySpeed as a background service..."
 echo -e ""
 echo -e ""
 sleep 2
-if command -v systemctl &> /dev/null && ! systemctl --all --type service | grep -n "myspeed.service"; then
-  cat << EOF >> /etc/systemd/system/myspeed.service
-  [Unit]
-  Description=MySpeed
-  After=network.target
 
-  [Service]
-  Type=simple
-  ExecStart=/usr/bin/node server
-  Restart=always
-  User=root
-  Environment=NODE_ENV=production
-  WorkingDirectory=$INSTALLATION_PATH
+if command -v systemctl &> /dev/null; then
+  cat << EOF > /etc/systemd/system/myspeed.service
+[Unit]
+Description=MySpeed
+After=network.target
 
-  [Install]
-  WantedBy=multi-user.target
+[Service]
+Type=simple
+ExecStart=$INSTALLATION_PATH/myspeed
+Restart=always
+User=root
+WorkingDirectory=$INSTALLATION_PATH
+
+[Install]
+WantedBy=multi-user.target
 EOF
   systemctl daemon-reload
-  echo -e "$NORMALℹ MySpeed will be added to autostart..."
-  sleep 1
-  systemctl enable myspeed
+
+  if ! systemctl is-enabled myspeed &> /dev/null; then
+    echo -e "$NORMALℹ MySpeed will be added to autostart..."
+    sleep 1
+    systemctl enable myspeed
+  fi
+
   echo -e "$NORMALℹ MySpeed service is starting..."
   sleep 1
-  systemctl start myspeed
+  systemctl restart myspeed
 fi
 
 clear
 
 if ! command -v systemctl &> /dev/null; then
     echo -e "$YELLOW⚠ Warning: $NORMAL Your Linux system currently does not support starting MySpeed in the background. \"systemd\" is required for this purpose."
-    echo -e "$BLUEℹ Info: $NORMAL If you have installed \"systemd\", you can restart the installation. It will be set up automatically."
+    echo -e "$BLUEℹ Info: $NORMAL You can start MySpeed manually by running: $INSTALLATION_PATH/myspeed"
     sleep 5
-else
-  echo -e "$GREENℹ MySpeed is being restarted..."
-  sleep 2
-  systemctl restart myspeed
 fi
 
 clear
@@ -216,6 +184,6 @@ echo -e "$GREEN-$NORMAL-$GREEN-$NORMAL-$GREEN-$NORMAL-$GREEN-$NORMAL-$GREEN-$NOR
 echo -e "$GREEN✓ Installation completed: $NORMAL MySpeed has been installed under $INSTALLATION_PATH."
 echo -e "You can access the web interface in your browser at$BLUE http://$(curl -s ifconfig.me):5216$NORMAL."
 if [ -d "$INSTALLATION_PATH" ]; then
-  echo -e "$BLUEℹ Info:$NORMAL If the update was not successful, please restart MySpeed:$BLUE systemctl restart myspeed"
+  echo -e "$BLUEℹ Info:$NORMAL To restart MySpeed:$BLUE systemctl restart myspeed"
 fi
 echo -e "$GREEN-$NORMAL-$GREEN-$NORMAL-$GREEN-$NORMAL-$GREEN-$NORMAL-$GREEN-$NORMAL-$GREEN-$NORMAL-$GREEN-$NORMAL-$GREEN-$NORMAL-$GREEN-$NORMAL-"

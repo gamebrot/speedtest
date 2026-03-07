@@ -1,8 +1,9 @@
-const fs = require("fs");
+import fs from 'node:fs';
+
 let ooklaServers;
 let libreServers;
 
-module.exports.getLibreServers = () => {
+export const getLibreServers = () => {
     if (libreServers) return libreServers;
 
     if (fs.existsSync("./data/servers/librespeed.json")) {
@@ -15,7 +16,7 @@ module.exports.getLibreServers = () => {
     return [];
 }
 
-module.exports.getOoklaServers = () => {
+export const getOoklaServers = () => {
     if (ooklaServers) return ooklaServers;
 
     if (fs.existsSync("./data/servers/ookla.json")) {
@@ -28,7 +29,7 @@ module.exports.getOoklaServers = () => {
     return [];
 }
 
-module.exports.getByMode = (mode) => {
-    if (mode === "ookla") return this.getOoklaServers();
-    if (mode === "libre") return this.getLibreServers();
+export const getByMode = (mode) => {
+    if (mode === "ookla") return getOoklaServers();
+    if (mode === "libre") return getLibreServers();
 }

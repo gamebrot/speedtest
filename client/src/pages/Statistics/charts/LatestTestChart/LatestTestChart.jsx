@@ -1,27 +1,33 @@
 import StatisticContainer from "@/pages/Statistics/components/StatisticContainer";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faArrowDown, faArrowUp, faPingPongPaddleBall} from "@fortawesome/free-solid-svg-icons";
+import {faArrowDown, faArrowUp, faPingPongPaddleBall, faWaveSquare} from "@fortawesome/free-solid-svg-icons";
 import "./styles.sass";
 import {getIconBySpeed} from "@/common/utils/TestUtil";
 import {useContext} from "react";
 import {ConfigContext} from "@/common/contexts/Config";
+import {StatusContext} from "@/common/contexts/Status";
 import {t} from "i18next";
 
 export const LatestTestChart = (props) => {
 
     const [config] = useContext(ConfigContext);
+    const [status] = useContext(StatusContext);
 
     if (!props.test) return <></>;
     if (config === null) return <></>;
 
+    const hasJitter = props.test.jitter !== null && props.test.jitter !== undefined;
+
     return (
-        <StatisticContainer title={t("latest.latest")}>
+        <StatisticContainer title={t("latest.latest")} onClick={props.onClick} running={status.running} expanded={props.expanded}>
             <div className="info-container">
                 <div className="test-container">
                     <div className="test-info">
                         <h2>{t("latest.ping")}</h2>
                         <p className={"icon-" + getIconBySpeed(props.test.ping, config.ping, false)}>
-                            {(props.test.ping === -1 ? "N/A" : props.test.ping) + " " + t("latest.ping_unit")}</p>
+                            {(props.test.ping === -1 ? "N/A" : props.test.ping) + " " + t("latest.ping_unit")}
+                            {hasJitter && <span className="jitter-value"><FontAwesomeIcon icon={faWaveSquare} className="jitter-icon" />{props.test.jitter}</span>}
+                        </p>
                     </div>
                     <FontAwesomeIcon icon={faPingPongPaddleBall}
                                      className={"icon-" + getIconBySpeed(props.test.ping, config.ping, false)}/>

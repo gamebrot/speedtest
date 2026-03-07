@@ -2,28 +2,36 @@ import "./styles.sass";
 import Screenshot1 from "@/common/assets/sc1.png";
 import Screenshot2 from "@/common/assets/sc2.png";
 
-
 export const Features = () => {
     return (
-        <div className="feature-area">
-            <div className="feature">
-                <img src={Screenshot1} alt="Screenshot - What is MySpeed?"/>
+        <section className="features-section">
+            <div className="feature-block">
                 <div className="feature-content">
-                    <h1>What is MySpeed?</h1>
-                    <p>MySpeed is a Software that helps you keeping track of your network speed. <br/><br/>It
-                        automatically creates speedtests based on your schedule and displays them in a list.</p>
+                    <span className="feature-label">Automated Testing</span>
+                    <h3>Set it and forget it</h3>
+                    <p>
+                        Configure your test schedule once and let MySpeed handle the rest. 
+                        Tests run automatically in the background with support for multiple providers.
+                    </p>
+                </div>
+                <div className="feature-image">
+                    <img src={Screenshot1} alt="Automated speed testing interface"/>
                 </div>
             </div>
 
-            <div className="feature feature-reverse">
-                <img src={Screenshot2} alt="Screenshot - Detailed statistics"/>
+            <div className="feature-block feature-reverse">
                 <div className="feature-content">
-                    <h1>Detailed statistics</h1>
-                    <p>MySpeed provides you with detailed statistics about your network speed. <br/><br/>This
-                        includes data about your download and upload speed, as well as your ping.</p>
+                    <span className="feature-label">Analytics</span>
+                    <h3>Track your performance</h3>
+                    <p>
+                        View your speed history with clear visualizations. Identify patterns, 
+                        detect issues, and keep your ISP accountable.
+                    </p>
+                </div>
+                <div className="feature-image">
+                    <img src={Screenshot2} alt="Speed test analytics dashboard"/>
                 </div>
             </div>
-
-        </div>
+        </section>
     )
 }

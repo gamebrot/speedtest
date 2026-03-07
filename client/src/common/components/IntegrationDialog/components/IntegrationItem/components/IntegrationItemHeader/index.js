@@ -1,1 +1,0 @@
-export {IntegrationItemHeader as default} from "./IntegrationItemHeader";

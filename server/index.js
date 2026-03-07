@@ -1,59 +1,93 @@
-const express = require('express');
-const path = require('path');
-const timerTask = require('./tasks/timer');
-const integrationTask = require('./tasks/integrations');
+import express from 'express';
+import path from 'node:path';
+import fs from 'node:fs';
+import https from 'node:https';
+import { fileURLToPath } from 'node:url';
+import * as timerTask from './tasks/timer.js';
+import * as integrationTask from './tasks/integrations.js';
+import './util/createFolders.js';
+import './util/loadServers.js';
+import errorHandler from './util/errorHandler.js';
+import errorMiddleware from './middlewares/error.js';
+import configRoutes from './routes/config.js';
+import speedtestsRoutes from './routes/speedtests.js';
+import systemRoutes from './routes/system.js';
+import storageRoutes from './routes/storage.js';
+import recommendationsRoutes from './routes/recommendations.js';
+import nodesRoutes from './routes/nodes.js';
+import integrationsRoutes from './routes/integrations.js';
+import prometheusRoutes from './routes/prometheus.js';
+import opengraphRoutes from './routes/opengraph.js';
+import db from './config/database.js';
+import * as config from './controller/config.js';
+import { initialize as initializeIntegrations } from './controller/integrations.js';
+import { requestInterfaces } from './util/loadInterfaces.js';
+import { load as loadCli } from './util/loadCli.js';
+import { removeOld } from './tasks/speedtest.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const devModeHtml = fs.readFileSync(path.join(__dirname, 'templates', 'env.html'), 'utf-8');
 
 const app = express();
 
 app.disable('x-powered-by');
 
 const port = process.env.SERVER_PORT || 5216;
+const httpsPort = process.env.HTTPS_PORT || 5217;
 
-require('./util/createFolders');
-require('./util/loadServers');
+const certsDir = path.join(process.cwd(), 'data', 'certs');
+const certPath = path.join(certsDir, 'cert.pem');
+const keyPath = path.join(certsDir, 'key.pem');
 
-process.on('uncaughtException', err => require('./util/errorHandler')(err));
+const hasSSLCerts = () => fs.existsSync(certPath) && fs.existsSync(keyPath);
 
-app.use(express.json());
-app.use(require('./middlewares/error'));
+process.on('uncaughtException', err => errorHandler(err));
 
-app.use("/api/config", require('./routes/config'));
-app.use("/api/speedtests", require('./routes/speedtests'));
-app.use("/api/info", require('./routes/system'));
-app.use("/api/storage", require('./routes/storage'));
-app.use("/api/recommendations", require('./routes/recommendations'));
-app.use("/api/nodes", require('./routes/nodes'));
-app.use("/api/integrations", require('./routes/integrations'));
-app.use("/api/prometheus", require('./routes/prometheus'));
-app.use('/api/opengraph', require('./routes/opengraph'));
+app.use(express.json({ limit: '50mb' }));
+app.use(errorMiddleware);
+
+app.use("/api/config", configRoutes);
+app.use("/api/speedtests", speedtestsRoutes);
+app.use("/api/info", systemRoutes);
+app.use("/api/storage", storageRoutes);
+app.use("/api/recommendations", recommendationsRoutes);
+app.use("/api/nodes", nodesRoutes);
+app.use("/api/integrations", integrationsRoutes);
+app.use("/api/prometheus", prometheusRoutes);
+app.use('/api/opengraph', opengraphRoutes);
 app.use("/api*all", (req, res) => res.status(404).json({message: "Route not found"}));
 
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../build')));
+let buildPath = path.join(__dirname, '..', 'build');
+let buildExists = fs.existsSync(buildPath);
 
-    app.get('*all', (req, res) => res.sendFile(path.join(__dirname, '../build', 'index.html')));
-} else {
-    app.get("*all", (req, res) => res.status(500).sendFile(path.join(__dirname, 'templates', 'env.html')));
+if (!buildExists) {
+    buildPath = path.join(process.cwd(), 'build');
+    buildExists = fs.existsSync(buildPath);
 }
 
-let db = require("./config/database");
+if (buildExists) {
+    app.use(express.static(buildPath));
+    app.get('*all', (req, res) => res.sendFile(path.join(buildPath, 'index.html')));
+} else {
+    app.get("*all", (req, res) => res.status(500).type('html').send(devModeHtml));
+}
 
 const run = async () => {
-    const config = require('./controller/config');
-
     await db.sync({alter: true, force: false});
 
-    await require('./controller/integrations').initialize();
+    await initializeIntegrations();
 
-    await require('./util/loadInterfaces').requestInterfaces();
-    setInterval(() => require('./util/loadInterfaces').requestInterfaces(), 3600000);
+    await requestInterfaces();
+    setInterval(() => requestInterfaces(), 3600000);
 
-    if (process.env.PREVIEW_MODE !== "true") await require('./util/loadCli').load();
+    if (process.env.PREVIEW_MODE !== "true") await loadCli();
 
     await config.insertDefaults();
 
     timerTask.startTimer(await config.getValue("cron"));
-    setInterval(async () => require('./tasks/speedtest').removeOld(), 60000);
+    setInterval(async () => removeOld(), 60000);
 
     integrationTask.startTimer();
     if (process.env.RUN_TEST_ON_STARTUP === "true") {
@@ -61,6 +95,21 @@ const run = async () => {
     }
 
     app.listen(port, () => console.log(`Server listening on port ${port}`));
+
+    if (hasSSLCerts()) {
+        try {
+            const sslOptions = {
+                cert: fs.readFileSync(certPath),
+                key: fs.readFileSync(keyPath)
+            };
+
+            https.createServer(sslOptions, app).listen(httpsPort, () =>
+                console.log(`HTTPS server listening on port ${httpsPort}`)
+            );
+        } catch (err) {
+            console.error(`Failed to start HTTPS server: ${err.message}`);
+        }
+    }
 }
 
 db.authenticate().then(() => {

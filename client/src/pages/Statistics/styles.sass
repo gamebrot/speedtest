@@ -9,7 +9,59 @@
   gap: 2rem
   justify-content: space-between
   flex-wrap: wrap
-  transition: 1s all ease-in-out
+
+.statistic-stale
+  opacity: 0.7
+  transition: opacity 0.2s ease
+
+.statistic-loading
+  .skeleton-picker
+    width: 280px
+    height: 48px
+    background: linear-gradient(90deg, hsl(215, 28%, 12%) 25%, hsl(215, 28%, 17%) 50%, hsl(215, 28%, 12%) 75%)
+    background-size: 200% 100%
+    border-radius: 0.75rem
+    opacity: 0
+    transform: translateY(10px)
+    
+    &.skeleton-visible
+      animation: skeleton-shimmer 1.5s infinite, skeleton-fade-in 0.3s ease forwards
+    
+  .skeleton-chart
+    flex: 1 1 30%
+    min-width: 16rem
+    height: 18rem
+    background: linear-gradient(90deg, hsl(215, 28%, 12%) 25%, hsl(215, 28%, 17%) 50%, hsl(215, 28%, 12%) 75%)
+    background-size: 200% 100%
+    border-radius: 1rem
+    border: 1px solid $light-gray
+    opacity: 0
+    transform: translateY(10px)
+    
+    &.skeleton-visible
+      animation: skeleton-shimmer 1.5s infinite, skeleton-fade-in 0.3s ease forwards
+
+@keyframes skeleton-shimmer
+  0%
+    background-position: 200% 0
+  100%
+    background-position: -200% 0
+
+@keyframes skeleton-fade-in
+  0%
+    opacity: 0
+    transform: translateY(10px)
+  100%
+    opacity: 1
+    transform: translateY(0)
+
+.statistics-header
+  width: 100%
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 1rem
+  margin-bottom: 0.5rem
 
 @media screen and (max-width: 1472px)
   .statistic-area

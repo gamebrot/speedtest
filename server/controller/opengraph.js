@@ -1,25 +1,29 @@
-const fs = require("fs");
-const resvg = require("@resvg/resvg-js").Resvg;
-const moment = require("moment-timezone");
-const tests = require("../controller/speedtests");
-const axios = require("axios");
+import fs from 'node:fs';
+import { Resvg } from '@resvg/resvg-js';
+import moment from 'moment-timezone';
+import * as tests from './speedtests.js';
+import axios from 'axios';
+import { html } from 'satori-html';
+import satori from 'satori';
 
 async function generateOpenGraphImage(req) {
-  const test = await tests.listStatistics(1);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  const formatDate = (d) => d.toISOString().split('T')[0];
+  const test = await tests.listStatistics(formatDate(yesterday), formatDate(today));
 
   if (!test.download.avg || !test.upload.avg || !test.ping.avg) {
     throw new Error("Error fetching OpenGraph data");
   }
 
   const fontPath = "/assets/fonts/inter-v12-latin-regular.ttf";
+  const localFontPath = `client/public${fontPath}`;
 
-  const font =
-    process.env.NODE_ENV === "production"
-      ? (await axios.get(`${req.protocol}://${req.hostname}${fontPath}`)).data
-      : await fs.promises.readFile(`client/public${fontPath}`);
-
-  const html = (await import("satori-html")).html;
-  const satori = (await import("satori")).default;
+  const font = fs.existsSync(localFontPath)
+    ? await fs.promises.readFile(localFontPath)
+    : (await axios.get(`${req.protocol}://${req.hostname}${fontPath}`)).data;
 
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const date = moment().tz(timeZone).format("MM/DD/YYYY");
@@ -165,9 +169,9 @@ async function generateOpenGraphImage(req) {
     ],
   });
 
-  const svg = new resvg(image);
+  const svg = new Resvg(image);
 
   return svg.render().asPng();
 }
 
-module.exports = generateOpenGraphImage;
+export default generateOpenGraphImage;

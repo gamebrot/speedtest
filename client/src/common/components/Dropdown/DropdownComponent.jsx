@@ -1,54 +1,50 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import "./styles.sass";
 import {
-    faArrowDown,
-    faArrowUp,
     faCircleNodes,
     faClock,
     faGlobeEurope,
     faInfo,
     faKey,
     faPause,
-    faPingPongPaddleBall,
     faPlay,
-    faWandMagicSparkles,
-    faCheck,
-    faExclamationTriangle, 
     faSliders, 
     faHardDrive,
     faMoon,
-    faSun
+    faSun,
+    faGauge
 } from "@fortawesome/free-solid-svg-icons";
 import {ConfigContext} from "@/common/contexts/Config";
 import {StatusContext} from "@/common/contexts/Status";
-import {InputDialogContext} from "@/common/contexts/InputDialog";
+import {useAlert} from "@/common/contexts/Alert";
 import {ThemeContext} from "@/common/contexts/Theme";
-import {baseRequest, jsonRequest, patchRequest, postRequest} from "@/common/utils/RequestUtil";
-import {creditsInfo, recommendationsInfo} from "@/common/components/Dropdown/utils/infos";
-import {levelOptions, selectOptions} from "@/common/components/Dropdown/utils/options";
-import {parseCron, stringifyCron} from "@/common/components/Dropdown/utils/utils";
+import {postRequest} from "@/common/utils/RequestUtil";
 import {t} from "i18next";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {ToastNotificationContext} from "@/common/contexts/ToastNotification";
-import {NodeContext} from "@/common/contexts/Node";
 import {IntegrationDialog} from "@/common/components/IntegrationDialog";
 import LanguageDialog from "@/common/components/LanguageDialog";
 import ProviderDialog from "@/common/components/ProviderDialog";
 import StorageDialog from "@/common/components/StorageDialog";
+import OptimalValuesDialog from "@/common/components/OptimalValuesDialog";
+import FrequencyDialog from "@/common/components/FrequencyDialog";
+import PasswordDialog from "@/common/components/PasswordDialog";
+import PauseDialog from "@/common/components/PauseDialog";
 
 const DropdownComponent = ({isOpen, switchDropdown}) => {
-    const [config, reloadConfig] = useContext(ConfigContext);
+    const [config] = useContext(ConfigContext);
     const [status, updateStatus] = useContext(StatusContext);
     const [isDarkMode, toggleTheme] = useContext(ThemeContext);
-    const findNode = useContext(NodeContext)[4];
-    const updateNodes = useContext(NodeContext)[1];
-    const currentNode = useContext(NodeContext)[2];
     const updateToast = useContext(ToastNotificationContext);
-    const [setDialog] = useContext(InputDialogContext);
+    const alert = useAlert();
     const [showIntegrationDialog, setShowIntegrationDialog] = useState(false);
     const [showLanguageDialog, setShowLanguageDialog] = useState(false);
     const [showProviderDialog, setShowProviderDialog] = useState(false);
     const [showStorageDialog, setShowStorageDialog] = useState(false);
+    const [showOptimalValuesDialog, setShowOptimalValuesDialog] = useState(false);
+    const [showFrequencyDialog, setShowFrequencyDialog] = useState(false);
+    const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+    const [showPauseDialog, setShowPauseDialog] = useState(false);
     const ref = useRef();
 
     useEffect(() => {
@@ -72,114 +68,21 @@ const DropdownComponent = ({isOpen, switchDropdown}) => {
             document.removeEventListener("mousedown", onClick);
         }
     }, [isOpen]);
-    const showFeedback = (customText = "dropdown.changes_applied", reload = true) => {
-        updateToast(t(customText), customText === "dropdown.changes_unsaved" ? "red" : "green",
-            customText === "dropdown.changes_unsaved" ? faExclamationTriangle : faCheck);
-
-        if (reload) reloadConfig();
-    }
-
-    const patchDialog = async (key, dialog, postValue = (val) => val) => {
-        setTimeout(async () => setDialog({...(await dialog(config[key])),
-            onSuccess: value => patchRequest(`/config/${key}`, {value: postValue(value)})
-                .then(res => showFeedback(!res.ok ? "dropdown.changes_unsaved" : undefined))
-        }), 160);
-    }
-
-    const updatePing = async () => patchDialog("ping", (value) => ({
-        title: t("update.ping_title"), placeholder: t("update.ping_placeholder"), value
-    }));
-
-    const updateUpload = async () => patchDialog("upload", (value) => ({
-        title: t("update.upload_title"), placeholder: t("update.upload_placeholder"), value
-    }));
-
-    const updateDownload = async () => patchDialog("download", (value) => ({
-        title: t("update.download_title"), placeholder: t("update.download_placeholder"), value
-    }));
-
-    const recommendedSettings = async () => {
-        const result = await jsonRequest("/recommendations");
-
-        if (!result.message) {
-            setDialog({
-                title: t("update.recommendations_set"),
-                description: recommendationsInfo(result.ping, result.download, result.upload),
-                buttonText: t("dialog.apply"),
-                onSuccess: async () => {
-                    await patchRequest("/config/ping", {value: result.ping});
-                    await patchRequest("/config/download", {value: result.download});
-                    await patchRequest("/config/upload", {value: result.upload});
-                    showFeedback();
-                }
-            });
-        } else setDialog({title: t("update.recommendations_title"), description: t("info.recommendations_error"), buttonText: t("dialog.okay")});
-    }
-
-    const updatePassword = async () => {
-        const passwordSet = currentNode !== 0 ? findNode(currentNode).password : localStorage.getItem("password") != null;
-
-        setDialog({
-            title: <>{t("update.new_password")} » <a onClick={updatePasswordLevel}>{t("update.level")}</a></>,
-            placeholder: t("update.password_placeholder"),
-            type: "password",
-            unsetButton: passwordSet ? t("dialog.password.unlock") : undefined,
-            onClear: () => patchRequest("/config/password", {value: "none"})
-                .then(() => showFeedback("update.password_removed", false))
-                .then(() => {
-                    currentNode !== 0 ? baseRequest("/nodes/" + currentNode + "/password", "PATCH",
-                        {password: "none"}).then(() => updateNodes()) : localStorage.removeItem("password");
-                }),
-            onSuccess: (value) => patchRequest("/config/password", {value})
-                .then(() => showFeedback(undefined, false))
-                .then(() => {
-                    currentNode !== 0 ? baseRequest("/nodes/" + currentNode + "/password", "PATCH",
-                        {password: value}).then(() => updateNodes()) : localStorage.setItem("password", value);
-                })
-        })
-    }
-
-    const updatePasswordLevel = () => patchDialog("passwordLevel", async (value) => ({
-        title: t("update.level_title"), select: true, selectOptions: levelOptions(), value, replace: true
-    }));
-
-    const updateCron = async () => {
-        setDialog({
-            title: t("update.cron_title"),
-            select: true,
-            selectOptions: selectOptions(),
-            value: config.cron,
-            unsetButton: t("update.manually"),
-            onClear: updateCronManually,
-            onSuccess: value => patchRequest("/config/cron", {value}).then(() => showFeedback())
-        });
-    }
-
-    const updateCronManually = () => patchDialog("cron", (value) => ({
-        title: <>{t("update.cron_title")} <a href="https://crontab.guru/" target="_blank">?</a></>,
-        placeholder: t("update.cron_rules"),
-        value: value,
-        updateDescription: (val) => <>{t("update.cron_next_test")} <span className="dialog-value">{parseCron(val)}</span></>,
-        description: <>{t("update.cron_next_test")} <span className="dialog-value">{parseCron(value)}</span></>
-    }), (val) => stringifyCron(val));
-
-    const togglePause = () => {
+    
+    const togglePause = async () => {
         if (!status.paused) {
-            setDialog({
-                title: t("update.pause_title"),
-                placeholder: t("update.hours"),
-                type: "number",
-                buttonText: t("update.pause"),
-                unsetButton: t("update.release_manually"),
-                onClear: () => postRequest("/speedtests/pause", {resumeIn: -1}).then(updateStatus),
-                onSuccess: (hours) => postRequest("/speedtests/pause", {resumeIn: hours}).then(updateStatus)
-            });
-        } else postRequest("/speedtests/continue").then(updateStatus);
-    }
+            setShowPauseDialog(true);
+        } else {
+            await postRequest("/speedtests/continue");
+            updateStatus();
+        }
+    };
 
-    const showCredits = () => setDialog({title: "MySpeed", description: creditsInfo(), buttonText: t("dialog.close")});
-
-    const showProviderDetails = () => setDialog({title: t("dropdown.provider"), description: config.previewMessage, buttonText: t("dialog.close")});
+    const showProviderDetails = () => alert.openAlert(
+        t("dropdown.provider"),
+        config.previewMessage,
+        { buttonText: t("dialog.close") }
+    );
 
     const handleThemeToggle = () => {
         toggleTheme();
@@ -187,30 +90,30 @@ const DropdownComponent = ({isOpen, switchDropdown}) => {
     };
 
     const options = [
-        {run: updatePing, icon: faPingPongPaddleBall, text: t("dropdown.ping")},
-        {run: updateUpload, icon: faArrowUp, text: t("dropdown.upload")},
-        {run: updateDownload, icon: faArrowDown, text: t("dropdown.download")},
-        {run: recommendedSettings, icon: faWandMagicSparkles, text: t("dropdown.recommendations")},
+        {run: () => setShowOptimalValuesDialog(true), icon: faGauge, text: t("dropdown.optimal_values")},
         {hr: true, key: 1},
         {run: () => setShowProviderDialog(true), icon: faSliders, text: t("dropdown.change_provider")},
         {run: () => setShowStorageDialog(true), icon: faHardDrive, text: t("dropdown.storage")},
-        {run: updatePassword, icon: faKey, text: t("dropdown.password"), previewHidden: true},
-        {run: updateCron, icon: faClock, text: t("dropdown.cron")},
+        {run: () => setShowPasswordDialog(true), icon: faKey, text: t("dropdown.password"), previewHidden: true},
+        {run: () => setShowFrequencyDialog(true), icon: faClock, text: t("dropdown.cron")},
         {run: togglePause, icon: status.paused ? faPlay : faPause, text: t("dropdown." + (status.paused ? "resume_tests" : "pause_tests"))},
         {run: () => setShowIntegrationDialog(true), icon: faCircleNodes, text: t("dropdown.integrations")},
         {hr: true, key: 2},
         {run: handleThemeToggle, icon: isDarkMode ? faSun : faMoon, text: t(isDarkMode ? "dropdown.light_mode" : "dropdown.dark_mode"), allowView: true},
         {run: () => setShowLanguageDialog(true), icon: faGlobeEurope, text: t("dropdown.language"), allowView: true},
-        {run: showCredits, icon: faInfo, text: t("dropdown.info"), allowView: true, previewHidden: true},
         {run: showProviderDetails, icon: faInfo, text: t("dropdown.provider"), previewShown: true}
     ];
 
     return (
         <>
-            {showIntegrationDialog && <IntegrationDialog onClose={() => setShowIntegrationDialog(false)}/>}
-            {showLanguageDialog && <LanguageDialog onClose={() => setShowLanguageDialog(false)}/>}
-            {showProviderDialog && <ProviderDialog onClose={() => setShowProviderDialog(false)}/>}
-            {showStorageDialog && <StorageDialog onClose={() => setShowStorageDialog(false)}/>}
+            <IntegrationDialog open={showIntegrationDialog} onClose={() => setShowIntegrationDialog(false)}/>
+            <LanguageDialog open={showLanguageDialog} onClose={() => setShowLanguageDialog(false)}/>
+            <ProviderDialog open={showProviderDialog} onClose={() => setShowProviderDialog(false)}/>
+            <StorageDialog open={showStorageDialog} onClose={() => setShowStorageDialog(false)}/>
+            <OptimalValuesDialog open={showOptimalValuesDialog} onClose={() => setShowOptimalValuesDialog(false)}/>
+            <FrequencyDialog open={showFrequencyDialog} onClose={() => setShowFrequencyDialog(false)}/>
+            <PasswordDialog open={showPasswordDialog} onClose={() => setShowPasswordDialog(false)}/>
+            <PauseDialog open={showPauseDialog} onClose={() => setShowPauseDialog(false)} onPause={updateStatus}/>
             <div className={`dropdown ${isOpen ? '' : 'dropdown-invisible'}`} ref={ref}>
                 <div className="dropdown-content">
                     <h2>{t("dropdown.settings")}</h2>

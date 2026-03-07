@@ -1,4 +1,4 @@
-const passwordMiddleware = require('./password');
+import passwordMiddleware from './password.js';
 
 const passwordWrapper = (allowViewAccess, customResponseHandler) => async (req, res, next) => {
     // Intercept the response send method
@@ -22,4 +22,4 @@ const passwordWrapper = (allowViewAccess, customResponseHandler) => async (req, 
     }
 };
 
-module.exports = passwordWrapper;
+export default passwordWrapper;

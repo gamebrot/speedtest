@@ -1,0 +1,133 @@
+name: Build MSI
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      release_id:
+        required: true
+        type: string
+
+jobs:
+  build-msi:
+    name: "Windows MSI Installer"
+    runs-on: windows-latest
+    steps:
+      - name: Download Windows server binary
+        uses: actions/download-artifact@v4
+        with:
+          name: MySpeed-windows-x64.exe
+          path: ./installer
+
+      - name: Download build folder
+        uses: actions/download-artifact@v4
+        with:
+          name: build-folder
+          path: ./installer/build
+
+      - name: Download WinSW service wrapper
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/winsw/winsw/releases/download/v3.0.0-alpha.11/WinSW-x64.exe" -OutFile "installer\MySpeedService.exe"
+
+      - name: Create service configuration
+        shell: powershell
+        run: |
+          $serviceConfig = @"
+          <service>
+            <id>MySpeed</id>
+            <name>MySpeed Speedtest Tracker</name>
+            <description>MySpeed Speedtest Tracker Service</description>
+            <executable>MySpeed.exe</executable>
+            <workingdirectory>%BASE%</workingdirectory>
+            <logmode>rotate</logmode>
+            <logpath>%BASE%\logs</logpath>
+            <stoptimeout>30 sec</stoptimeout>
+            <startmode>Automatic</startmode>
+            <onfailure action="restart" delay="10 sec"/>
+            <resetfailure>1 hour</resetfailure>
+          </service>
+          "@
+          $serviceConfig | Out-File -FilePath "installer\MySpeedService.xml" -Encoding UTF8
+
+      - name: Install WiX Toolset
+        run: |
+          choco install wixtoolset -y
+          echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" >> $env:GITHUB_PATH
+
+      - name: Create WiX configuration
+        shell: powershell
+        run: |
+          $wxsContent = @"
+          <?xml version="1.0" encoding="UTF-8"?>
+          <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+            <Product Id="*" Name="MySpeed" Language="1033" Version="${{ inputs.version }}.0" Manufacturer="Mathias Wagner" UpgradeCode="A1B2C3D4-5E6F-7890-ABCD-EF1234567890">
+              <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+          
+              <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+              <MediaTemplate EmbedCab="yes" />
+          
+              <Feature Id="ProductFeature" Title="MySpeed" Level="1">
+                <ComponentGroupRef Id="ProductComponents" />
+                <ComponentGroupRef Id="BuildFilesGroup" />
+                <ComponentRef Id="DataFolder" />
+                <ComponentRef Id="LogsFolderComponent" />
+              </Feature>
+          
+              <Directory Id="TARGETDIR" Name="SourceDir">
+                <Directory Id="ProgramFilesFolder">
+                  <Directory Id="INSTALLFOLDER" Name="MySpeed">
+                    <Directory Id="BUILDFOLDER" Name="build" />
+                    <Directory Id="DATAFOLDER" Name="data" />
+                    <Directory Id="LOGSFOLDER" Name="logs" />
+                  </Directory>
+                </Directory>
+              </Directory>
+          
+              <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+                <Component Id="MySpeedExecutable" Guid="*">
+                  <File Id="MySpeedExe" Source="MySpeed.exe" KeyPath="yes" />
+                </Component>
+                <Component Id="ServiceWrapper" Guid="B2C3D4E5-6F7A-8901-BCDE-F23456789012">
+                  <File Id="ServiceWrapperExe" Source="MySpeedService.exe" KeyPath="yes" />
+                  <File Id="ServiceConfig" Source="MySpeedService.xml" />
+                  <ServiceInstall Id="MySpeedService" Name="MySpeed" DisplayName="MySpeed Speedtest Tracker" 
+                                 Type="ownProcess" Start="auto" ErrorControl="normal" 
+                                 Description="MySpeed Speedtest Tracker Service"
+                                 Account="LocalSystem" Interactive="no" />
+                  <ServiceControl Id="MySpeedServiceControl" Name="MySpeed" Start="install" Stop="both" Remove="uninstall" Wait="yes" />
+                </Component>
+              </ComponentGroup>
+          
+              <Component Id="LogsFolderComponent" Directory="LOGSFOLDER" Guid="C3D4E5F6-7A8B-9012-CDEF-345678901234">
+                <CreateFolder />
+              </Component>
+          
+              <Component Id="DataFolder" Directory="DATAFOLDER" Guid="D4E5F6A7-8B9C-0123-DEF0-456789012345">
+                <CreateFolder />
+              </Component>
+            </Product>
+          </Wix>
+          "@
+          $wxsContent | Out-File -FilePath "installer\myspeed.wxs" -Encoding UTF8
+
+      - name: Build MSI
+        working-directory: installer
+        run: |
+          heat dir build -cg BuildFilesGroup -gg -scom -sreg -sfrag -srd -dr BUILDFOLDER -var var.BuildSourceDir -out build-files.wxs
+          candle myspeed.wxs build-files.wxs -dBuildSourceDir=build
+          light myspeed.wixobj build-files.wixobj -o MySpeed-installer.msi
+
+      - name: Upload to Release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            await github.rest.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: ${{ inputs.release_id }},
+              name: 'MySpeed-installer.msi',
+              data: fs.readFileSync('installer/MySpeed-installer.msi')
+            });

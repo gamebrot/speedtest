@@ -1,7 +1,7 @@
-const config = require('../controller/config');
-const bcrypt = require('bcrypt');
+import * as config from '../controller/config.js';
+import bcrypt from 'bcrypt';
 
-module.exports = (allowViewAccess) => async (req, res, next) => {
+export default (allowViewAccess) => async (req, res, next) => {
     if (process.env.PREVIEW_MODE === "true") return next();
 
     let passwordHash = await config.getValue("password");
@@ -23,4 +23,4 @@ module.exports = (allowViewAccess) => async (req, res, next) => {
     }
 
     return res.status(401).json({message: "Please provide the correct password in the header"});
-}
+};

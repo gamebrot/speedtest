@@ -1,52 +1,47 @@
-import {DialogContext, DialogProvider} from "@/common/contexts/Dialog";
+import {Dialog, DialogHeader, DialogBody, DialogFooter} from "@/common/contexts/Dialog";
 import {t, changeLanguage} from "i18next";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faClose, faGlobe} from "@fortawesome/free-solid-svg-icons";
+import {faGlobe} from "@fortawesome/free-solid-svg-icons";
 import "./styles.sass";
 import {languages} from "@/i18n";
 import {useContext, useState} from "react";
 import {ToastNotificationContext} from "@/common/contexts/ToastNotification";
 
-export const Dialog = () => {
-    const [selectedLanguage, setSelectedLanguage] = useState(localStorage.getItem("language") || "en");
+export const LanguageDialog = ({open, onClose}) => {
     const updateToast = useContext(ToastNotificationContext);
-    const close = useContext(DialogContext);
+    const [selectedLanguage, setSelectedLanguage] = useState(localStorage.getItem("language") || "en");
 
-    const updateLanguage = () => {
+    const updateLanguage = (close) => {
         changeLanguage(selectedLanguage);
         updateToast(t('dropdown.language_changed'), "green", faGlobe);
         close();
-    }
+    };
 
     return (
-        <>
-            <div className="dialog-header">
-                <h4 className="dialog-text">{t("update.language")}</h4>
-                <FontAwesomeIcon icon={faClose} className="dialog-text dialog-icon" onClick={() => close()}/>
-            </div>
-            <div className="language-chooser-dialog">
-                {languages.map((language, index) => (
-                    <div key={index}
-                         className={"language-chooser-item" + (selectedLanguage === language.code ? " language-selected" : "")}
-                         onClick={() => setSelectedLanguage(language.code)}>
-                        <img src={language.flag} alt={language.name}/>
-                        <p>{language.name}</p>
-                    </div>
-                ))}
-            </div>
-            <div className="dialog-buttons">
-                <button className="dialog-btn" onClick={updateLanguage}>{t("dialog.update")}</button>
-            </div>
-        </>
-    )
-}
-
-export const LanguageDialog = (props) => {
-    return (
-        <>
-            <DialogProvider close={props.onClose}>
-                <Dialog />
-            </DialogProvider>
-        </>
-    )
+        <Dialog open={open} onClose={onClose} className="language-dialog">
+            {({close}) => (
+                <>
+                    <DialogHeader onClose={close}>{t("update.language")}</DialogHeader>
+                    <DialogBody>
+                        <div className="language-content">
+                            <div className="language-list">
+                                {languages.map((language) => (
+                                    <div 
+                                        key={language.code}
+                                        className={`language-item${selectedLanguage === language.code ? " language-item-active" : ""}`}
+                                        onClick={() => setSelectedLanguage(language.code)}
+                                    >
+                                        <img src={language.flag} alt={language.name} className="language-flag"/>
+                                        <span className="language-name">{language.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </DialogBody>
+                    <DialogFooter>
+                        <button className="dialog-btn" onClick={() => updateLanguage(close)}>{t("dialog.update")}</button>
+                    </DialogFooter>
+                </>
+            )}
+        </Dialog>
+    );
 }

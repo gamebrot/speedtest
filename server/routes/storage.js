@@ -1,7 +1,9 @@
-const app = require('express').Router();
-const tests = require('../controller/speedtests');
-const config = require('../controller/config');
-const password = require('../middlewares/password');
+import express from 'express';
+import * as tests from '../controller/speedtests.js';
+import * as config from '../controller/config.js';
+import password from '../middlewares/password.js';
+
+const app = express.Router();
 
 app.get("/", password(false), async (req, res) => {
     res.json(await config.getUsedStorage());
@@ -58,4 +60,4 @@ app.delete("/config", password(false), async (req, res) => {
     res.status(result ? 200 : 500).json({message: result ? "Config reset" : "Error resetting config"});
 });
 
-module.exports = app;
+export default app;

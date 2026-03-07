@@ -1,10 +1,10 @@
-const axios = require("axios");
-const {replaceVariables} = require("../util/helpers");
+import axios from "axios";
+import { replaceVariables } from "../util/helpers.js";
 
 const defaults = {
-    finished: "✨ *A speedtest is finished*\n🏓 `Ping`: %ping% ms\n🔼 `Upload`: %upload% Mbps\n🔽 `Download`: %download% Mbps",
+    finished: "✨ *A speedtest is finished*\n🏓 `Ping`: %ping% ms (±%jitter% ms)\n🔼 `Upload`: %upload% Mbps\n🔽 `Download`: %download% Mbps",
     failed: "❌ *A speedtest has failed*\n`Reason`: %error%"
-}
+};
 
 const postWebhook = async (token, chatId, message, triggerActivity) => {
     axios.post(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -12,9 +12,9 @@ const postWebhook = async (token, chatId, message, triggerActivity) => {
     })
         .then(() => triggerActivity())
         .catch(() => triggerActivity(true));
-}
+};
 
-module.exports = (registerEvent) => {
+export default (registerEvent) => {
     registerEvent('testFinished', async (integration, data, activity) => {
         if (integration.data.send_finished)
             await postWebhook(integration.data.token, integration.data.chat_id,
@@ -38,4 +38,4 @@ module.exports = (registerEvent) => {
             {name: "error_message", type: "textarea", required: false}
         ]
     };
-}
+};

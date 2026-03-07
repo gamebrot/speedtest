@@ -15,8 +15,8 @@
   },
   "dialog": {
     "okay": "Хорошо",
-    "done": "Готовый",
-    "continue": "Продолжай",
+    "done": "Готово",
+    "continue": "Продолжить",
     "apply": "Да, применить",
     "update": "Обновление",
     "close": "Закрыть",
@@ -56,14 +56,14 @@
     "password": "Изменить пароль",
     "cron": "Установить частоту",
     "time": "Установить период",
-    "storage": "Управляй хранилищем",
+    "storage": "Управление хранилищем",
     "pause_tests": "Приостановить тесты",
     "resume_tests": "Продолжить тесты",
     "language": "Изменить язык",
-    "light_mode": "Режим освещения",
+    "light_mode": "Светлый режим",
     "dark_mode": "Темный режим",
-    "theme_switched_light": "Переключился в режим освещения",
-    "theme_switched_dark": "Переключись в темный режим",
+    "theme_switched_light": "Включен светлый режим",
+    "theme_switched_dark": "Включен темный режим",
     "info": "Информация о проекте",
     "provider": "О провайдере",
     "integrations": "Интеграции"
@@ -88,10 +88,10 @@
   "update": {
     "ping_title": "Установите оптимальный пинг (мс)",
     "ping_placeholder": "Пинг (мс)",
-    "upload_title": "Установите оптимальную скорость (Мбит/с)",
-    "upload_placeholder": "Скорость подъема (Мбит/с)",
-    "download_title": "Установите оптимальную скорость передачи данных (Мбит/с)",
-    "download_placeholder": "Скорость снижения (Мбит/с)",
+    "upload_title": "Установите оптимальную исходящую скорость (Мбит/с)",
+    "upload_placeholder": "Исходящая скорость (Мбит/с)",
+    "download_title": "Установите оптимальную входящую скорость (Мбит/с)",
+    "download_placeholder": "Входящая скорость (Мбит/с)",
     "recommendations_title": "Оптимальные рекомендации",
     "recommendations_set": "Установить автоматические рекомендации?",
     "provider_title": "Установи провайдера speedtest",
@@ -101,15 +101,15 @@
     "password_removed": "Блокировка пароля была снята, а установленный пароль удален.",
     "level": "Уровень изменений",
     "level_title": "Права для посетителей",
-    "cron_title": "Установите тестовую частоту",
+    "cron_title": "Установите частоту тестов",
     "cron_rules": "Правило Cron",
     "cron_next_test": "Следующий тест:",
-    "time_title": "Показать тесты последних ...",
+    "time_title": "Показать тесты за последние ...",
     "download": "Скачать",
-    "pause_title": "Скоростные тесты приостанавливают...",
+    "pause_title": "Приостановить тесты на...",
     "hours": "Часы",
     "pause": "Пауза",
-    "release_manually": "Освободить вручную",
+    "release_manually": "Возобновить вручную",
     "language": "Изменить язык",
     "view_title": "Изменить вид"
   },
@@ -142,7 +142,7 @@
     "import_config_error": "Возникла ошибка при импорте конфигурации",
     "export": "Экспорт",
     "import": "Импорт",
-    "clear_history": "Чистая история",
+    "clear_history": "Очистить историю",
     "history_cleared": "История была очищена",
     "delete": "Удалить",
     "confirm_delete": "Да, удаляй",
@@ -158,11 +158,11 @@
   "latest": {
     "ping": "Пинг",
     "ping_unit": "ms",
-    "down": "Скачать",
+    "down": "Входящяя",
     "speed_unit": "Mbit/s",
-    "up": "Загрузить",
+    "up": "Исходящая",
     "latest": "Последний тест",
-    "before": "с сайта"
+    "before": ""
   },
   "info": {
     "credits": "<MSpeed>MySpeed</MSpeed> - это проект с открытым исходным кодом, предоставленный GNMYT. Оставь звезду на <Github>GitHub</Github> или <Donate>пожертвуй</Donate>, чтобы поддержать проект.",
@@ -193,31 +193,31 @@
     "minutes": "{{minutes}} Протоколы",
     "hour": "1 час",
     "hours": "{{hours}} часов",
-    "on": "На сайте",
-    "at": "На сайте"
+    "on": "в",
+    "at": "в"
   },
   "test": {
     "not_available": "В настоящее время нет доступных тестов",
     "no_latest": "Текущий тест отсутствует. Пожалуйста, выполните тест или подождите, пока не будет выполнен следующий тест.",
-    "loading_more": "Загрузи больше тестов...",
+    "loading_more": "Загрузить больше тестов...",
     "no_more_tests": "Больше никаких тестов для загрузки",
     "unknown_error": "Неизвестная ошибка:",
     "failed": "Тест не прошел",
-    "recheck": "Пожалуйста, проверьте, насколько это возможно, если такое случается чаще.",
+    "recheck": "Пожалуйста, проверьте, насколько это возможно, случается ли такое часто.",
     "delete": "Удалить тест",
     "deleted": "Тест был удален",
     "average": {
       "title": "Средняя скорость",
-      "description": "<Bold>{{amount}}</Bold> Тесты показали, что на <Bold>{{date}}</Bold> средняя скорость загрузки <Bold>{{down}} Mbits/s</Bold> и скорость загрузки <Bold>{{up}} Mbits/s</Bold> была пройдена. Тесты длились в среднем <Bold>{{duration}} секунд</Bold>."
+      "description": "<Bold>{{amount}}</Bold> Тесты показали, что на <Bold>{{date}}</Bold> средняя входящая скорость <Bold>{{down}} Mbits/s</Bold> и исходящая скорость <Bold>{{up}} Mbits/s</Bold>. Тесты длились в среднем <Bold>{{duration}} секунд</Bold>."
     },
     "result": {
       "title": "Результат тестирования",
-      "description": "В <Link>этом тесте</Link> была достигнута максимальная скорость скачивания <Bold>{{down}} Мбит/с</Bold> и максимальная скорость загрузки <Bold>{{up}} Мбит/с</Bold>. Он был создан <Bold>{{type}}</Bold> и занял <Bold>{{duration}} секунд</Bold>.",
+      "description": "В <Link>этом тесте</Link> была достигнута максимальная входящая скорость <Bold>{{down}} Мбит/с</Bold> и максимальная исходящая скорость <Bold>{{up}} Мбит/с</Bold>. Он был создан <Bold>{{type}}</Bold> и занял <Bold>{{duration}} секунд</Bold>.",
       "from_you": "от тебя",
       "automatic": "автоматический"
     },
     "overview": {
-      "title": "Тестовый обзор последнего {{amount}}",
+      "title": "Обзор тестов за последние {{amount}}",
       "1": "24 часа",
       "2": "2 дня",
       "3": "7 дней",
@@ -242,7 +242,7 @@
       "failed_title": "Неудачные тесты",
       "failed_description": "Количество неудачных тестов",
       "average_title": "Средняя продолжительность",
-      "average_description": "Средняя продолжительность испытаний"
+      "average_description": "Средняя продолжительность тестов"
     },
     "failed": {
       "title": "Неудачные тесты",
@@ -259,15 +259,15 @@
       "no": "Автоматически создается"
     },
     "duration": {
-      "title": "Продолжительность испытания",
+      "title": "Продолжительность теста",
       "label": "Номер"
     },
     "values": {
-      "min": "Номер",
-      "max": "Самый высокий",
+      "min": "Минимум",
+      "max": "Максимум",
       "avg": "Среднее",
-      "down": "Значения для скачивания",
-      "up": "Загружаемые значения"
+      "down": "Входящая скорость",
+      "up": "Исходящая скорость"
     }
   },
   "nodes": {
@@ -297,7 +297,7 @@
     "messages": {
       "not_reachable": "Сервер недоступен",
       "password_changed": "Пароль был изменен",
-      "tests_pending": "Результаты испытаний ожидаются"
+      "tests_pending": "Результаты тестов ожидаются"
     }
   },
   "preview": {
@@ -311,7 +311,7 @@
     "display_name": "Имя интеграции",
     "create": "Добавить",
     "activity": {
-      "never_executed": "Никогда не казнен",
+      "never_executed": "Никогда не выполнялся",
       "last_run": "Последний перед "
     },
     "discord": {
@@ -338,9 +338,9 @@
         "error_message": "Сообщение об ошибке",
         "error_message_placeholder": "Ошибка: %error%",
         "send_failed": "Отправка сообщений об ошибках",
-        "send_finished": "Отправить заполненный",
-        "finished_message": "Завершенное сообщение",
-        "finished_message_placeholder": "%ping% ms, %download% Mbit/s, %upload% Mbit/s"
+        "send_finished": "Отправка сообщений о тестах",
+        "finished_message": "Сообщение о выполнении теста",
+        "finished_message_placeholder": "%ping% мс, %download% Мбит/с, %upload% Мбит/с"
       }
     },
     "pushover": {
@@ -350,9 +350,9 @@
         "user_key": "Ключ пользователя",
         "error_message": "Сообщение об ошибке",
         "error_message_placeholder": "Ошибка: %error%",
-        "send_failed": "Отправляй сообщения об ошибках",
-        "send_finished": "Отправляйте готовые сообщения",
-        "finished_message": "Готовое сообщение",
+        "send_failed": "Отправка сообщений об ошибках",
+        "send_finished": "Отправка сообщений о тестах",
+        "finished_message": "Сообщение о выполнении теста",
         "finished_message_placeholder": "%ping% мс, %download% Мбит/с, %upload% Мбит/с"
       }
     },
@@ -371,9 +371,9 @@
         "error_message": "Сообщение об ошибке",
         "error_message_placeholder": "Ошибка: %error%",
         "send_failed": "Отправка сообщений об ошибках",
-        "send_finished": "Отправить заполненный",
-        "finished_message": "Завершенное сообщение",
-        "finished_message_placeholder": "%ping% ms, %download% Mbit/s, %upload% Mbit/s"
+        "send_finished": "Отправка сообщений о тестах",
+        "finished_message": "Сообщение о выполнении теста",
+        "finished_message_placeholder": "%ping% мс, %download% Мбит/с, %upload% Мбит/с"
       }
     },
     "webhook": {
@@ -381,11 +381,11 @@
       "fields": {
         "url": "URL Webhook",
         "url_placeholder": "https://ваш-сервер.ru/hook",
-        "send_started": "Начатая отправка",
+        "send_started": "Отправка сообщения о начале теста",
         "send_failed": "Отправка сообщений об ошибках",
-        "send_finished": "Отправить заполненный",
-        "send_alive": "Отправляйте живые сообщения",
-        "send_recommendations": "Отправить рекомендации",
+        "send_finished": "Отправка сообщений о тестах",
+        "send_alive": "Отправка Keep-Alive сообщений",
+        "send_recommendations": "Отправка рекомендаций",
         "send_config_updates": "Отправка обновлений конфигурации"
       }
     }

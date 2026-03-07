@@ -1,78 +1,196 @@
-import {DialogContext, DialogProvider} from "@/common/contexts/Dialog";
+import {Dialog, DialogHeader, DialogBody} from "@/common/contexts/Dialog";
 import "./styles.sass";
 import React, {useContext, useEffect, useState} from "react";
 import {t} from "i18next";
-import {faClose, faExclamationTriangle} from "@fortawesome/free-solid-svg-icons";
+import i18n from "i18next";
+import {faCheck, faCircleNodes, faExclamationTriangle, faFloppyDisk, faTrash, faTrashArrowUp} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {jsonRequest} from "@/common/utils/RequestUtil";
-import IntegrationItem from "@/common/components/IntegrationDialog/components/IntegrationItem";
+import {deleteRequest, jsonRequest, patchRequest, putRequest} from "@/common/utils/RequestUtil";
 import {v4 as uuid} from 'uuid';
-import AvailableIntegrations from "./components/AvailableIntegrations";
-import IntegrationAddButton from "@/common/components/IntegrationDialog/components/IntegrationAddButton";
-import NoIntegrationsTab from "@/common/components/IntegrationDialog/components/NoIntegrationsTab";
 import {ConfigContext} from "@/common/contexts/Config";
+import {generateRelativeTime} from "@/pages/Home/components/LatestTest/utils";
+import FormField from "@/common/components/FormField";
+import ExpandableCard from "@/common/components/ExpandableCard";
+import DropdownSelect from "@/common/components/DropdownSelect";
 
-export const Dialog = ({integrations, active, setActive}) => {
-    const close = useContext(DialogContext);
-    const [config] = useContext(ConfigContext);
-    const [currentTab, setCurrentTab] = useState(integrations[Object.keys(integrations)[0]].name);
-
-    const addIntegration = () => setActive([...active, {uuid: uuid(), name: currentTab,
-        integration: integrations[currentTab], data: {}, open: true}]);
-
-    const deleteIntegration = (uuid) => setActive(active.filter((item) => item.uuid !== uuid));
-
-    return (
-        <>
-            <div className="dialog-header">
-                <h4 className="dialog-text">{t("dropdown.integrations")}</h4>
-                <FontAwesomeIcon icon={faClose} className="dialog-text dialog-icon" onClick={() => close()}/>
-            </div>
-            <div className="integration-dialog">
-                <AvailableIntegrations integrations={integrations} currentTab={currentTab}
-                                       setCurrentTab={setCurrentTab}/>
-
-                <div className="integrations-tab">
-                    {config.previewMode && active.filter(item => item.name === currentTab).length > 0
-                        && <div className="pr-integration-container">
-                            <FontAwesomeIcon icon={faExclamationTriangle} />
-                            <p>{t("integrations.preview_active")}</p>
-                    </div>}
-
-                    {active.map((item) => (item.name !== currentTab ? undefined :
-                        <IntegrationItem integration={integrations[currentTab]}
-                                         remove={() => deleteIntegration(item.uuid)}
-                                         data={item} key={item.uuid} isOpen={item.open} />))}
-
-                    {active.filter(item => item.name === currentTab).length === 0
-                        && <NoIntegrationsTab onClick={addIntegration} integration={integrations[currentTab]}/>}
-
-                    {active.filter(item => item.name === currentTab).length > 0
-                        && <IntegrationAddButton onClick={addIntegration}/>}
-                </div>
-            </div>
-        </>
-    );
-}
-
-export const IntegrationDialog = (props) => {
-    const [integrationData, setIntegrationData] = useState(undefined);
-    const [activeData, setActiveData] = useState(undefined);
+const IntegrationCard = ({integration, integrationDef, onRemove, onUpdate, config}) => {
+    const [displayName, setDisplayName] = useState(integration.displayName || t(`integrations.${integration.name}.title`));
+    const [fields, setFields] = useState(() => {
+        const initial = {};
+        integrationDef.fields.forEach(field => {
+            initial[field.name] = integration.data?.[field.name] ?? (field.type === "boolean" ? false : "");
+        });
+        return initial;
+    });
+    const [unsavedChanges, setUnsavedChanges] = useState(false);
+    const [saveConfirmed, setSaveConfirmed] = useState(false);
+    const [deleteConfirmed, setDeleteConfirmed] = useState(false);
+    const [error, setError] = useState(false);
+    const [lastActivity, setLastActivity] = useState(generateRelativeTime(integration.lastActivity));
 
     useEffect(() => {
-        jsonRequest("/integrations")
-            .then(data => setIntegrationData(data));
+        const interval = setInterval(() => {
+            if (integration.lastActivity) setLastActivity(generateRelativeTime(integration.lastActivity));
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [integration.lastActivity]);
 
-        jsonRequest("/integrations/active")
-            .then(data => setActiveData(data.map(item => ({...item, uuid: uuid()}))));
-    }, []);
+    const updateField = (name, value) => {
+        setFields(prev => ({...prev, [name]: value}));
+        setUnsavedChanges(true);
+    };
+
+    const isValidInput = (field) => {
+        const value = fields[field.name];
+        if (field.required && !value) return false;
+        if (field.regex && value && !new RegExp(field.regex).test(value)) return false;
+        if (field.type === "text" && value && value.length > 255) return false;
+        if (field.type === "textarea" && value && value.length > 2000) return false;
+        return true;
+    };
+
+    const getPlaceholder = (fieldName) => {
+        const placeholderKey = `integrations.${integration.name}.fields.${fieldName}_placeholder`;
+        const baseKey = `integrations.${integration.name}.fields.${fieldName}`;
+        return i18n.exists(placeholderKey) ? t(placeholderKey) : t(baseKey);
+    };
+
+    const handleSave = async () => {
+        const data = {...fields, integration_name: displayName};
+        try {
+            if (!integration.id) {
+                const response = await putRequest(`/integrations/${integration.name}`, data);
+                if (!response.ok) throw new Error();
+                const result = await response.json();
+                onUpdate(integration.uuid, {id: result.id, isNew: false});
+            } else {
+                const response = await patchRequest(`/integrations/${integration.id}`, data);
+                if (!response.ok) throw new Error();
+            }
+            setUnsavedChanges(false);
+            setSaveConfirmed(true);
+            setError(false);
+            setTimeout(() => setSaveConfirmed(false), 1500);
+        } catch {
+            setError(true);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!deleteConfirmed) {
+            setDeleteConfirmed(true);
+            setTimeout(() => setDeleteConfirmed(false), 3000);
+            return;
+        }
+        if (!integration.id) {
+            onRemove(integration.uuid);
+            return;
+        }
+        await deleteRequest(`/integrations/${integration.id}`);
+        onRemove(integration.uuid);
+    };
+
+    const getStatusClass = () => {
+        if (integration.activityFailed) return "status-error";
+        if (!integration.lastActivity) return "status-inactive";
+        return "status-active";
+    };
+
+    const getStatusText = () => {
+        if (integration.activityFailed) return t("failed");
+        if (!integration.lastActivity) return t("integrations.activity.never_executed");
+        return t("integrations.activity.last_run") + lastActivity;
+    };
 
     return (
-        <>
-            <DialogProvider close={props.onClose} customClass={(!integrationData || !activeData) ? "dialog-loading" : ""}>
-                {(!integrationData || !activeData) && <div className="lds-ellipsis"><div/><div/><div/><div/></div>}
-                {integrationData && activeData && <Dialog integrations={integrationData} active={activeData} setActive={setActiveData}/>}
-            </DialogProvider>
-        </>
-    )
-}
+        <ExpandableCard icon={integrationDef.icon} title={displayName} subtitle={getStatusText()} statusDot={getStatusClass()}
+            actions={<>
+                {!config.previewMode && unsavedChanges && !saveConfirmed && (
+                    <button className="card-action-btn save-btn" onClick={(e) => {e.stopPropagation(); handleSave();}}>
+                        <FontAwesomeIcon icon={faFloppyDisk}/>
+                    </button>
+                )}
+                {saveConfirmed && <span className="card-action-btn success-indicator"><FontAwesomeIcon icon={faCheck}/></span>}
+                {!config.previewMode && (
+                    <button className={`card-action-btn delete-btn ${deleteConfirmed ? "confirm" : ""}`}
+                            onClick={(e) => {e.stopPropagation(); handleDelete();}}>
+                        <FontAwesomeIcon icon={deleteConfirmed ? faTrashArrowUp : faTrash}/>
+                    </button>
+                )}
+            </>}
+            defaultExpanded={integration.isNew || false} error={error} success={saveConfirmed}>
+            <FormField label={t("integrations.display_name")} type="text" value={displayName}
+                onChange={(v) => { setDisplayName(v); setUnsavedChanges(true); }} placeholder={t("integrations.display_name")}/>
+            {integrationDef.fields.map((field) => (
+                <FormField key={field.name} label={t(`integrations.${integration.name}.fields.${field.name}`)}
+                    type={field.type} value={fields[field.name]} onChange={(value) => updateField(field.name, value)}
+                    placeholder={getPlaceholder(field.name)} error={!isValidInput(field)}/>
+            ))}
+        </ExpandableCard>
+    );
+};
+
+export const IntegrationDialog = ({open, onClose}) => {
+    const [config] = useContext(ConfigContext);
+    const [integrations, setIntegrations] = useState(null);
+    const [active, setActive] = useState(null);
+
+    useEffect(() => {
+        if (!open) return;
+        Promise.all([jsonRequest("/integrations"), jsonRequest("/integrations/active")]).then(([intData, activeData]) => {
+            setIntegrations(intData);
+            setActive(activeData.map(item => ({...item, uuid: uuid()})));
+        });
+    }, [open]);
+
+    const addIntegration = (item) => setActive([...active, {uuid: uuid(), name: item.key, data: {}, isNew: true}]);
+    const removeIntegration = (id) => setActive(active.filter(item => item.uuid !== id));
+    const updateIntegration = (id, updates) => setActive(active.map(item => item.uuid === id ? {...item, ...updates} : item));
+
+    const dropdownItems = integrations ? Object.entries(integrations).map(([name, def]) => ({
+        key: name, label: t(`integrations.${name}.title`), icon: def.icon
+    })) : [];
+
+    const loading = !integrations || !active;
+
+    return (
+        <Dialog open={open} onClose={onClose} className="integration-dialog">
+            {({close}) => (
+                <>
+                    <DialogHeader onClose={close}>{t("dropdown.integrations")}</DialogHeader>
+                    <DialogBody>
+                        {loading ? (
+                            <div className="lds-ellipsis"><div/><div/><div/><div/></div>
+                        ) : (
+                            <div className="integrations-wrapper">
+                                {config.previewMode && active.length > 0 && (
+                                    <div className="preview-warning">
+                                        <FontAwesomeIcon icon={faExclamationTriangle}/>
+                                        <span>{t("integrations.preview_active")}</span>
+                                    </div>
+                                )}
+                                {active.length === 0 ? (
+                                    <div className="empty-state">
+                                        <FontAwesomeIcon icon={faCircleNodes}/>
+                                        <p>{t("integrations.none_active").replace("<br/>", " ").replace("<Bold>", "").replace("</Bold>", "")}</p>
+                                        <DropdownSelect items={dropdownItems} onSelect={addIntegration} buttonText={t("integrations.create")} disabled={config.previewMode}/>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="integrations-list">
+                                            {active.map(item => (
+                                                <IntegrationCard key={item.uuid} integration={item} integrationDef={integrations[item.name]}
+                                                    onRemove={removeIntegration} onUpdate={updateIntegration} config={config}/>
+                                            ))}
+                                        </div>
+                                        <DropdownSelect items={dropdownItems} onSelect={addIntegration} buttonText={t("integrations.create")} disabled={config.previewMode}/>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </DialogBody>
+                </>
+            )}
+        </Dialog>
+    );
+};

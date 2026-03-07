@@ -1,7 +1,7 @@
-const Sequelize = require('sequelize');
-const db = require("../config/database");
+import Sequelize from 'sequelize';
+import db from '../config/database.js';
 
-module.exports = db.define("recommendations", {
+export default db.define("recommendations", {
     ping: {
         type: Sequelize.INTEGER,
         allowNull: false

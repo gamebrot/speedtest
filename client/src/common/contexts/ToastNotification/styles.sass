@@ -5,69 +5,77 @@
   bottom: 2rem
   right: 1rem
   z-index: 5
-  background-color: $darker-gray
-  box-shadow: 0 0 1rem $darker-gray
-  border: 2px solid $light-gray
-  border-radius: 0.5rem
-  animation: 0.5s moveIn
+  background-color: var(--glass-bg)
+  backdrop-filter: blur(16px)
+  -webkit-backdrop-filter: blur(16px)
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25)
+  border: 1px solid $light-gray
+  border-radius: 0.75rem
+  animation: 0.5s moveIn cubic-bezier(0.4, 0, 0.2, 1)
   cursor: pointer
+  transition: all 0.2s ease
 
 .toast-hidden
   visibility: hidden
   transition: all 0s 0.5s
-  animation: 0.5s moveOut
+  animation: 0.5s moveOut cubic-bezier(0.4, 0, 0.2, 1)
 
 .toast-green
-  transition: all 0.3s
+  border-left: 4px solid $accent-primary
 
   & .toast-content svg
-    color: $green
+    color: $accent-primary
 
 .toast-green:hover
-  border-color: $green
-  filter: brightness(0.9)
+  border-color: $light-gray
+  border-left-color: $accent-primary
+  transform: translateX(-4px)
 
 .toast-red
+  border-left: 4px solid $accent-danger
+
   & .toast-content svg
-    color: $red
+    color: $accent-danger
 
 .toast-red:hover
-  border-color: $red
-  filter: brightness(0.9)
+  border-color: $light-gray
+  border-left-color: $accent-danger
+  transform: translateX(-4px)
 
 .toast-content
   display: flex
   align-items: center
-  padding: 1rem 1rem
+  padding: 1rem 1.25rem
   color: $white
   font-size: 14px
   font-weight: 500
 
 .toast-content svg
   margin-right: 1rem
-  width: 2rem
-  height: 2rem
+  width: 1.75rem
+  height: 1.75rem
 
 .toast-content h2
   margin: 0
-  font-size: 1.4rem
+  font-size: 1.25rem
+  font-weight: 600
 
 
 @keyframes moveIn
   0%
     transform: translateX(100%)
-  60%
-    transform: translateX(-10%)
+    opacity: 0
   100%
     transform: translateX(0)
+    opacity: 1
 
 @keyframes moveOut
   0%
     transform: translateX(0)
-  60%
-    transform: translateX(-10%)
+    opacity: 1
   100%
     transform: translateX(100%)
+    opacity: 0
 
 
 @media screen and (max-width: 425px)
@@ -79,15 +87,15 @@
   @keyframes moveIn
     0%
       transform: translateY(100%)
-    60%
-      transform: translateY(-10%)
+      opacity: 0
     100%
       transform: translateY(0)
+      opacity: 1
 
   @keyframes moveOut
     0%
       transform: translateY(0)
-    60%
-      transform: translateY(-10%)
+      opacity: 1
     100%
       transform: translateY(100%)
+      opacity: 0

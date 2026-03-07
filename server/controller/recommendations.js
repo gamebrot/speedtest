@@ -1,11 +1,11 @@
-const recommendations = require('../models/Recommendations');
-const {triggerEvent} = require("./integrations");
+import recommendations from '../models/Recommendations.js';
+import { triggerEvent } from './integrations.js';
 
-module.exports.getCurrent = async () => {
+export const getCurrent = async () => {
     return await recommendations.findOne();
 }
 
-module.exports.update = async (ping, download, upload) => {
+export const update = async (ping, download, upload) => {
     const configuration = {ping: Math.round(ping), download: parseFloat(download.toFixed(2)),
         upload: parseFloat(upload.toFixed(2))};
     

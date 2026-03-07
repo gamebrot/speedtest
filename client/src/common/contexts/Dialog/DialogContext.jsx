@@ -1,54 +1,84 @@
-import React, {createContext, useEffect, useRef} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
+import {createPortal} from "react-dom";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faClose} from "@fortawesome/free-solid-svg-icons";
 import "./styles.sass";
 
-export const DialogContext = createContext({});
-
-export const DialogProvider = (props) => {
+export const Dialog = ({open, onClose, className, disableClose, children}) => {
     const areaRef = useRef();
-    const ref = useRef();
-
-    const close = (force = false) => {
-        if (props.disableClosing && !force) return;
-        areaRef.current?.classList.add("dialog-area-hidden");
-        ref.current?.classList.add("dialog-hidden");
-    }
-
-    const onClose = (e) => {
-        if (e.animationName === "fadeOut") {
-            hideTooltips(false);
-            props?.close();
-        }
-    }
-
-    const handleKeyDown = (e) => {
-        if (e.code === "Enter" && props.submit) props.submit();
-    }
-
-    const hideTooltips = (state) => Array.from(document.getElementsByClassName("tooltip")).forEach(element => {
-        if (state && !element.classList.contains("tooltip-invisible"))
-            element.classList.add("tooltip-invisible");
-        if (!state && element.classList.contains("tooltip-invisible"))
-            element.classList.remove("tooltip-invisible");
-    });
+    const dialogRef = useRef();
+    const [visible, setVisible] = useState(false);
+    const isClosingRef = useRef(false);
 
     useEffect(() => {
-        const handleClick = (event) => {
-            if (!ref.current?.contains(event.target)) close();
+        if (open && !visible) {
+            setVisible(true);
+            isClosingRef.current = false;
+        } else if (!open && visible && !isClosingRef.current) {
+            isClosingRef.current = true;
+            areaRef.current?.classList.add("dialog-area-hidden");
+            dialogRef.current?.classList.add("dialog-hidden");
         }
+    }, [open, visible]);
 
-        document.addEventListener("mousedown", handleClick);
+    const handleClose = useCallback(() => {
+        if (disableClose || isClosingRef.current) return;
+        isClosingRef.current = true;
+        areaRef.current?.classList.add("dialog-area-hidden");
+        dialogRef.current?.classList.add("dialog-hidden");
+    }, [disableClose]);
 
-        return () => document.removeEventListener("mousedown", handleClick);
-    }, [ref]);
+    const forceClose = useCallback(() => {
+        if (isClosingRef.current) return;
+        isClosingRef.current = true;
+        areaRef.current?.classList.add("dialog-area-hidden");
+        dialogRef.current?.classList.add("dialog-hidden");
+    }, []);
 
-    return (
-        <DialogContext.Provider value={close}>
-            <div className="dialog-area" ref={areaRef}>
-                <div className={"dialog" + (props.customClass ? " " + props.customClass : "")} ref={ref}
-                     onAnimationEnd={onClose} onKeyDown={handleKeyDown} onAnimationStart={() => hideTooltips(true)}>
-                    {props.children}
-                </div>
+    const handleAnimationEnd = (e) => {
+        if (e.animationName === "fadeOut") {
+            setVisible(false);
+            isClosingRef.current = false;
+            onClose?.();
+        }
+    };
+
+    const handleBackdropClick = (e) => {
+        if (e.target === areaRef.current) handleClose();
+    };
+
+    useEffect(() => {
+        if (!visible) return;
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape" && !disableClose) {
+                e.preventDefault();
+                handleClose();
+            }
+        };
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [visible, disableClose, handleClose]);
+
+    if (!visible) return null;
+
+    return createPortal(
+        <div className="dialog-area" ref={areaRef} onClick={handleBackdropClick}>
+            <div className={`dialog${className ? ` ${className}` : ""}`} ref={dialogRef}
+                 onAnimationEnd={handleAnimationEnd}>
+                {typeof children === "function" ? children({close: handleClose, forceClose}) : children}
             </div>
-        </DialogContext.Provider>
-    )
-}
+        </div>,
+        document.body
+    );
+};
+
+export const DialogHeader = ({children, onClose, disableClose}) => (
+    <div className="dialog-header">
+        <h4 className="dialog-text">{children}</h4>
+        {!disableClose && <FontAwesomeIcon icon={faClose} className="dialog-text dialog-icon" onClick={onClose}/>}
+    </div>
+);
+
+export const DialogBody = ({children}) => <div className="dialog-main">{children}</div>;
+
+export const DialogFooter = ({children}) => <div className="dialog-buttons">{children}</div>;

@@ -1,7 +1,7 @@
 @use "@/common/styles/colors" as *
 
 .welcome-banner
-  width: 30rem
+  width: 32rem
   display: flex
   flex-direction: column
   justify-content: space-between
@@ -14,15 +14,16 @@
     display: flex
     justify-content: space-between
     align-items: center
-    margin-top: 1rem
+    margin-top: 1.5rem
 
     h3
       margin: 0
-      font-size: 14pt
+      font-size: 1rem
       color: $subtext
+      font-weight: 500
 
     .dialog-btn
-      padding: 0.4rem 1.3rem
+      padding: 0.6rem 1.5rem
       border-radius: 0.6rem
 
   .slide-in
@@ -31,7 +32,7 @@
 @keyframes slide-in
   from
     opacity: 0
-    transform: translateX(10%) rotate(10deg) scale(0.5)
+    transform: translateX(20px)
   to
     opacity: 1
     transform: translateX(0)

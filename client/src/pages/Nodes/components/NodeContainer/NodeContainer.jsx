@@ -7,28 +7,32 @@ import {
     faClock,
     faExclamationTriangle,
     faKey,
+    faPen,
     faServer,
-    faTableTennisPaddleBall
+    faTableTennisPaddleBall,
+    faTrash
 } from "@fortawesome/free-solid-svg-icons";
 import React, {useContext, useEffect, useState} from "react";
 import {NodeContext} from "@/common/contexts/Node";
-import {InputDialogContext} from "@/common/contexts/InputDialog";
+import {useAlert} from "@/common/contexts/Alert";
 import {ToastNotificationContext} from "@/common/contexts/ToastNotification";
-import {baseRequest} from "@/common/utils/RequestUtil";
+import {baseRequest, patchRequest} from "@/common/utils/RequestUtil";
 import {t} from "i18next";
 import {Trans} from "react-i18next";
 import {getIconBySpeed} from "@/common/utils/TestUtil";
 import {ConfigContext} from "@/common/contexts/Config";
 import {useNavigate} from "react-router-dom";
+import ContextMenu from "@/common/components/ContextMenu";
 
 export const NodeContainer = (node) => {
     const updateNodes = useContext(NodeContext)[1];
     const updateCurrentNode = useContext(NodeContext)[3];
     const reloadConfig = useContext(ConfigContext)[1];
     const updateToast = useContext(ToastNotificationContext);
-    const [setDialog] = useContext(InputDialogContext);
+    const alert = useAlert();
     const [nodeData, setNodeData] = useState(null);
     const [nodeError, setNodeError] = useState(undefined);
+    const [contextMenu, setContextMenu] = useState(null);
 
     const navigate = useNavigate();
 
@@ -37,6 +41,7 @@ export const NodeContainer = (node) => {
     const updateData = async () => {
         const testRequest = await baseRequest(prefix + "/speedtests?limit=1");
 
+        if (testRequest.status === 401) return setNodeError("PASSWORD_CHANGED");
         if (!testRequest.ok) return setNodeError("SERVER_NOT_REACHABLE");
         const tests = await testRequest.json();
 
@@ -44,6 +49,7 @@ export const NodeContainer = (node) => {
 
         const configRequest = await baseRequest(prefix + "/config");
 
+        if (configRequest.status === 401) return setNodeError("PASSWORD_CHANGED");
         if (!configRequest.ok) return setNodeError("SERVER_NOT_REACHABLE");
         const config = await configRequest.json();
 
@@ -62,26 +68,26 @@ export const NodeContainer = (node) => {
         });
     }
 
-    const updatePassword = (wrong = false) => {
-        setDialog({
-            title: t("nodes.password_outdated"),
-            type: "password",
+    const updatePassword = async (wrong = false) => {
+        const result = await alert.openInput(t("nodes.password_outdated"), {
+            inputType: "password",
             description: wrong ?
                 <span className="icon-red">{t("dialog.password.wrong")}</span> : t("nodes.update_password"),
             placeholder: t("dialog.password.placeholder"),
-            buttonText: t("dialog.update"),
-            onSuccess: async (password) => {
-                const res = await (await baseRequest(`/nodes/${node.id}/password`, "PATCH", {password: password})).json();
-
-                if (res.type === "PASSWORD_UPDATED") {
-                    updateData().catch(() => setNodeError("SERVER_NOT_REACHABLE"));
-                    updateToast(t("nodes.password_updated"), "green", faKey);
-                } else {
-                    updatePassword(true);
-                }
-            }
+            buttonText: t("dialog.update")
         });
-    }
+
+        if (result) {
+            const res = await (await baseRequest(`/nodes/${node.id}/password`, "PATCH", {password: result})).json();
+
+            if (res.type === "PASSWORD_UPDATED") {
+                updateData().catch(() => setNodeError("SERVER_NOT_REACHABLE"));
+                updateToast(t("nodes.password_updated"), "green", faKey);
+            } else {
+                updatePassword(true);
+            }
+        }
+    };
 
     useEffect(() => {
         updateData().catch(() => setNodeError("SERVER_NOT_REACHABLE"));
@@ -100,77 +106,127 @@ export const NodeContainer = (node) => {
         reloadConfig();
     }
 
-    const onContext = (event) => {
+    const onContext = async (event) => {
         event.preventDefault();
+        event.stopPropagation();
 
         if (node.currentNode) return;
-        setDialog({
-            title: t("nodes.delete.title"),
-            description: <Trans components={{Bold: <span className="dialog-value"/>}}
-                                values={node}>nodes.delete.description</Trans>,
-            buttonText: t("nodes.delete.yes"),
-            mainRed: true,
-            onSuccess: () => baseRequest("/nodes/" + node.id, "DELETE").then(() => {
-                updateToast(t("nodes.delete.success"), "green", faServer);
-                updateNodes();
-            })
+
+        setContextMenu({x: event.clientX, y: event.clientY});
+    };
+
+    const closeContextMenu = () => setContextMenu(null);
+
+    const handleRename = async () => {
+        const newName = await alert.openInput(t("nodes.rename.title"), {
+            placeholder: t("nodes.rename.placeholder"),
+            buttonText: t("dialog.save"),
+            value: node.name
         });
-    }
+
+        if (newName && newName !== node.name) {
+            await patchRequest(`/nodes/${node.id}/name`, {name: newName});
+            updateToast(t("nodes.rename.success"), "green", faPen);
+            updateNodes();
+        }
+    };
+
+    const handleDelete = async () => {
+        const confirmed = await alert.openConfirm(
+            t("nodes.delete.title"),
+            <Trans components={{Bold: <span className="dialog-value"/>}}
+                   values={node}>nodes.delete.description</Trans>,
+            {
+                buttonText: t("nodes.delete.yes"),
+                danger: true
+            }
+        );
+
+        if (confirmed) {
+            await baseRequest("/nodes/" + node.id, "DELETE");
+            updateToast(t("nodes.delete.success"), "green", faServer);
+            updateNodes();
+        }
+    };
+
+    const contextMenuItems = [
+        {
+            icon: faPen,
+            label: t("nodes.rename.title"),
+            onClick: handleRename
+        },
+        {divider: true},
+        {
+            icon: faTrash,
+            label: t("nodes.delete.title"),
+            onClick: handleDelete,
+            danger: true
+        }
+    ];
 
     return (
-        <div className={"node-item hover-" + (nodeError ? "red" : (nodeData ? "green" : "orange"))} key={node.id}
-             onClick={switchNode} onContextMenu={onContext}>
-            <div className="node-info-area">
-                <FontAwesomeIcon icon={faServer}
-                                 className={"icon-" + (nodeError ? "red" : (nodeData ? "green" : "orange"))}/>
-                <div className="node-info">
-                    <h1>{node.name}</h1>
-                    <p>{node.url.replace(/(^\w+:|^)\/\//, '')}</p>
+        <>
+            {contextMenu && (
+                <ContextMenu
+                    items={contextMenuItems}
+                    position={contextMenu}
+                    onClose={closeContextMenu}
+                />
+            )}
+            <div className={"node-item hover-" + (nodeError ? "red" : (nodeData ? "green" : "orange"))} key={node.id}
+                 onClick={switchNode} onContextMenu={onContext}>
+                <div className="node-info-area">
+                    <FontAwesomeIcon icon={faServer}
+                                     className={"icon-" + (nodeError ? "red" : (nodeData ? "green" : "orange"))}/>
+                    <div className="node-info">
+                        <h1>{node.name}</h1>
+                        <p>{node.url.replace(/(^\w+:|^)\/\//, '')}</p>
+                    </div>
                 </div>
-            </div>
-            <div className="speed-area">
+                <div className="speed-area">
 
-                {nodeError === "SERVER_NOT_REACHABLE" && (<div className="icon-text">
-                    <h2>{t("nodes.messages.not_reachable")}</h2>
-                    <FontAwesomeIcon icon={faExclamationTriangle} className="speed-icon icon-red"/>
-                </div>)}
-
-                {nodeError === "PASSWORD_CHANGED" && (<div className="icon-text">
-                    <h2>{t("nodes.messages.password_changed")}</h2>
-                    <FontAwesomeIcon icon={faKey} className="speed-icon icon-red"/>
-                </div>)}
-
-                {!nodeError && !nodeData && (
-                    <FontAwesomeIcon icon={faCircleNotch} className="speed-icon" spin={true}/>)}
-
-                {nodeData && nodeData.pending && !nodeError && (<div className="icon-text">
-                        <h2>{t("nodes.messages.tests_pending")}</h2>
-                        <FontAwesomeIcon icon={faClock} className="speed-icon icon-blue"/>
+                    {nodeError === "SERVER_NOT_REACHABLE" && (<div className="icon-text">
+                        <h2>{t("nodes.messages.not_reachable")}</h2>
+                        <FontAwesomeIcon icon={faExclamationTriangle} className="speed-icon icon-red"/>
                     </div>)}
 
-                {nodeData && !nodeData.pending && !nodeError && (
-                    <>
-                        <div className="speed-item">
-                            <FontAwesomeIcon icon={faTableTennisPaddleBall}
-                                             className={"icon-" + nodeData.pingIcon}/>
-                            <h1>{nodeData.ping} {t("latest.ping_unit")}</h1>
-                        </div>
+                    {nodeError === "PASSWORD_CHANGED" && (<div className="icon-text">
+                        <h2>{t("nodes.messages.password_changed")}</h2>
+                        <FontAwesomeIcon icon={faKey} className="speed-icon icon-red"/>
+                    </div>)}
 
-                        <div className="speed-item">
-                            <FontAwesomeIcon icon={faArrowDown}
-                                             className={"icon-" + nodeData.downloadIcon}/>
-                            <h1>{nodeData.download} {t("latest.speed_unit")}</h1>
-                        </div>
+                    {!nodeError && !nodeData && (
+                        <FontAwesomeIcon icon={faCircleNotch} className="speed-icon" spin={true}/>)}
 
-                        <div className="speed-item">
-                            <FontAwesomeIcon icon={faArrowUp}
-                                             className={"icon-" + nodeData.uploadIcon}/>
-                            <h1>{nodeData.upload} {t("latest.speed_unit")}</h1>
-                        </div>
-                    </>
-                )}
+                    {nodeData && nodeData.pending && !nodeError && (<div className="icon-text">
+                            <h2>{t("nodes.messages.tests_pending")}</h2>
+                            <FontAwesomeIcon icon={faClock} className="speed-icon icon-blue"/>
+                        </div>)}
+
+                    {nodeData && !nodeData.pending && !nodeError && (
+                        <>
+                            <div className="speed-item">
+                                <FontAwesomeIcon icon={faTableTennisPaddleBall}
+                                                 className={"icon-" + nodeData.pingIcon}/>
+                                <h1>{nodeData.ping} {t("latest.ping_unit")}</h1>
+                            </div>
+
+                            <div className="speed-item">
+                                <FontAwesomeIcon icon={faArrowDown}
+                                                 className={"icon-" + nodeData.downloadIcon}/>
+                                <h1>{nodeData.download} {t("latest.speed_unit")}</h1>
+                            </div>
+
+                            <div className="speed-item">
+                                <FontAwesomeIcon icon={faArrowUp}
+                                                 className={"icon-" + nodeData.uploadIcon}/>
+                                <h1>{nodeData.upload} {t("latest.speed_unit")}</h1>
+                            </div>
+                        </>
+                    )}
+                </div>
+
             </div>
-
-        </div>
+        </>
     );
 }

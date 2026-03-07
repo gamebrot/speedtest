@@ -1,7 +1,7 @@
-const Sequelize = require('sequelize');
-const db = require("../config/database");
+import Sequelize from 'sequelize';
+import db from '../config/database.js';
 
-module.exports = db.define("integration_data", {
+export default db.define("integration_data", {
     id: {
         type: Sequelize.STRING,
         required: true,

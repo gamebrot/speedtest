@@ -1,9 +1,24 @@
-const app = require('express').Router();
-const tests = require('../controller/speedtests');
-const pauseController = require('../controller/pause');
-const config = require('../controller/config');
-const testTask = require("../tasks/speedtest");
-const password = require('../middlewares/password');
+import express from 'express';
+import * as tests from '../controller/speedtests.js';
+import * as pauseController from '../controller/pause.js';
+import * as config from '../controller/config.js';
+import * as testTask from '../tasks/speedtest.js';
+import password from '../middlewares/password.js';
+
+const app = express.Router();
+
+const validateDateRange = (from, to) => {
+    if (!from || !to) {
+        return { valid: false, message: "Both 'from' and 'to' date parameters are required" };
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(from)) {
+        return { valid: false, message: "Invalid 'from' date format. Use YYYY-MM-DD" };
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(to)) {
+        return { valid: false, message: "Invalid 'to' date format. Use YYYY-MM-DD" };
+    }
+    return { valid: true };
+};
 
 app.get("/", password(true), async (req, res) => {
     if (req.query.limit && /[^0-9]/.test(req.query.limit))
@@ -16,7 +31,38 @@ app.get("/", password(true), async (req, res) => {
 });
 
 app.get("/statistics", password(true), async (req, res) => {
-    res.json(await tests.listStatistics(req.query.days || 1));
+    const { from, to } = req.query;
+    const validation = validateDateRange(from, to);
+    if (!validation.valid) {
+        return res.status(400).json({ message: validation.message });
+    }
+    
+    res.json(await tests.listStatistics(from, to));
+});
+
+app.get("/export", password(true), async (req, res) => {
+    const { from, to, format } = req.query;
+    const validation = validateDateRange(from, to);
+    if (!validation.valid) {
+        return res.status(400).json({ message: validation.message });
+    }
+
+    const exportData = await tests.exportTests(from, to);
+
+    if (format === 'csv') {
+        const csvHeader = 'id,ping,jitter,download,upload,time,type,created,error\n';
+        const csvRows = exportData.map(test => 
+            `${test.id},${test.ping ?? ''},${test.jitter ?? ''},${test.download ?? ''},${test.upload ?? ''},${test.time ?? ''},${test.type ?? ''},${test.created ?? ''},${(test.error ?? '').replace(/,/g, ';').replace(/\n/g, ' ')}`
+        ).join('\n');
+        
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="myspeed-export-${from}-to-${to}.csv"`);
+        res.send(csvHeader + csvRows);
+    } else {
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Disposition', `attachment; filename="myspeed-export-${from}-to-${to}.json"`);
+        res.json(exportData);
+    }
 });
 
 app.post("/run", password(false), async (req, res) => {
@@ -60,4 +106,4 @@ app.delete("/:id", password(false), async (req, res) => {
     res.json({message: "Successfully deleted the provided speedtest"});
 });
 
-module.exports = app;
+export default app;

@@ -1,7 +1,9 @@
-const libreProvider = require('./providers/loadLibre');
-const ooklaProvider = require('./providers/loadOokla');
+import * as libreProvider from './providers/loadLibre.js';
+import * as ooklaProvider from './providers/loadOokla.js';
+import * as cloudflareProvider from './providers/loadCloudflare.js';
 
-module.exports.load = async () => {
+export const load = async () => {
     await libreProvider.load();
     await ooklaProvider.load();
-}
+    await cloudflareProvider.load();
+};

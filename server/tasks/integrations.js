@@ -1,40 +1,40 @@
-const schedule = require('node-schedule');
-const {triggerEvent} = require("../controller/integrations");
+import schedule from 'node-schedule';
+import { triggerEvent } from "../controller/integrations.js";
 
 let currentState = "ping";
 let job;
 
-module.exports.setState = (state = "ping") => {
+export const setState = (state = "ping") => {
     currentState = state;
-}
+};
 
-module.exports.sendPing = async (type, message) => {
+export const sendPing = async (type, message) => {
     await triggerEvent("minutePassed", {type, message});
-}
+};
 
-module.exports.sendCurrent = async () => {
-    if (currentState === "ping") await this.sendPing();
-}
+export const sendCurrent = async () => {
+    if (currentState === "ping") await sendPing();
+};
 
-module.exports.sendError = async (error = "Unknown error") => {
+export const sendError = async (error = "Unknown error") => {
     await triggerEvent("testFailed", error);
-}
+};
 
-module.exports.sendRunning = async () => {
+export const sendRunning = async () => {
     await triggerEvent("testStarted");
-}
+};
 
-module.exports.sendFinished = async (data) => {
+export const sendFinished = async (data) => {
     await triggerEvent("testFinished", data);
-}
+};
 
-module.exports.startTimer = () => {
-    job = schedule.scheduleJob('* * * * *', () => this.sendCurrent());
-}
+export const startTimer = () => {
+    job = schedule.scheduleJob('* * * * *', () => sendCurrent());
+};
 
-module.exports.stopTimer = () => {
+export const stopTimer = () => {
     if (job !== undefined) {
         job.cancel();
         job = undefined;
     }
-}
+};

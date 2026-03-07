@@ -1,16 +1,15 @@
-const speedTest = require('../util/speedtest');
-const tests = require('../controller/speedtests');
-const config = require('../controller/config');
-const controller = require("../controller/recommendations");
-const parseData = require('../util/providers/parseData');
-let {setState, sendRunning, sendError, sendFinished} = require("./integrations");
-const serverController = require("../controller/servers");
-const cloudflareTask = require("./cloudflare");
+import speedTest from '../util/speedtest.js';
+import * as tests from '../controller/speedtests.js';
+import * as config from '../controller/config.js';
+import * as controller from "../controller/recommendations.js";
+import * as parseData from '../util/providers/parseData.js';
+import { setState, sendRunning, sendError, sendFinished } from "./integrations.js";
+import * as serverController from "../controller/servers.js";
 
-let isRunning = false;
+let _isRunning = false;
 
 const setRunning = (running, sendRequest = true) => {
-    isRunning = running;
+    _isRunning = running;
 
     if (running) {
         setState("running");
@@ -34,7 +33,7 @@ const createRecommendations = async () => {
     }
 }
 
-module.exports.run = async (retryAuto = false) => {
+export const run = async (retryAuto = false) => {
     setRunning(true);
     let mode = await config.getValue("provider");
 
@@ -44,31 +43,31 @@ module.exports.run = async (retryAuto = false) => {
     }
 
     let serverId = mode === "cloudflare" ? 0 : await config.getValue(mode + "Id");
+    let serverUrl = mode === "libre" ? await config.getValue("libreUrl") : undefined;
 
     if (serverId === "none")
         serverId = undefined;
+    
+    if (serverUrl === "none")
+        serverUrl = undefined;
 
-    let speedtest;
-    if (mode === "cloudflare") {
-        const startTime = new Date().getTime();
-        speedtest = await cloudflareTask();
-        speedtest = {...speedtest, elapsed: (new Date().getTime() - startTime) / 1000};
-    } else {
-        speedtest = await (retryAuto ? speedTest(mode) : speedTest(mode, serverId));
-    }
+    if (mode === "libre" && serverUrl)
+        serverId = undefined;
+
+    let speedtest = await (retryAuto ? speedTest(mode) : speedTest(mode, serverId, serverUrl));
 
     if (mode === "ookla" && speedtest.server) {
         if (serverId === undefined) await config.updateValue("ooklaId", speedtest.server?.id);
         serverId = speedtest.server?.id;
     }
 
-    if (mode === "libre" && speedtest.server) {
-        let server = Object.entries(serverController.getLibreServers())
-            .filter(([, value]) => value === speedtest.server.name)[0][0];
+    if (mode === "libre" && speedtest.server && !serverUrl) {
+        let serverEntry = Object.entries(serverController.getLibreServers())
+            .filter(([, value]) => value === speedtest.server.name)[0];
 
-        if (server) {
-            if (serverId === undefined) await config.updateValue("libreId", server);
-            serverId = parseInt(server);
+        if (serverEntry) {
+            if (serverId === undefined) await config.updateValue("libreId", serverEntry[0]);
+            serverId = parseInt(serverEntry[0]);
         }
     }
 
@@ -77,35 +76,35 @@ module.exports.run = async (retryAuto = false) => {
     return {...speedtest, serverId}
 }
 
-module.exports.create = async (type = "auto", retried = false) => {
+export const create = async (type = "auto", retried = false) => {
     const mode = await config.getValue("provider");
     if (mode === "none") return 400;
-    if (isRunning && !retried) return 500;
+    if (_isRunning && !retried) return 500;
 
     try {
         let test;
         if (process.env.PREVIEW_MODE === "true") {
             await new Promise(resolve => setTimeout(resolve, 5000));
             test = {
-                ping: {latency: Math.floor(Math.random() * 25) + 5},
+                ping: {latency: Math.floor(Math.random() * 25) + 5, jitter: Math.random() * 5 + 0.5},
                 download: {bandwidth: 125 * 100000 * (Math.random() + 0.5), elapsed: 10000},
                 upload: {bandwidth: 125 * 100000 * (Math.random() + 0.5), elapsed: 10000},
             }
         } else {
-            test = await this.run(retried);
+            test = await run(retried);
         }
 
-        let {ping, download, upload, time, resultId} = await parseData.parseData(process.env.PREVIEW_MODE === "true" ?
+        let {ping, jitter, download, upload, time, resultId} = await parseData.parseData(process.env.PREVIEW_MODE === "true" ?
             "ookla" : mode, test);
 
-        let testResult = await tests.create(ping, download, upload, time, test.serverId, type, resultId);
-        console.log(`Test #${testResult} was executed successfully in ${time}s. 🏓 ${ping} ⬇ ${download}️ ⬆ ${upload}️`);
+        let testResult = await tests.create(ping, download, upload, time, test.serverId, type, resultId, null, jitter);
+        console.log(`Test #${testResult} was executed successfully in ${time}s. 🏓 ${ping} (±${jitter || 'N/A'}) ⬇ ${download}️ ⬆ ${upload}️`);
         createRecommendations().then(() => "");
         setRunning(false);
-        sendFinished({ping, download, upload, time}).then(() => "");
+        sendFinished({ping, jitter, download, upload, time}).then(() => "");
     } catch (e) {
         console.log(e)
-        if (!retried) return this.create(type, true);
+        if (!retried) return create(type, true);
         let testResult = await tests.create(-1, -1, -1, null, 0, type, null, e.message);
         await sendError(e.message);
         setRunning(false, false);
@@ -113,8 +112,8 @@ module.exports.create = async (type = "auto", retried = false) => {
     }
 }
 
-module.exports.isRunning = () => isRunning;
+export const isRunning = () => _isRunning;
 
-module.exports.removeOld = async () => {
+export const removeOld = async () => {
     await tests.removeOld();
-}
+};

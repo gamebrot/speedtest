@@ -1,13 +1,17 @@
-const fs = require('fs');
+import fs from 'node:fs';
+import path from 'node:path';
 
-const neededFolder = ["data", "bin", "data/logs", "data/servers"];
+const baseDir = process.cwd();
+
+const neededFolder = ["data", "bin", "data/logs", "data/servers", "data/certs"];
 
 neededFolder.forEach(folder => {
-    if (!fs.existsSync(folder)) {
+    const fullPath = path.join(baseDir, folder);
+    if (!fs.existsSync(fullPath)) {
         try {
-            fs.mkdirSync(folder, {recursive: true});
+            fs.mkdirSync(fullPath, {recursive: true});
         } catch (e) {
-            console.error("Could not create the data folder. Please check the permission");
+            console.error(`Could not create the ${folder} folder. Please check the permission`);
             process.exit(0);
         }
     }

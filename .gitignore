@@ -7,8 +7,14 @@
 /.pnp
 .pnp.js
 
+# deno
+deno.lock
 
 # production
 /build
 /data
 /bin
+
+# docs
+/docs/.vitepress/dist
+/docs/.vitepress/cache

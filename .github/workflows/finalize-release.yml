@@ -1,0 +1,97 @@
+name: Finalize Release
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      release_id:
+        required: true
+        type: string
+
+env:
+  REGISTRY_IMAGE: germannewsmaker/myspeed
+
+jobs:
+  finalize:
+    name: "Update Versions & Publish"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update version files
+        run: |
+          V="${{ inputs.version }}"
+          jq ".version = \"$V\"" deno.json > tmp && mv tmp deno.json
+          cd client && npm version $V --no-git-tag-version --allow-same-version && cd ..
+
+      - name: Commit and push version bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add deno.json client/package.json client/package-lock.json
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: bump version to ${{ inputs.version }}"
+            git push origin HEAD:${{ github.event.repository.default_branch }}
+          fi
+
+      - name: Get previous tag
+        id: prev
+        run: |
+          CUR="v${{ inputs.version }}"
+          PREV=$(git tag --sort=-creatordate | grep -v "^$CUR$" | head -1)
+          echo "tag=$PREV" >> $GITHUB_OUTPUT
+
+      - name: Publish release notes
+        uses: actions/github-script@v7
+        env:
+          VERSION: ${{ inputs.version }}
+          PREV_TAG: ${{ steps.prev.outputs.tag }}
+          RELEASE_ID: ${{ inputs.release_id }}
+          REGISTRY_IMAGE: ${{ env.REGISTRY_IMAGE }}
+        with:
+          script: |
+            const { VERSION: v, PREV_TAG: prev, RELEASE_ID: rid, REGISTRY_IMAGE: registry } = process.env;
+            const releaseId = parseInt(rid, 10);
+            const repo = { owner: context.repo.owner, repo: context.repo.repo };
+            const repoUrl = `https://github.com/${repo.owner}/${repo.repo}`;
+            
+            let prs = [];
+            if (prev) {
+              try {
+                const { data: { commits } } = await github.rest.repos.compareCommits({ ...repo, base: prev, head: `v${v}` });
+                for (const c of commits) {
+                  const { data } = await github.rest.repos.listPullRequestsAssociatedWithCommit({ ...repo, commit_sha: c.sha });
+                  for (const pr of data.filter(p => p.merged_at && !prs.find(x => x.number === p.number))) {
+                    prs.push({ number: pr.number, title: pr.title, user: pr.user.login });
+                  }
+                }
+              } catch (e) { console.log('PR fetch error:', e.message); }
+            }
+            
+            const L = (label, file) => `[${label}](../../releases/download/v${v}/${file})`;
+            
+            let body = `## Downloads\n\n`;
+            body += `| Platform | x86-64 | ARM64 |\n`;
+            body += `| :-- | :-- | :-- |\n`;
+            body += `| **Windows** | ${L('EXE', 'MySpeed-windows-x64.exe')} · ${L('MSI', 'MySpeed-installer.msi')} | |\n`;
+            body += `| **Linux** | ${L('Binary', 'MySpeed-linux-x64')} | ${L('Binary', 'MySpeed-linux-arm64')} |\n`;
+            body += `| **macOS** | ${L('Binary', 'MySpeed-macos-x64')} | ${L('Binary', 'MySpeed-macos-arm64')} |\n`;
+            body += `\n### Source Distribution\n`;
+            body += `- ${L('ZIP Archive', 'MySpeed.zip')} (requires Deno runtime)\n`;
+            body += `\n### Docker Images\n`;
+            body += `- \`${registry}:latest\`\n`;
+            body += `- \`${registry}:${v}\`\n`;
+            
+            if (prs.length) {
+              body += `\n---\n\n## What's Changed\n`;
+              body += prs.map(p => `* ${p.title} by @${p.user} in ${repoUrl}/pull/${p.number}`).join('\n');
+              body += `\n\n**Full Changelog**: ${repoUrl}/compare/${prev}...v${v}`;
+            }
+            
+            await github.rest.repos.updateRelease({ ...repo, release_id: releaseId, body, draft: false });
+            console.log('Published:', prs.length, 'PRs');

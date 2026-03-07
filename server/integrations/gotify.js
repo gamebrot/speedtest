@@ -1,19 +1,19 @@
-const axios = require("axios");
-const {replaceVariables} = require("../util/helpers");
+import axios from "axios";
+import { replaceVariables } from "../util/helpers.js";
 
 const defaults = {
-    finished: "A speedtest is finished:\nPing: %ping% ms\nUpload: %upload% Mbps\nDownload: %download% Mbps",
+    finished: "A speedtest is finished:\nPing: %ping% ms (±%jitter% ms)\nUpload: %upload% Mbps\nDownload: %download% Mbps",
     failed: "A speedtest has failed. Reason: %error%"
-}
+};
 
 const postWebhook = async (url, key, triggerActivity, message, priority) => {
     axios.post(`${url}/message`, {message, priority: parseInt(priority)},
         {headers: {"Authorization": "Bearer " + key}})
         .then(() => triggerActivity())
         .catch(() => triggerActivity(true));
-}
+};
 
-module.exports = (registerEvent) => {
+export default (registerEvent) => {
     registerEvent('testFinished', async (integration, data, activity) => {
         if (integration.data.send_finished)
             await postWebhook(integration.data.url, integration.data.key, activity,
@@ -39,4 +39,4 @@ module.exports = (registerEvent) => {
             {name: "error_message", type: "textarea", required: false}
         ]
     };
-}
+};
