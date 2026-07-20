@@ -26,14 +26,14 @@ jobs:
       - name: Update version files
         run: |
           V="${{ inputs.version }}"
-          jq ".version = \"$V\"" deno.json > tmp && mv tmp deno.json
-          cd client && npm version $V --no-git-tag-version --allow-same-version && cd ..
+          jq ".version = \"$V\"" package.json > tmp && mv tmp package.json
+          jq ".version = \"$V\"" client/package.json > tmp && mv tmp client/package.json
 
       - name: Commit and push version bump
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add deno.json client/package.json client/package-lock.json
+          git add package.json client/package.json
           if ! git diff --staged --quiet; then
             git commit -m "chore: bump version to ${{ inputs.version }}"
             git push origin HEAD:${{ github.event.repository.default_branch }}
@@ -82,7 +82,7 @@ jobs:
             body += `| **Linux** | ${L('Binary', 'MySpeed-linux-x64')} | ${L('Binary', 'MySpeed-linux-arm64')} |\n`;
             body += `| **macOS** | ${L('Binary', 'MySpeed-macos-x64')} | ${L('Binary', 'MySpeed-macos-arm64')} |\n`;
             body += `\n### Source Distribution\n`;
-            body += `- ${L('ZIP Archive', 'MySpeed.zip')} (requires Deno runtime)\n`;
+            body += `- ${L('ZIP Archive', 'MySpeed.zip')} (requires Bun runtime)\n`;
             body += `\n### Docker Images\n`;
             body += `- \`${registry}:latest\`\n`;
             body += `- \`${registry}:${v}\`\n`;

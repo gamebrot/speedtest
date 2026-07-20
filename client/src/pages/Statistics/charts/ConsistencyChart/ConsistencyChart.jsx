@@ -1,11 +1,16 @@
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import { t } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowDown, faArrowUp, faPingPongPaddleBall } from "@fortawesome/free-solid-svg-icons";
 import StatisticContainer from "@/pages/Statistics/components/StatisticContainer";
+import { PreferencesContext } from "@/common/contexts/Preferences";
+import { convertSpeed, getSpeedUnit } from "@/common/utils/FormatUtil";
 import "./styles.sass";
 
 export const ConsistencyChart = (props) => {
+    const [preferences] = useContext(PreferencesContext);
+    const speedUnit = getSpeedUnit(preferences);
+
     const data = useMemo(() => {
         if (!props.consistency) return null;
         return props.consistency;
@@ -28,7 +33,7 @@ export const ConsistencyChart = (props) => {
                         <p className={getConsistencyColor(data.download.consistency)}>
                             {data.download.consistency}%
                         </p>
-                        <span className="consistency-detail">±{data.download.stdDev} {t("latest.speed_unit")}</span>
+                        <span className="consistency-detail">±{convertSpeed(data.download.stdDev, preferences)} {speedUnit}</span>
                     </div>
                     <FontAwesomeIcon icon={faArrowDown} className={getConsistencyColor(data.download.consistency)} />
                 </div>
@@ -39,7 +44,7 @@ export const ConsistencyChart = (props) => {
                         <p className={getConsistencyColor(data.upload.consistency)}>
                             {data.upload.consistency}%
                         </p>
-                        <span className="consistency-detail">±{data.upload.stdDev} {t("latest.speed_unit")}</span>
+                        <span className="consistency-detail">±{convertSpeed(data.upload.stdDev, preferences)} {speedUnit}</span>
                     </div>
                     <FontAwesomeIcon icon={faArrowUp} className={getConsistencyColor(data.upload.consistency)} />
                 </div>

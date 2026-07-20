@@ -154,7 +154,20 @@ export const Statistics = () => {
     }
 
     if (!deferredStatistics) return <></>;
-    if (!deferredStatistics.tests || deferredStatistics.tests.length === 0) return <h2 className="error-text">{t("test.not_available")}</h2>;
+    if (!deferredStatistics.tests || deferredStatistics.tests.total === 0) return (
+        <div className="statistic-area">
+            <div className="statistics-header">
+                <DateRangePicker 
+                    from={dateRange.from} 
+                    to={dateRange.to} 
+                    onChange={handleDateRangeChange}
+                />
+            </div>
+            <div className="statistics-empty">
+                <p>{t("test.not_available")}</p>
+            </div>
+        </div>
+    );
 
     const renderChart = (chartType) => {
         switch (chartType) {

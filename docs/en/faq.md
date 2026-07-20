@@ -31,7 +31,9 @@ results could be manipulated.
 :::
 
 ::: details What happens to the old test results?
-The old test results are automatically deleted as soon as they are older than 30 days.
+Old test results are automatically deleted once they exceed your configured retention period. By default
+this period is **1 year**, but you can change it to any value you like — or disable cleanup entirely
+to keep your tests forever — under **Manage storage → Speedtests → Data retention**.
 :::
 
 ::: details Does it have to run permanently?

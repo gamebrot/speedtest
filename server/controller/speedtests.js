@@ -1,9 +1,12 @@
 import tests from '../models/Speedtests.js';
 import { Op, Sequelize } from 'sequelize';
 import { mapFixed, mapRounded } from '../util/helpers.js';
+import { getValue } from './config.js';
 
-export const create = async (ping, download, upload, time, serverId, type = "auto", resultId = null, error = null, jitter = null) => {
-    return (await tests.create({ping, jitter, download, upload, error, serverId, type, resultId, time, created: new Date().toISOString()})).id;
+const DEFAULT_RETENTION_DAYS = 365;
+
+export const create = async (ping, download, upload, time, serverId, type = "auto", resultId = null, error = null, jitter = null, serverName = null, serverHost = null) => {
+    return (await tests.create({ping, jitter, download, upload, error, serverId, serverName, serverHost, type, resultId, time, created: new Date().toISOString()})).id;
 }
 
 export const getOne = async (id) => {
@@ -285,11 +288,16 @@ export const deleteOne = async (id) => {
 }
 
 export const removeOld = async () => {
+    const stored = await getValue("retentionDays");
+    const days = parseInt(stored ?? DEFAULT_RETENTION_DAYS);
+
+    if (!Number.isFinite(days) || days <= 0) return true;
+
     await tests.destroy({
         where: {
             created: process.env.DB_TYPE === "mysql"
-                ? {[Op.lte]: new Date(new Date().getTime() - 30 * 24 * 3600000)}
-                : {[Op.lte]: Sequelize.literal(`datetime('now', '-30 days')`)}
+                ? {[Op.lte]: new Date(new Date().getTime() - days * 24 * 3600000)}
+                : {[Op.lte]: Sequelize.literal(`datetime('now', '-${days} days')`)}
         }
     });
     return true;

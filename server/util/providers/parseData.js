@@ -17,13 +17,16 @@ export const parseOokla = (test) => {
     let download = roundSpeed(test.download.bandwidth);
     let upload = roundSpeed(test.upload.bandwidth);
     let time = Math.round((test.download.elapsed + test.upload.elapsed) / 1000);
+    let serverName = test.server?.name ?? null;
+    let serverHost = test.server?.host ?? null;
 
-    return {ping, jitter, download, upload, time, resultId: test.result?.id};
+    return {ping, jitter, download, upload, time, resultId: test.result?.id, serverName, serverHost};
 };
 
-export const parseLibre = (test) => ({...test, ping: Math.round(test.ping), 
+export const parseLibre = (test) => ({...test, ping: Math.round(test.ping),
     jitter: test.jitter ? parseFloat(parseFloat(test.jitter).toFixed(2)) : null,
-    time: Math.round(test.elapsed / 1000), resultId: null});
+    time: Math.round(test.elapsed / 1000), resultId: null,
+    serverName: test.server?.name ?? null, serverHost: test.server?.url ?? null});
 
 export const parseCloudflare = (test) => {
     if (test && test.latency_measurement && test.speed_measurements) {
@@ -42,10 +45,12 @@ export const parseCloudflare = (test) => {
         const time = Math.round((test.elapsed || 30000) / 1000);
         
         return {ping, jitter, download: parseFloat(download.toFixed(2)),
-            upload: parseFloat(upload.toFixed(2)), time, resultId: null};
+            upload: parseFloat(upload.toFixed(2)), time, resultId: null,
+            serverName: null, serverHost: null};
     }
 
-    return {ping: 0, jitter: null, download: 0, upload: 0, time: 0, resultId: null};
+    return {ping: 0, jitter: null, download: 0, upload: 0, time: 0, resultId: null,
+        serverName: null, serverHost: null};
 };
 
 export const parseData = (provider, data) => {

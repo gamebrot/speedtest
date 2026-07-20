@@ -8,16 +8,14 @@ import {
     faKey,
     faPause,
     faPlay,
-    faSliders, 
+    faSliders,
     faHardDrive,
-    faMoon,
-    faSun,
-    faGauge
+    faGauge,
+    faUserGear
 } from "@fortawesome/free-solid-svg-icons";
 import {ConfigContext} from "@/common/contexts/Config";
 import {StatusContext} from "@/common/contexts/Status";
 import {useAlert} from "@/common/contexts/Alert";
-import {ThemeContext} from "@/common/contexts/Theme";
 import {postRequest} from "@/common/utils/RequestUtil";
 import {t} from "i18next";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -30,11 +28,11 @@ import OptimalValuesDialog from "@/common/components/OptimalValuesDialog";
 import FrequencyDialog from "@/common/components/FrequencyDialog";
 import PasswordDialog from "@/common/components/PasswordDialog";
 import PauseDialog from "@/common/components/PauseDialog";
+import PreferencesDialog from "@/common/components/PreferencesDialog";
 
 const DropdownComponent = ({isOpen, switchDropdown}) => {
     const [config] = useContext(ConfigContext);
     const [status, updateStatus] = useContext(StatusContext);
-    const [isDarkMode, toggleTheme] = useContext(ThemeContext);
     const updateToast = useContext(ToastNotificationContext);
     const alert = useAlert();
     const [showIntegrationDialog, setShowIntegrationDialog] = useState(false);
@@ -45,6 +43,7 @@ const DropdownComponent = ({isOpen, switchDropdown}) => {
     const [showFrequencyDialog, setShowFrequencyDialog] = useState(false);
     const [showPasswordDialog, setShowPasswordDialog] = useState(false);
     const [showPauseDialog, setShowPauseDialog] = useState(false);
+    const [showPreferencesDialog, setShowPreferencesDialog] = useState(false);
     const ref = useRef();
 
     useEffect(() => {
@@ -84,11 +83,6 @@ const DropdownComponent = ({isOpen, switchDropdown}) => {
         { buttonText: t("dialog.close") }
     );
 
-    const handleThemeToggle = () => {
-        toggleTheme();
-        updateToast(t(isDarkMode ? "dropdown.theme_switched_light" : "dropdown.theme_switched_dark"), "green", isDarkMode ? faSun : faMoon);
-    };
-
     const options = [
         {run: () => setShowOptimalValuesDialog(true), icon: faGauge, text: t("dropdown.optimal_values")},
         {hr: true, key: 1},
@@ -99,8 +93,8 @@ const DropdownComponent = ({isOpen, switchDropdown}) => {
         {run: togglePause, icon: status.paused ? faPlay : faPause, text: t("dropdown." + (status.paused ? "resume_tests" : "pause_tests"))},
         {run: () => setShowIntegrationDialog(true), icon: faCircleNodes, text: t("dropdown.integrations")},
         {hr: true, key: 2},
-        {run: handleThemeToggle, icon: isDarkMode ? faSun : faMoon, text: t(isDarkMode ? "dropdown.light_mode" : "dropdown.dark_mode"), allowView: true},
         {run: () => setShowLanguageDialog(true), icon: faGlobeEurope, text: t("dropdown.language"), allowView: true},
+        {run: () => setShowPreferencesDialog(true), icon: faUserGear, text: t("dropdown.preferences"), allowView: true},
         {run: showProviderDetails, icon: faInfo, text: t("dropdown.provider"), previewShown: true}
     ];
 
@@ -114,6 +108,7 @@ const DropdownComponent = ({isOpen, switchDropdown}) => {
             <FrequencyDialog open={showFrequencyDialog} onClose={() => setShowFrequencyDialog(false)}/>
             <PasswordDialog open={showPasswordDialog} onClose={() => setShowPasswordDialog(false)}/>
             <PauseDialog open={showPauseDialog} onClose={() => setShowPauseDialog(false)} onPause={updateStatus}/>
+            <PreferencesDialog open={showPreferencesDialog} onClose={() => setShowPreferencesDialog(false)}/>
             <div className={`dropdown ${isOpen ? '' : 'dropdown-invisible'}`} ref={ref}>
                 <div className="dropdown-content">
                     <h2>{t("dropdown.settings")}</h2>

@@ -6,6 +6,9 @@ import {t} from "i18next";
 import {patchRequest} from "@/common/utils/RequestUtil";
 import {ConfigContext} from "@/common/contexts/Config";
 import {ToastNotificationContext} from "@/common/contexts/ToastNotification";
+import {PreferencesContext} from "@/common/contexts/Preferences";
+import {formatDateTime} from "@/common/utils/FormatUtil";
+import SelectableOption, {SelectableList} from "@/common/components/SelectableOption";
 import {CronExpressionParser} from "cron-parser";
 import "./styles.sass";
 
@@ -17,9 +20,9 @@ const PRESETS = [
     {id: "really_rare", cron: "0 0,6,12,18 * * *", icon: faSeedling}
 ];
 
-const getNextRun = (cron) => {
+const getNextRunDate = (cron) => {
     try {
-        return CronExpressionParser.parse(cron).next().toDate().toLocaleString();
+        return CronExpressionParser.parse(cron).next().toDate();
     } catch {
         return null;
     }
@@ -28,6 +31,13 @@ const getNextRun = (cron) => {
 export const FrequencyDialog = ({open, onClose}) => {
     const [config, reloadConfig] = useContext(ConfigContext);
     const updateToast = useContext(ToastNotificationContext);
+    const [preferences] = useContext(PreferencesContext);
+
+    const getNextRun = (cron) => {
+        const date = getNextRunDate(cron);
+        if (!date) return null;
+        return formatDateTime(date, preferences);
+    };
     const isCustomPreset = !PRESETS.find(p => p.cron === config.cron);
     const [selected, setSelected] = useState(() => {
         const preset = PRESETS.find(p => p.cron === config.cron);
@@ -71,19 +81,16 @@ export const FrequencyDialog = ({open, onClose}) => {
                     <DialogHeader onClose={close}>{t("update.cron_title")}</DialogHeader>
                     <DialogBody>
                         <div className="frequency-content">
-                            <div className="frequency-presets">
+                            <SelectableList>
                                 {PRESETS.map(preset => (
-                                    <div key={preset.id} 
-                                        className={`frequency-item${selected === preset.id ? " frequency-item-active" : ""}`}
-                                        onClick={() => handlePresetClick(preset)}>
-                                        <FontAwesomeIcon icon={preset.icon}/>
-                                        <div className="frequency-item-text">
-                                            <h3>{t(`options.cron.${preset.id}`)}</h3>
-                                            <p>{t(`options.cron.${preset.id}_desc`)}</p>
-                                        </div>
-                                    </div>
+                                    <SelectableOption key={preset.id}
+                                        icon={preset.icon}
+                                        title={t(`options.cron.${preset.id}`)}
+                                        description={t(`options.cron.${preset.id}_desc`)}
+                                        active={selected === preset.id}
+                                        onClick={() => handlePresetClick(preset)}/>
                                 ))}
-                            </div>
+                            </SelectableList>
                             
                             <button 
                                 className={`frequency-advanced-toggle${showAdvanced ? " frequency-advanced-open" : ""}`}

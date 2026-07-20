@@ -40,7 +40,7 @@ export const libreList = [
     {os: 'freebsd', arch: 'arm64', suffix: 'freebsd_arm64.tar.gz'}
 ];
 
-export const cloudflareVersion = "2.1.0";
+export const cloudflareVersion = "2.2.2";
 export const cloudflareList = [
     // MacOS
     {os: 'darwin', arch: 'x64', suffix: 'cfspeedtest-x86_64-apple-darwin.tar.gz'},

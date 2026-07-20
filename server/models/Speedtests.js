@@ -11,6 +11,16 @@ export default db.define("speedtests", {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },
+    serverName: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
+    serverHost: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
     ping: {
         type: Sequelize.INTEGER,
         allowNull: false

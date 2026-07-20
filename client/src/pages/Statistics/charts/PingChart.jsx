@@ -2,10 +2,14 @@ import ChartWrapper from "@/common/components/ChartWrapper";
 import { useMemo, useContext, memo } from "react";
 import { t } from "i18next";
 import { ThemeContext } from "@/common/contexts/Theme";
+import { PreferencesContext } from "@/common/contexts/Preferences";
+import { TIME_FORMAT_12H } from "@/common/utils/FormatUtil";
 import "./SpeedChart/styles.sass";
 
 const PingChart = memo(({ compact = false, ...props }) => {
     const [isDarkMode] = useContext(ThemeContext);
+    const [preferences] = useContext(PreferencesContext);
+    const use12h = preferences?.timeFormat === TIME_FORMAT_12H;
 
     const filteredData = useMemo(() => {
         if (!props.data?.ping || !props.labels) return { labels: [], data: [], jitter: [], average: 0, jitterAverage: 0, failed: [], errors: [], isSingleDay: false };
@@ -104,8 +108,8 @@ const PingChart = memo(({ compact = false, ...props }) => {
                     title: (items) => {
                         if (items.length > 0) {
                             const date = new Date(filteredData.labels[items[0].dataIndex]);
-                            return date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) + 
-                                   ' ' + date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+                            return date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) +
+                                   ' ' + date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: use12h });
                         }
                         return '';
                     },
@@ -159,10 +163,10 @@ const PingChart = memo(({ compact = false, ...props }) => {
                     callback: function(value, index) {
                         const date = new Date(filteredData.labels[index]);
                         if (filteredData.isSingleDay) {
-                            return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                            return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: use12h });
                         }
-                        return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + 
-                               date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                        return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
+                               date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: use12h });
                     }
                 }
             },
@@ -195,7 +199,7 @@ const PingChart = memo(({ compact = false, ...props }) => {
                 hoverBorderWidth: 2
             }
         }
-    }), [themeColors, filteredData.labels, filteredData.errors, filteredData.failed, filteredData.isSingleDay, compact]);
+    }), [themeColors, filteredData.labels, filteredData.errors, filteredData.failed, filteredData.isSingleDay, compact, use12h]);
 
     const chartData = useMemo(() => ({
         labels: filteredData.labels,

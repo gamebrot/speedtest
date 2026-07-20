@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
 import moment from 'moment-timezone';
 import * as tests from './speedtests.js';
-import axios from 'axios';
 import { html } from 'satori-html';
 import satori from 'satori';
 
@@ -23,7 +22,7 @@ async function generateOpenGraphImage(req) {
 
   const font = fs.existsSync(localFontPath)
     ? await fs.promises.readFile(localFontPath)
-    : (await axios.get(`${req.protocol}://${req.hostname}${fontPath}`)).data;
+    : await fetch(`${req.protocol}://${req.hostname}${fontPath}`).then(res => res.arrayBuffer());
 
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const date = moment().tz(timeZone).format("MM/DD/YYYY");

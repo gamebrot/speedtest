@@ -2,22 +2,24 @@
 
 .export-button-container
   position: relative
-  display: inline-block
+  display: inline-flex
+  flex-shrink: 0
 
 .export-button
   display: flex
   align-items: center
   gap: 0.5rem
-  padding: 0.5rem 0.875rem
+  padding: 0.6rem 1rem
   background-color: $dark-gray
   border: 1px solid $light-gray
-  border-radius: 0.5rem
+  border-radius: 0.6rem
   cursor: pointer
   transition: all 0.2s ease-in-out
   color: $white
   font-family: inherit
-  font-size: 0.8rem
+  font-size: 0.95rem
   font-weight: 600
+  white-space: nowrap
   
   &:hover:not(:disabled)
     border-color: $accent-primary
@@ -28,14 +30,15 @@
 
 .export-icon
   color: $subtext
-  font-size: 0.875rem
+  font-size: 1rem
+  flex-shrink: 0
 
 .export-text
   white-space: nowrap
 
 .chevron-icon
   color: $subtext
-  font-size: 0.625rem
+  font-size: 0.75rem
   transition: transform 0.2s ease
   
   &.open
@@ -86,7 +89,7 @@
     flex-shrink: 0
 
   span
-    font-size: 0.875rem
+    font-size: 0.95rem
     font-weight: 500
 
 @media screen and (max-width: 600px)
@@ -94,7 +97,9 @@
     display: none
   
   .export-button
-    padding: 0.5rem 0.625rem
+    padding: 0.55rem 0.7rem
+    aspect-ratio: 1 / 1
+    justify-content: center
   
   .chevron-icon
     display: none
@@ -106,4 +111,5 @@
     left: 50%
     right: auto
     transform: translateX(-50%)
-    max-width: calc(100vw - 2rem)
+    width: calc(100vw - 2rem)
+    max-width: 20rem

@@ -11,7 +11,7 @@ gelöst sein. :)
    Installationsort)
 
 2. Führe eine Neuinstallation der Abhängigkeiten aus   
-   Führe `deno cache --reload server/index.js` im Installationsordner aus, um alle Abhängigkeiten neu zu laden.
+   Führe `bun install` im Installationsordner aus, um alle Abhängigkeiten neu zu laden.
    :::
 
 ::: danger Diese MySpeed-Instanz befindet sich aktuell im Entwicklungsmodus

@@ -34,10 +34,10 @@ Here we describe the setup for Windows.
 This process installs the latest development version of MySpeed. Errors may occur.
 :::
 
-1. Download Deno  
-   To build MySpeed from source, you need **Deno**. Open PowerShell and run:
+1. Download Bun  
+   To build MySpeed from source, you need **Bun**. Open PowerShell and run:
    ```powershell
-   irm https://deno.land/install.ps1 | iex
+   powershell -c "irm bun.sh/install.ps1 | iex"
    ```
 
 2. Download MySpeed source  
@@ -45,11 +45,11 @@ This process installs the latest development version of MySpeed. Errors may occu
 
 3. Install dependencies and build
    ```powershell
-   deno install
+   bun install
    cd client && npm install && npm run build && cd .. && move client\build build
    ```
 
 4. Start MySpeed
    ```powershell
-   deno run --allow-all server/index.js
+   bun run server/index.js
    ```

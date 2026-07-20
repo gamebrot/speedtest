@@ -2,17 +2,22 @@ import ChartWrapper from "@/common/components/ChartWrapper";
 import { useMemo, useContext, memo } from "react";
 import { t } from "i18next";
 import { ThemeContext } from "@/common/contexts/Theme";
+import { PreferencesContext } from "@/common/contexts/Preferences";
+import { convertSpeed, getSpeedUnit, TIME_FORMAT_12H } from "@/common/utils/FormatUtil";
 import "./styles.sass";
 
 export const SpeedChart = memo(({ labels, data, dataKey, titleKey, color, onClick, failed, errors, compact = false }) => {
     const [isDarkMode] = useContext(ThemeContext);
+    const [preferences] = useContext(PreferencesContext);
+    const speedUnit = getSpeedUnit(preferences);
+    const use12h = preferences?.timeFormat === TIME_FORMAT_12H;
 
     const filteredData = useMemo(() => {
         if (!data?.[dataKey] || !labels) return { labels: [], data: [], average: 0, failed: [], errors: [], isSingleDay: false };
 
         const filtered = labels.map((label, index) => ({
             label,
-            value: data[dataKey][index],
+            value: convertSpeed(data[dataKey][index], preferences),
             isFailed: failed?.[index] || false,
             error: errors?.[index] || null,
             date: new Date(label)
@@ -35,7 +40,7 @@ export const SpeedChart = memo(({ labels, data, dataKey, titleKey, color, onClic
             average,
             isSingleDay
         };
-    }, [labels, data, dataKey, failed, errors]);
+    }, [labels, data, dataKey, failed, errors, preferences]);
 
     const failedMarkerData = useMemo(() => {
         return filteredData.labels.map((_, index) => 
@@ -92,8 +97,8 @@ export const SpeedChart = memo(({ labels, data, dataKey, titleKey, color, onClic
                     title: (items) => {
                         if (items.length > 0) {
                             const date = new Date(filteredData.labels[items[0].dataIndex]);
-                            return date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) + 
-                                   ' ' + date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+                            return date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) +
+                                   ' ' + date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: use12h });
                         }
                         return '';
                     },
@@ -102,7 +107,7 @@ export const SpeedChart = memo(({ labels, data, dataKey, titleKey, color, onClic
                             const error = filteredData.errors[item.dataIndex];
                             return error ? `${t("statistics.failed_test")}: ${error}` : t("statistics.failed_test");
                         }
-                        return `${item.dataset.label}: ${item.formattedValue} ${t("latest.speed_unit")}`;
+                        return `${item.dataset.label}: ${item.formattedValue} ${speedUnit}`;
                     },
                     afterBody: (items) => {
                         if (items.length > 0) {
@@ -147,10 +152,10 @@ export const SpeedChart = memo(({ labels, data, dataKey, titleKey, color, onClic
                     callback: function(value, index) {
                         const date = new Date(filteredData.labels[index]);
                         if (filteredData.isSingleDay) {
-                            return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                            return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: use12h });
                         }
-                        return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + 
-                               date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                        return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
+                               date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: use12h });
                     }
                 }
             },
@@ -184,7 +189,7 @@ export const SpeedChart = memo(({ labels, data, dataKey, titleKey, color, onClic
                 hoverBorderWidth: 2
             }
         }
-    }), [themeColors, filteredData.labels, filteredData.errors, filteredData.failed, filteredData.isSingleDay, compact]);
+    }), [themeColors, filteredData.labels, filteredData.errors, filteredData.failed, filteredData.isSingleDay, compact, speedUnit, use12h]);
 
     const hasFailedTests = useMemo(() => failedMarkerData.some(v => v !== null), [failedMarkerData]);
 
@@ -243,7 +248,7 @@ export const SpeedChart = memo(({ labels, data, dataKey, titleKey, color, onClic
     return (
         <div className="chart-container" onClick={onClick}>
             <div className="chart-header">
-                <h3 className="chart-title">{t(titleKey)} ({t("latest.speed_unit")})</h3>
+                <h3 className="chart-title">{t(titleKey)} ({speedUnit})</h3>
             </div>
             <div className="chart-body">
                 <ChartWrapper type="line" data={chartData} options={chartOptions} />

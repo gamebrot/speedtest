@@ -18,31 +18,36 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v4
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          deno-version: v2.x
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+          bun-version: latest
 
       - name: Install client dependencies
         working-directory: client
-        run: npm install --force
+        run: bun install
 
       - name: Build client
         working-directory: client
-        run: npm run build
+        run: bun run build
 
       - name: Move build folder
         run: Move-Item -Path client/build -Destination .
 
+      - name: Install server dependencies
+        run: bun install
+
+      - name: Generate migrations
+        run: bun run generate-migrations
+
+      - name: Generate integrations
+        run: bun run generate-integrations
+
+      - name: Generate client embed
+        run: bun run generate-client-embed
+
       - name: Compile binary
-        run: deno compile --allow-all --no-check --include build --include server/integrations --include server/templates --target x86_64-pc-windows-msvc --output MySpeed.exe server/index.js
-        env:
-          RUST_MIN_STACK: 16777216
+        run: bun build --compile --compile-autoload-package-json --external pg-hstore --external pg --target=bun-windows-x64 server/index.js --outfile MySpeed.exe
 
       - name: Upload to Release
         uses: actions/github-script@v7
@@ -77,11 +82,11 @@ jobs:
       matrix:
         include:
           - arch: x64
-            target: x86_64-unknown-linux-gnu
+            target: bun-linux-x64
             runner: ubuntu-latest
             artifact_name: MySpeed-linux-x64
           - arch: arm64
-            target: aarch64-unknown-linux-gnu
+            target: bun-linux-arm64
             runner: ubuntu-24.04-arm
             artifact_name: MySpeed-linux-arm64
 
@@ -89,31 +94,36 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v4
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          deno-version: v2.x
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+          bun-version: latest
 
       - name: Install client dependencies
         working-directory: client
-        run: npm install --force
+        run: bun install
 
       - name: Build client
         working-directory: client
-        run: npm run build
+        run: bun run build
 
       - name: Move build folder
         run: mv client/build .
 
+      - name: Install server dependencies
+        run: bun install
+
+      - name: Generate migrations
+        run: bun run generate-migrations
+
+      - name: Generate integrations
+        run: bun run generate-integrations
+
+      - name: Generate client embed
+        run: bun run generate-client-embed
+
       - name: Compile binary
-        run: deno compile --allow-all --no-check --include build --include server/integrations --include server/templates --target ${{ matrix.target }} --output MySpeed server/index.js
-        env:
-          RUST_MIN_STACK: 8388608
+        run: bun build --compile --compile-autoload-package-json --external pg-hstore --external pg --target=${{ matrix.target }} server/index.js --outfile MySpeed
 
       - name: Rename binary
         run: mv MySpeed ${{ matrix.artifact_name }}
@@ -139,41 +149,46 @@ jobs:
       matrix:
         include:
           - arch: x64
-            target: x86_64-apple-darwin
+            target: bun-darwin-x64
             artifact_name: MySpeed-macos-x64
           - arch: arm64
-            target: aarch64-apple-darwin
+            target: bun-darwin-arm64
             artifact_name: MySpeed-macos-arm64
 
     steps:
       - name: Checkout project
         uses: actions/checkout@v4
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          deno-version: v2.x
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+          bun-version: latest
 
       - name: Install client dependencies
         working-directory: client
-        run: npm install --force
+        run: bun install
 
       - name: Build client
         working-directory: client
-        run: npm run build
+        run: bun run build
 
       - name: Move build folder
         run: mv client/build .
 
+      - name: Install server dependencies
+        run: bun install
+
+      - name: Generate migrations
+        run: bun run generate-migrations
+
+      - name: Generate integrations
+        run: bun run generate-integrations
+
+      - name: Generate client embed
+        run: bun run generate-client-embed
+
       - name: Compile binary
-        run: deno compile --allow-all --no-check --include build --include server/integrations --include server/templates --target ${{ matrix.target }} --output MySpeed server/index.js
-        env:
-          RUST_MIN_STACK: 8388608
+        run: bun build --compile --compile-autoload-package-json --external pg-hstore --external pg --target=${{ matrix.target }} server/index.js --outfile MySpeed
 
       - name: Rename binary
         run: mv MySpeed ${{ matrix.artifact_name }}
@@ -198,29 +213,33 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v4
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          deno-version: v2.x
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+          bun-version: latest
 
       - name: Install client dependencies
         working-directory: client
-        run: npm install --force
+        run: bun install
 
       - name: Build client
         working-directory: client
-        run: npm run build
+        run: bun run build
 
       - name: Move build folder
         run: mv client/build .
 
+      - name: Install server dependencies
+        run: bun install
+
+      - name: Generate migrations
+        run: bun run generate-migrations
+
+      - name: Generate integrations
+        run: bun run generate-integrations
+
       - name: Create zip archive
-        run: zip -r MySpeed.zip build server deno.json
+        run: zip -r MySpeed.zip build server package.json
 
       - name: Upload to Release
         uses: actions/github-script@v7

@@ -66,6 +66,7 @@
     "dark_mode": "Dunkler Modus",
     "theme_switched_light": "In den hellen Modus geschaltet",
     "theme_switched_dark": "In den dunklen Modus geschaltet",
+    "preferences": "Einstellungen",
     "info": "Infos zum Projekt",
     "provider": "Über den Anbieter",
     "integrations": "Integrationen"
@@ -155,7 +156,22 @@
     "reset": "Zurücksetzen",
     "confirm_reset": "Ja, zurücksetzen",
     "settings_exported": "Die Einstellungen wurden exportiert",
-    "settings_imported": "Die Einstellungen wurden importiert"
+    "settings_imported": "Die Einstellungen wurden importiert",
+    "retention": "Datenspeicherung",
+    "retention_desc": "Wie lange Speedtest-Ergebnisse aufbewahrt werden, bevor sie automatisch gelöscht werden.",
+    "retention_saved": "Speicherdauer aktualisiert",
+    "retention_days_placeholder": "365",
+    "retention_options": {
+      "week": "7 Tage",
+      "month": "30 Tage",
+      "quarter": "90 Tage",
+      "half_year": "180 Tage",
+      "year": "1 Jahr (Standard)",
+      "forever": "Für immer behalten",
+      "custom": "Benutzerdefiniert..."
+    },
+    "retention_days_suffix": "Tage",
+    "retention_back": "Zurück zu Voreinstellungen"
   },
   "latest": {
     "ping": "Ping",
@@ -164,6 +180,7 @@
     "jitter_unit": "ms",
     "down": "Download",
     "speed_unit": "Mbit/s",
+    "byte_speed_unit": "MB/s",
     "up": "Upload",
     "latest": "Letzter Test",
     "before": "vor"
@@ -377,7 +394,50 @@
       "title": "HealthChecks",
       "fields": {
         "url": "HealthChecks-URL",
-        "url_placeholder": "https://hc-ping.com/<uuid>"
+        "url_placeholder": "https://hc-ping.com/<uuid>",
+        "interval": "Ping-Intervall (Minuten)",
+        "interval_placeholder": "1"
+      }
+    },
+    "influxdb": {
+      "title": "InfluxDB",
+      "fields": {
+        "url": "Server-URL",
+        "url_placeholder": "http://localhost:8086",
+        "org": "Organisation",
+        "bucket": "Bucket",
+        "token": "API-Token",
+        "measurement": "Measurement-Name",
+        "measurement_placeholder": "speedtests (Standard)",
+        "host": "Host-Tag",
+        "host_placeholder": "Standard: Hostname des Geräts",
+        "tags": "Zusätzliche Tags",
+        "tags_placeholder": "region=eu,role=primary (komma-getrennt)"
+      }
+    },
+    "ntfy": {
+      "title": "ntfy",
+      "fields": {
+        "url": "Server-URL",
+        "url_placeholder": "https://ntfy.sh",
+        "topic": "Topic",
+        "topic_placeholder": "myspeed-alerts",
+        "token": "Zugriffstoken",
+        "token_placeholder": "tk_... (optional, für geschützte Server)",
+        "title": "Benachrichtigungstitel",
+        "title_placeholder": "MySpeed (optional)",
+        "tags": "Tags",
+        "tags_placeholder": "warning,satellite (kommagetrennt)",
+        "priority": "Standardpriorität (1-5)",
+        "priority_placeholder": "3",
+        "error_priority": "Fehlerpriorität (1-5)",
+        "error_priority_placeholder": "5",
+        "error_message": "Fehlernachricht",
+        "error_message_placeholder": "Fehler: %error%",
+        "send_failed": "Fehlernachrichten senden",
+        "send_finished": "Abgeschlossene senden",
+        "finished_message": "Abgeschlossen-Nachricht",
+        "finished_message_placeholder": "%ping% ms, %download% Mbit/s, %upload% Mbit/s"
       }
     },
     "telegram": {
@@ -403,11 +463,40 @@
         "send_finished": "Abgeschlossene senden",
         "send_alive": "Lebendig-Nachrichten senden",
         "send_recommendations": "Empfehlungen senden",
-        "send_config_updates": "Konfigurations-Updates senden"
+        "send_config_updates": "Konfigurations-Updates senden",
+        "interval": "Keep-Alive-Intervall (Minuten)",
+        "interval_placeholder": "1"
       }
     }
   },
   "common": {
     "back_to_top": "Zurück zum Anfang"
+  },
+  "preferences": {
+    "title": "Einstellungen",
+    "theme": {
+      "title": "Erscheinungsbild",
+      "description": "Wechsle zwischen dunklem und hellem Design.",
+      "dark": "Dunkel",
+      "dark_desc": "Augenschonender bei wenig Licht",
+      "light": "Hell",
+      "light_desc": "Hellere Darstellung für tagsüber"
+    },
+    "time_format": {
+      "title": "Zeitformat",
+      "description": "Wie Uhrzeiten in der gesamten App angezeigt werden.",
+      "h24": "24-Stunden",
+      "h24_desc": "Anzeige im Format 14:30",
+      "h12": "12-Stunden",
+      "h12_desc": "Anzeige im Format 2:30 PM"
+    },
+    "speed_unit": {
+      "title": "Geschwindigkeitseinheit",
+      "description": "Lege fest, wie Geschwindigkeiten angezeigt werden. Werte werden automatisch umgerechnet.",
+      "mbps": "Mbit/s (Megabit pro Sekunde)",
+      "mbps_desc": "Standardeinheit von Anbietern und Speedtests",
+      "mbytes": "MB/s (Megabyte pro Sekunde)",
+      "mbytes_desc": "Üblich in Browsern und Download-Managern"
+    }
   }
 }

@@ -4,6 +4,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faInfinity, faClock, faMugHot, faMoon, faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import {t} from "i18next";
 import {postRequest} from "@/common/utils/RequestUtil";
+import SelectableOption, {SelectableList} from "@/common/components/SelectableOption";
 import "./styles.sass";
 
 const PRESETS = [
@@ -46,19 +47,16 @@ export const PauseDialog = ({open, onClose, onPause}) => {
                     <DialogHeader onClose={close}>{t("update.pause_title")}</DialogHeader>
                     <DialogBody>
                         <div className="pause-content">
-                            <div className="pause-presets">
+                            <SelectableList>
                                 {PRESETS.map(preset => (
-                                    <div key={preset.id}
-                                         className={`pause-item${selected === preset.id ? " pause-item-active" : ""}`}
-                                         onClick={() => setSelected(preset.id)}>
-                                        <FontAwesomeIcon icon={preset.icon}/>
-                                        <div className="pause-item-text">
-                                            <h3>{t(`pause.${preset.id}`)}</h3>
-                                            <p>{t(`pause.${preset.id}_desc`)}</p>
-                                        </div>
-                                    </div>
+                                    <SelectableOption key={preset.id}
+                                                      icon={preset.icon}
+                                                      title={t(`pause.${preset.id}`)}
+                                                      description={t(`pause.${preset.id}_desc`)}
+                                                      active={selected === preset.id}
+                                                      onClick={() => setSelected(preset.id)}/>
                                 ))}
-                            </div>
+                            </SelectableList>
                             
                             <button 
                                 className={`pause-custom-toggle${showCustom ? " pause-custom-open" : ""}`}

@@ -2,25 +2,37 @@ import ChartWrapper from "@/common/components/ChartWrapper";
 import { useMemo, useContext, memo } from "react";
 import { t } from "i18next";
 import { ThemeContext } from "@/common/contexts/Theme";
+import { PreferencesContext } from "@/common/contexts/Preferences";
+import { convertSpeed, getSpeedUnit, TIME_FORMAT_12H } from "@/common/utils/FormatUtil";
 import "./SpeedChart/styles.sass";
 
 const HourlyChart = memo((props) => {
     const [isDarkMode] = useContext(ThemeContext);
+    const [preferences] = useContext(PreferencesContext);
+    const speedUnit = getSpeedUnit(preferences);
+    const use12h = preferences?.timeFormat === TIME_FORMAT_12H;
+
+    const formatHourLabel = (hour) => {
+        if (use12h) {
+            const suffix = hour >= 12 ? "PM" : "AM";
+            let h = hour % 12;
+            if (h === 0) h = 12;
+            return `${h}:00 ${suffix}`;
+        }
+        return `${hour.toString().padStart(2, '0')}:00`;
+    };
 
     const chartData = useMemo(() => {
         if (!props.hourlyAverages) return { labels: [], datasets: [] };
 
-        const labels = props.hourlyAverages.map(h => {
-            const hour = h.hour;
-            return `${hour.toString().padStart(2, '0')}:00`;
-        });
+        const labels = props.hourlyAverages.map(h => formatHourLabel(h.hour));
 
         return {
             labels,
             datasets: [
                 {
                     label: t("latest.down"),
-                    data: props.hourlyAverages.map(h => h.download),
+                    data: props.hourlyAverages.map(h => convertSpeed(h.download, preferences)),
                     backgroundColor: 'hsla(187, 94%, 43%, 0.75)',
                     borderColor: 'hsl(187, 94%, 43%)',
                     borderWidth: 1.5,
@@ -28,7 +40,7 @@ const HourlyChart = memo((props) => {
                 },
                 {
                     label: t("latest.up"),
-                    data: props.hourlyAverages.map(h => h.upload),
+                    data: props.hourlyAverages.map(h => convertSpeed(h.upload, preferences)),
                     backgroundColor: 'hsla(258, 90%, 66%, 0.75)',
                     borderColor: 'hsl(258, 90%, 66%)',
                     borderWidth: 1.5,
@@ -36,7 +48,7 @@ const HourlyChart = memo((props) => {
                 }
             ]
         };
-    }, [props.hourlyAverages]);
+    }, [props.hourlyAverages, preferences, use12h]);
 
     const themeColors = useMemo(() => ({
         gridColor: isDarkMode ? 'rgba(42, 52, 65, 0.6)' : 'rgba(203, 213, 225, 0.8)',
@@ -83,7 +95,7 @@ const HourlyChart = memo((props) => {
                 displayColors: true,
                 boxPadding: 8,
                 callbacks: {
-                    label: (item) => `${item.dataset.label}: ${item.formattedValue} ${t("latest.speed_unit")}`,
+                    label: (item) => `${item.dataset.label}: ${item.formattedValue} ${speedUnit}`,
                     afterBody: (items) => {
                         const hourIndex = items[0].dataIndex;
                         const count = props.hourlyAverages[hourIndex]?.count || 0;
@@ -133,7 +145,7 @@ const HourlyChart = memo((props) => {
                 }
             }
         }
-    }), [themeColors, props.hourlyAverages]);
+    }), [themeColors, props.hourlyAverages, speedUnit]);
 
     return (
         <div className="chart-container" onClick={props.onClick}>

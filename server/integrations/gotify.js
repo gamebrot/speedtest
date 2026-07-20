@@ -1,4 +1,4 @@
-import axios from "axios";
+import { postJson } from "../util/http.js";
 import { replaceVariables } from "../util/helpers.js";
 
 const defaults = {
@@ -6,25 +6,19 @@ const defaults = {
     failed: "A speedtest has failed. Reason: %error%"
 };
 
-const postWebhook = async (url, key, triggerActivity, message, priority) => {
-    axios.post(`${url}/message`, {message, priority: parseInt(priority)},
-        {headers: {"Authorization": "Bearer " + key}})
-        .then(() => triggerActivity())
-        .catch(() => triggerActivity(true));
-};
+const send = ({url, key}, message, priority, activity) =>
+    postJson(`${url}/message`, {message, priority: parseInt(priority)},
+        {headers: {"Authorization": "Bearer " + key}, activity});
 
 export default (registerEvent) => {
-    registerEvent('testFinished', async (integration, data, activity) => {
-        if (integration.data.send_finished)
-            await postWebhook(integration.data.url, integration.data.key, activity,
-                replaceVariables(integration.data.finished_message || defaults.finished, data),
-                integration.data.priority);
+    registerEvent('testFinished', async ({data: c}, data, activity) => {
+        if (c.send_finished) await send(c,
+            replaceVariables(c.finished_message || defaults.finished, data), c.priority, activity);
     });
 
-    registerEvent('testFailed', async (integration, error, activity) => {
-        if (integration.data.send_failed)
-            await postWebhook(integration.data.url, integration.data.key, activity,
-                replaceVariables(integration.data.failed_message || defaults.failed, {error}), 8);
+    registerEvent('testFailed', async ({data: c}, error, activity) => {
+        if (c.send_failed) await send(c,
+            replaceVariables(c.failed_message || defaults.failed, {error}), 8, activity);
     });
 
     return {

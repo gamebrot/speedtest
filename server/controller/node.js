@@ -1,4 +1,3 @@
-import axios from 'axios';
 import nodes from '../models/Node.js';
 
 export const listAll = async () => await nodes.findAll()
@@ -15,39 +14,45 @@ export const updateName = async (nodeId, name) => await nodes.update({name: name
 export const updatePassword = async (nodeId, password) => await nodes.update({password: password}, {where: {id: nodeId}});
 
 export const checkStatus = async (url, password) => {
-    if (password === "none") password = undefined;
-    const api = await axios.get(url + "/api/config", {
-        headers: {password: password},
-        validateStatus: (status) => status < 500
-    }).catch(() => {
+    try {
+        const headers = password && password !== "none" ? {password} : {};
+        const res = await fetch(url + "/api/config", {headers});
+
+        if (res.status === 401) return "PASSWORD_REQUIRED";
+        if (!res.ok) return "INVALID_URL";
+
+        const data = await res.json();
+        if (!data.ping) return "INVALID_URL";
+        if (data.viewMode) return "PASSWORD_REQUIRED";
+        return "NODE_VALID";
+    } catch {
         return "INVALID_URL";
-    });
-
-    if (api === "INVALID_URL") return "INVALID_URL";
-    if (api.status === 401) return "PASSWORD_REQUIRED";
-    if (api.status !== 200) return "INVALID_URL";
-
-    if (!api.data.ping) return "INVALID_URL";
-
-    if (api.data.viewMode) return "PASSWORD_REQUIRED";
-
-    return "NODE_VALID";
+    }
 }
 
+const SKIP_HEADERS = new Set(["host", "content-length", "connection"]);
+const serverError = (res) => res.status(500).json({message: "Internal server error"});
+
 export const proxyRequest = async (url, req, res) => {
-    const response = await axios(url, {
-        method: req.method,
-        headers: req.headers,
-        data: req.method === "GET" ? undefined : JSON.stringify(req.body),
-        signal: req.signal,
-        validateStatus: (status) => status < 500
-    }).catch(() => "INVALID_URL");
+    const headers = Object.fromEntries(
+        Object.entries(req.headers).filter(([k]) => !SKIP_HEADERS.has(k.toLowerCase()))
+    );
 
-    if (response === "INVALID_URL")
-        return res.status(500).json({message: "Internal server error"});
+    try {
+        const response = await fetch(url, {
+            method: req.method,
+            headers,
+            body: req.method === "GET" ? undefined : JSON.stringify(req.body),
+            signal: req.signal
+        });
 
-    if (response.headers["content-disposition"])
-        res.setHeader("content-disposition", response.headers["content-disposition"]);
+        if (response.status >= 500) return serverError(res);
 
-    res.status(response.status).json(response.data);
+        const disposition = response.headers.get("content-disposition");
+        if (disposition) res.setHeader("content-disposition", disposition);
+
+        res.status(response.status).json(await response.json().catch(() => null));
+    } catch {
+        serverError(res);
+    }
 }

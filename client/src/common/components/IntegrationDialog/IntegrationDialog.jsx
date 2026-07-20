@@ -18,7 +18,16 @@ const IntegrationCard = ({integration, integrationDef, onRemove, onUpdate, confi
     const [fields, setFields] = useState(() => {
         const initial = {};
         integrationDef.fields.forEach(field => {
-            initial[field.name] = integration.data?.[field.name] ?? (field.type === "boolean" ? false : "");
+            const stored = integration.data?.[field.name];
+            if (stored !== undefined && stored !== null) {
+                initial[field.name] = stored;
+            } else if (field.type === "boolean") {
+                initial[field.name] = false;
+            } else if (field.type === "number") {
+                initial[field.name] = "";
+            } else {
+                initial[field.name] = "";
+            }
         });
         return initial;
     });
@@ -42,10 +51,18 @@ const IntegrationCard = ({integration, integrationDef, onRemove, onUpdate, confi
 
     const isValidInput = (field) => {
         const value = fields[field.name];
-        if (field.required && !value) return false;
-        if (field.regex && value && !new RegExp(field.regex).test(value)) return false;
-        if (field.type === "text" && value && value.length > 255) return false;
-        if (field.type === "textarea" && value && value.length > 2000) return false;
+        const isEmpty = value === undefined || value === null || value === "";
+        if (field.required && isEmpty) return false;
+        if (!isEmpty) {
+            if (field.regex && !new RegExp(field.regex).test(value)) return false;
+            if (field.type === "text" && value.length > 255) return false;
+            if (field.type === "textarea" && value.length > 2000) return false;
+            if (field.type === "number") {
+                if (!Number.isInteger(Number(value))) return false;
+                if (field.min !== undefined && Number(value) < field.min) return false;
+                if (field.max !== undefined && Number(value) > field.max) return false;
+            }
+        }
         return true;
     };
 
@@ -56,7 +73,13 @@ const IntegrationCard = ({integration, integrationDef, onRemove, onUpdate, confi
     };
 
     const handleSave = async () => {
-        const data = {...fields, integration_name: displayName};
+        const cleanedFields = {};
+        integrationDef.fields.forEach(field => {
+            const v = fields[field.name];
+            if (field.type === "number" && (v === "" || v === null || v === undefined)) return;
+            cleanedFields[field.name] = v;
+        });
+        const data = {...cleanedFields, integration_name: displayName};
         try {
             if (!integration.id) {
                 const response = await putRequest(`/integrations/${integration.name}`, data);
@@ -124,7 +147,8 @@ const IntegrationCard = ({integration, integrationDef, onRemove, onUpdate, confi
             {integrationDef.fields.map((field) => (
                 <FormField key={field.name} label={t(`integrations.${integration.name}.fields.${field.name}`)}
                     type={field.type} value={fields[field.name]} onChange={(value) => updateField(field.name, value)}
-                    placeholder={getPlaceholder(field.name)} error={!isValidInput(field)}/>
+                    placeholder={getPlaceholder(field.name)} error={!isValidInput(field)}
+                    min={field.min} max={field.max}/>
             ))}
         </ExpandableCard>
     );

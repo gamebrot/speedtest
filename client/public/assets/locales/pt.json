@@ -267,7 +267,7 @@
       "max": "Máximo",
       "avg": "Média",
       "down": "Valores de download",
-      "up": "Carregar valores"
+      "up": "Valores de upload"
     }
   },
   "nodes": {
@@ -361,6 +361,31 @@
       "fields": {
         "url": "HealthChecks-URL",
         "url_placeholder": "https://hc-ping.com/<uuid>"
+      }
+    },
+    "ntfy": {
+      "title": "ntfy",
+      "fields": {
+        "url": "URL do servidor",
+        "url_placeholder": "https://ntfy.sh",
+        "topic": "Tópico",
+        "topic_placeholder": "myspeed-alerts",
+        "token": "Token de acesso",
+        "token_placeholder": "tk_... (opcional, para servidores protegidos)",
+        "title": "Título da notificação",
+        "title_placeholder": "MySpeed (opcional)",
+        "tags": "Etiquetas",
+        "tags_placeholder": "warning,satellite (separadas por vírgula)",
+        "priority": "Prioridade padrão (1-5)",
+        "priority_placeholder": "3",
+        "error_priority": "Prioridade de erro (1-5)",
+        "error_priority_placeholder": "5",
+        "error_message": "Mensagem de erro",
+        "error_message_placeholder": "Erro: %error%",
+        "send_failed": "Enviar mensagens de erro",
+        "send_finished": "Enviar mensagens concluídas",
+        "finished_message": "Mensagem de conclusão",
+        "finished_message_placeholder": "%ping% ms, %download% Mbps, %upload% Mbps"
       }
     },
     "telegram": {

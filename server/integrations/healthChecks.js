@@ -1,35 +1,26 @@
-import axios from "axios";
+import { postJson } from "../util/http.js";
 
-const sendPing = async (url, path, error, triggerActivity) => {
-    if (url == null) return;
-    if (path) url += "/" + path;
-
-    await axios.post(url, error, {headers: {"user-agent": "MySpeed/HealthAgent"}})
-        .then(() => triggerActivity())
-        .catch(() => triggerActivity(true));
-};
+const events = [
+    ['minutePassed'],
+    ['testStarted', "start"],
+    ['testFinished'],
+    ['testFailed', "fail"]
+];
 
 export default (registerEvent) => {
-    registerEvent('minutePassed', async (integration, data, triggerActivity) => {
-        if (integration.data.url) await sendPing(integration.data.url, undefined, undefined, triggerActivity);
-    });
-
-    registerEvent('testFailed', async (integration, error, triggerActivity) => {
-        if (integration.data.url) await sendPing(integration.data.url, "fail", error, triggerActivity);
-    });
-
-    registerEvent('testStarted', async (integration, data, triggerActivity) => {
-        if (integration.data.url) await sendPing(integration.data.url, "start", data, triggerActivity);
-    });
-
-    registerEvent('testFinished', async (integration, data, triggerActivity) => {
-        if (integration.data.url) await sendPing(integration.data.url, undefined, undefined, triggerActivity);
-    });
+    for (const [event, path] of events) {
+        registerEvent(event, async ({data: c}, payload, activity) => {
+            if (!c.url) return;
+            await postJson(path ? `${c.url}/${path}` : c.url, payload ?? {},
+                {headers: {"user-agent": "MySpeed/HealthAgent"}, activity});
+        });
+    }
 
     return {
         icon: "fa-solid fa-heart-pulse",
         fields: [
             {name: "url", type: "text", required: true, regex: /https?:\/\/.+/},
+            {name: "interval", type: "number", required: false, min: 1, max: 1440}
         ]
     };
 };

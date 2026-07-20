@@ -64,6 +64,8 @@
     transform: none !important
     cursor: default
     box-shadow: none
+    overflow: visible
+    max-height: none
 
     &:hover
       border: none
@@ -80,15 +82,20 @@
       max-height: 65vh
 
   .stats-header
-    padding: 0.5rem 0 0.75rem 0.25rem
+    padding: 0.5rem 3rem 0.75rem 0.25rem
 
   .stats-content
     height: auto
     min-height: auto
+    max-height: none
+    overflow: visible
     padding: 0 0.25rem 0.5rem
 
   .consistency-container
     gap: 2rem
+    flex: none
+    height: auto
+    min-height: 0
         
     .consistency-item
       svg

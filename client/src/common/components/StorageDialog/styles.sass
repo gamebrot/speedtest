@@ -66,7 +66,8 @@
   flex: 1
   display: flex
   flex-direction: column
-  gap: 1.25rem
+  gap: 1rem
+  min-height: 18rem
 
 .storage-row
   display: flex
@@ -103,6 +104,121 @@
   .dialog-btn
     padding: 0.5rem 1rem
 
+.storage-select,
+.storage-input
+  display: inline-flex
+  align-items: center
+  padding: 0.5rem 1rem
+  background-color: $darker-gray
+  border: 1px solid $light-gray
+  border-radius: 0.6rem
+  color: $white
+  font-family: inherit
+  font-size: 1rem
+  font-weight: 500
+  line-height: 1.25
+  cursor: pointer
+  outline: none
+  box-sizing: border-box
+  transition: all 0.15s ease
+
+  &:hover
+    border-color: $accent-primary
+
+  &:focus
+    border-color: $accent-primary
+
+  &.input-error,
+  &.input-error:focus
+    border-color: $accent-danger
+
+.storage-input
+  cursor: text
+  text-align: left
+  appearance: textfield
+  -moz-appearance: textfield
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button
+    -webkit-appearance: none
+    margin: 0
+
+.storage-retention-select-wrap
+  position: relative
+  display: inline-flex
+
+  &::after
+    content: ""
+    position: absolute
+    right: 0.85rem
+    top: 50%
+    width: 0.5rem
+    height: 0.5rem
+    border-right: 2px solid $subtext
+    border-bottom: 2px solid $subtext
+    transform: translateY(-70%) rotate(45deg)
+    pointer-events: none
+    transition: border-color 0.15s ease
+
+  &:hover::after
+    border-color: $accent-primary
+
+.storage-select
+  appearance: none
+  -webkit-appearance: none
+  -moz-appearance: none
+  padding-right: 2.25rem
+
+  &::-ms-expand
+    display: none
+
+.storage-retention-controls
+  align-items: center
+  flex-wrap: nowrap
+
+  .storage-retention-select-wrap
+    flex: 0 1 auto
+
+  .storage-input-wrap
+    position: relative
+    display: inline-flex
+    align-items: center
+    flex: 0 1 7.5rem
+
+    .storage-input
+      width: 100%
+      padding-right: 3rem
+
+    .storage-input-suffix
+      position: absolute
+      right: 0.85rem
+      color: $subtext
+      font-size: 0.875rem
+      font-weight: 500
+      pointer-events: none
+
+.storage-icon-btn
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  width: 2.4rem
+  height: 2.4rem
+  padding: 0
+  flex-shrink: 0
+  background-color: $darker-gray
+  border: 1px solid $light-gray
+  border-radius: 0.6rem
+  color: $subtext
+  cursor: pointer
+  transition: all 0.15s ease
+
+  &:hover
+    border-color: $accent-primary
+    color: $accent-primary
+
+  svg
+    font-size: 0.9rem
+
 @media (max-width: 781px)
   .storage-dialog-wrapper
     width: 95vw
@@ -123,6 +239,9 @@
     justify-content: center
     gap: 0.5rem
 
+  .storage-manager
+    min-height: 0
+
   .storage-row
     flex-direction: column
     align-items: flex-start
@@ -133,3 +252,11 @@
 
       .dialog-btn
         flex: 1
+
+    .storage-retention-controls
+      .storage-retention-select-wrap,
+      .storage-input-wrap
+        flex: 1
+
+      .storage-select
+        width: 100%

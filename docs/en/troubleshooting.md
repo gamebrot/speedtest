@@ -9,7 +9,7 @@ There can be several solutions to this error. Just work through all possibilitie
    To set the permissions, enter the command `chmod 700 /opt/myspeed`. (Replace /opt/myspeed with your installation location).
 
 2. **Perform a new installation of the dependencies**  
-   First, run `deno cache --reload server/index.js` in the installation folder to refresh all dependencies.
+   First, run `bun install` in the installation folder to refresh all dependencies.
    :::
 
 ::: danger This MySpeed instance is currently in development mode

@@ -30,7 +30,10 @@ Ergebnisse manipuliert werden könnten.
 :::
 
 ::: details Was passiert mit den alten Testergebnissen?
-Die alten Testergebnisse werden automatisch gelöscht, sobald sie älter als 30 Tage sind.
+Alte Testergebnisse werden automatisch gelöscht, sobald sie die von dir konfigurierte Aufbewahrungsdauer
+überschreiten. Standardmäßig beträgt diese **1 Jahr**, du kannst sie aber unter
+**Speicher verwalten → Speedtests → Datenspeicherung** auf jeden beliebigen Zeitraum ändern – oder die
+Bereinigung komplett deaktivieren, um die Ergebnisse dauerhaft zu behalten.
 :::
 
 ::: details Muss MySpeed dauerhaft laufen?

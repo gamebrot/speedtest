@@ -82,6 +82,14 @@ interface clearer.
 
 Do you want to be sure and download your tests to your computer? Then you can export your tests here.
 
+### 🗄️ Data retention
+
+Open **Manage storage → Speedtests → Data retention** to choose how long MySpeed should keep your
+speedtest history before automatically deleting old entries. The default is **1 year (365 days)**, but
+you can pick a different preset (7, 30, 90, 180 days), enter any custom number of days, or select
+**Keep forever** to disable automatic cleanup entirely. The setting takes effect on the next cleanup run
+(within a minute) and applies to both new and existing data.
+
 ### 🌍 Change language
 
 MySpeed is currently available in English and German languages. With this option you can change the language. Do you

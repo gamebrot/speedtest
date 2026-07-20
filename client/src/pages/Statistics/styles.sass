@@ -1,14 +1,17 @@
 @use "@/common/styles/colors" as *
 
 .statistic-area
-  margin-left: 20rem
-  margin-right: 20rem
+  width: 100%
+  max-width: calc(100% - 2rem)
+  padding-left: 20rem
+  padding-right: 20rem
   padding-top: 1.5rem
   margin-bottom: 2rem
   display: flex
   gap: 2rem
   justify-content: space-between
   flex-wrap: wrap
+  box-sizing: border-box
 
 .statistic-stale
   opacity: 0.7
@@ -18,9 +21,9 @@
   .skeleton-picker
     width: 280px
     height: 48px
-    background: linear-gradient(90deg, hsl(215, 28%, 12%) 25%, hsl(215, 28%, 17%) 50%, hsl(215, 28%, 12%) 75%)
+    background: linear-gradient(90deg, $darker-gray 25%, $dark-gray 50%, $darker-gray 75%)
     background-size: 200% 100%
-    border-radius: 0.75rem
+    border-radius: 0.6rem
     opacity: 0
     transform: translateY(10px)
     
@@ -31,7 +34,7 @@
     flex: 1 1 30%
     min-width: 16rem
     height: 18rem
-    background: linear-gradient(90deg, hsl(215, 28%, 12%) 25%, hsl(215, 28%, 17%) 50%, hsl(215, 28%, 12%) 75%)
+    background: linear-gradient(90deg, $darker-gray 25%, $dark-gray 50%, $darker-gray 75%)
     background-size: 200% 100%
     border-radius: 1rem
     border: 1px solid $light-gray
@@ -62,18 +65,43 @@
   justify-content: space-between
   gap: 1rem
   margin-bottom: 0.5rem
+  min-width: 0
+
+  > .date-range-picker
+    flex: 1 1 auto
+    min-width: 0
+
+  > .export-button-container
+    flex: 0 0 auto
+
+.statistics-empty
+  width: 100%
+  display: flex
+  align-items: center
+  justify-content: center
+  padding: 6rem 2rem
+  
+  p
+    font-size: 1.1rem
+    font-weight: 500
+    color: $subtext
+    text-align: center
 
 @media screen and (max-width: 1472px)
   .statistic-area
-    margin-left: 10rem
-    margin-right: 10rem
+    padding-left: 10rem
+    padding-right: 10rem
+
+@media screen and (max-width: 600px)
+  .statistics-header
+    gap: 0.5rem
 
 @media screen and (max-width: 425px)
   .statistic-area
-    margin-left: 3rem
-    margin-right: 3rem
+    padding-left: 3rem
+    padding-right: 3rem
 
 @media screen and (max-width: 375px)
   .statistic-area
-    margin-left: 1rem
-    margin-right: 1rem
+    padding-left: 1rem
+    padding-right: 1rem

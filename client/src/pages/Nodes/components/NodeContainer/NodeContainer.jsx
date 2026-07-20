@@ -21,6 +21,8 @@ import {t} from "i18next";
 import {Trans} from "react-i18next";
 import {getIconBySpeed} from "@/common/utils/TestUtil";
 import {ConfigContext} from "@/common/contexts/Config";
+import {PreferencesContext} from "@/common/contexts/Preferences";
+import {convertSpeed, getSpeedUnit} from "@/common/utils/FormatUtil";
 import {useNavigate} from "react-router-dom";
 import ContextMenu from "@/common/components/ContextMenu";
 
@@ -28,6 +30,8 @@ export const NodeContainer = (node) => {
     const updateNodes = useContext(NodeContext)[1];
     const updateCurrentNode = useContext(NodeContext)[3];
     const reloadConfig = useContext(ConfigContext)[1];
+    const [preferences] = useContext(PreferencesContext);
+    const speedUnit = getSpeedUnit(preferences);
     const updateToast = useContext(ToastNotificationContext);
     const alert = useAlert();
     const [nodeData, setNodeData] = useState(null);
@@ -214,13 +218,13 @@ export const NodeContainer = (node) => {
                             <div className="speed-item">
                                 <FontAwesomeIcon icon={faArrowDown}
                                                  className={"icon-" + nodeData.downloadIcon}/>
-                                <h1>{nodeData.download} {t("latest.speed_unit")}</h1>
+                                <h1>{convertSpeed(nodeData.download, preferences)} {speedUnit}</h1>
                             </div>
 
                             <div className="speed-item">
                                 <FontAwesomeIcon icon={faArrowUp}
                                                  className={"icon-" + nodeData.uploadIcon}/>
-                                <h1>{nodeData.upload} {t("latest.speed_unit")}</h1>
+                                <h1>{convertSpeed(nodeData.upload, preferences)} {speedUnit}</h1>
                             </div>
                         </>
                     )}

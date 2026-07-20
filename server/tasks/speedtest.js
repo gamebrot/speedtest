@@ -94,10 +94,10 @@ export const create = async (type = "auto", retried = false) => {
             test = await run(retried);
         }
 
-        let {ping, jitter, download, upload, time, resultId} = await parseData.parseData(process.env.PREVIEW_MODE === "true" ?
+        let {ping, jitter, download, upload, time, resultId, serverName, serverHost} = await parseData.parseData(process.env.PREVIEW_MODE === "true" ?
             "ookla" : mode, test);
 
-        let testResult = await tests.create(ping, download, upload, time, test.serverId, type, resultId, null, jitter);
+        let testResult = await tests.create(ping, download, upload, time, test.serverId, type, resultId, null, jitter, serverName, serverHost);
         console.log(`Test #${testResult} was executed successfully in ${time}s. 🏓 ${ping} (±${jitter || 'N/A'}) ⬇ ${download}️ ⬆ ${upload}️`);
         createRecommendations().then(() => "");
         setRunning(false);

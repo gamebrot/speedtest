@@ -13,12 +13,15 @@ import {errors} from "@/pages/Home/components/Speedtest/utils/errors";
 import {t} from "i18next";
 import {ConfigContext} from "@/common/contexts/Config";
 import {ToastNotificationContext} from "@/common/contexts/ToastNotification";
+import {PreferencesContext} from "@/common/contexts/Preferences";
+import {convertSpeed, formatShortTime} from "@/common/utils/FormatUtil";
 
 const SpeedtestComponent = forwardRef((props, forwardedRef) => {
     const alert = useAlert();
     const updateToast = useContext(ToastNotificationContext);
     const [config] = useContext(ConfigContext);
     const {deleteTest} = useContext(SpeedtestContext);
+    const [preferences] = useContext(PreferencesContext);
 
     const ref = useRef();
 
@@ -27,8 +30,12 @@ const SpeedtestComponent = forwardRef((props, forwardedRef) => {
     let errorMessage = t("test.unknown_error") + " " + props.error;
 
     let isAverage = props.type === "average";
-    let timeString = (String(isAverage ? props.time.getDate() : props.time.getHours()).padStart(2, '0')) + (isAverage ? "." : ":")
-        + (String(isAverage ? (props.time.getMonth() + 1) : props.time.getMinutes()).padStart(2, '0'));
+    let timeString = isAverage
+        ? String(props.time.getDate()).padStart(2, '0') + "." + String(props.time.getMonth() + 1).padStart(2, '0')
+        : formatShortTime(props.time, preferences);
+
+    const downValue = props.error ? "" : convertSpeed(props.down, preferences);
+    const upValue = props.error ? "" : convertSpeed(props.up, preferences);
 
     if (props.error) {
         for (let errorsKey in errors())
@@ -58,13 +65,13 @@ const SpeedtestComponent = forwardRef((props, forwardedRef) => {
         if (props.type === "average") {
             await alert.openAlert(
                 t("test.average.title"),
-                averageResultDialog(timeString, props),
+                averageResultDialog(timeString, {...props, down: downValue, up: upValue}),
                 {buttonText: t("dialog.okay")}
             );
         } else {
             await alert.openAlert(
                 t("test.result.title"),
-                resultDialog(props),
+                resultDialog({...props, down: downValue, up: upValue}),
                 {
                     buttonText: t("dialog.okay"),
                     clearButton: !config.viewMode ? t("test.delete") : undefined,
@@ -94,12 +101,12 @@ const SpeedtestComponent = forwardRef((props, forwardedRef) => {
             <div className="speedtest-row">
                 <FontAwesomeIcon icon={props.error ? faClose : faArrowDown}
                                  className={"speedtest-icon icon-" + props.downLevel}/>
-                <h2 className="speedtest-text">{props.error ? "" : props.down}</h2>
+                <h2 className="speedtest-text">{downValue}</h2>
             </div>
             <div className="speedtest-row">
                 <FontAwesomeIcon icon={props.error ? faClose : faArrowUp}
                                  className={"speedtest-icon icon-" + props.upLevel}/>
-                <h2 className="speedtest-text">{props.error ? "" : props.up}</h2>
+                <h2 className="speedtest-text">{upValue}</h2>
             </div>
         </div>
     );

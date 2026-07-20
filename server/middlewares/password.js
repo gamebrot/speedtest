@@ -1,5 +1,5 @@
 import * as config from '../controller/config.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 export default (allowViewAccess) => async (req, res, next) => {
     if (process.env.PREVIEW_MODE === "true") return next();

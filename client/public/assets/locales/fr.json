@@ -363,6 +363,31 @@
         "url_placeholder": "https://hc-ping.com/<uuid>"
       }
     },
+    "ntfy": {
+      "title": "ntfy",
+      "fields": {
+        "url": "URL du serveur",
+        "url_placeholder": "https://ntfy.sh",
+        "topic": "Sujet",
+        "topic_placeholder": "myspeed-alerts",
+        "token": "Jeton d'accès",
+        "token_placeholder": "tk_... (facultatif, pour les serveurs protégés)",
+        "title": "Titre de la notification",
+        "title_placeholder": "MySpeed (facultatif)",
+        "tags": "Étiquettes",
+        "tags_placeholder": "warning,satellite (séparées par des virgules)",
+        "priority": "Priorité par défaut (1-5)",
+        "priority_placeholder": "3",
+        "error_priority": "Priorité d'erreur (1-5)",
+        "error_priority_placeholder": "5",
+        "error_message": "Message d'erreur",
+        "error_message_placeholder": "Erreur : %error%",
+        "send_failed": "Envoyer les messages d'erreur",
+        "send_finished": "Envoyer les messages terminés",
+        "finished_message": "Message de fin",
+        "finished_message_placeholder": "%ping% ms, %download% Mbps, %upload% Mbps"
+      }
+    },
     "telegram": {
       "title": "Telegram",
       "fields": {

@@ -4,17 +4,13 @@ import test from '../models/Speedtests.js';
 import recommendations from '../models/Recommendations.js';
 import integration from '../models/IntegrationData.js';
 import { triggerEvent } from './integrations.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import * as timer from '../tasks/timer.js';
 import cron from 'cron-validator';
 import db from '../config/database.js';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import * as interfaces from '../util/loadInterfaces.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const configDefaults = {
     ping: "25",
@@ -28,8 +24,11 @@ const configDefaults = {
     libreUrl: "none",
     password: "none",
     passwordLevel: "none",
-    interface: "none"
+    interface: "none",
+    retentionDays: "365"
 }
+
+const MAX_RETENTION_DAYS = 10000;
 
 export const insertDefaults = async () => {
     let insert = [];
@@ -78,9 +77,9 @@ export const getUsedStorage = async () => {
             size += parseFloat(sizes[i].size);
         }
     } else {
-        const STORAGE_PATH = `../../data/storage${process.env.PREVIEW_MODE === "true" ? "_preview" : ""}.db`;
+        const STORAGE_PATH = path.join(process.cwd(), 'data', `storage${process.env.PREVIEW_MODE === "true" ? "_preview" : ""}.db`);
 
-        size = fs.statSync(path.join(__dirname, STORAGE_PATH)).size;
+        size = fs.statSync(STORAGE_PATH).size;
     }
 
     return {size, testCount: await test.count()};
@@ -123,6 +122,23 @@ export const validateInput = async (key, value) => {
 
     if (key === "interface" && !Object.keys(interfaces.interfaces).includes(value))
         return "The provided interface does not exist";
+
+    if (key === "retentionDays") {
+        if (/[^0-9-]/.test(value.toString()))
+            return "You need to provide a number in order to change this";
+
+        const num = parseInt(value);
+        if (isNaN(num))
+            return "You need to provide a valid number";
+
+        if (num <= 0) {
+            value = "0";
+        } else if (num > MAX_RETENTION_DAYS) {
+            return `Retention must be ${MAX_RETENTION_DAYS} days or less (use 0 for unlimited)`;
+        } else {
+            value = num.toString();
+        }
+    }
 
     if (configDefaults[key] === undefined)
         return "The provided key does not exist";

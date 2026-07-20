@@ -1,4 +1,4 @@
-import axios from "axios";
+import { postJson } from "../util/http.js";
 import { replaceVariables } from "../util/helpers.js";
 
 const defaults = {
@@ -6,26 +6,21 @@ const defaults = {
     failed: ":x: **A speedtest has failed**\n > `Reason`: %error%"
 };
 
-const postWebhook = async (url, username, color, message, triggerActivity) => {
-    axios.post(url, {
+const send = (url, username, color, description, activity) =>
+    postJson(url, {
         content: null, username,
-        embeds: [{description: message, color, footer: {text: "MySpeed"}, timestamp: new Date().toISOString()}],
-    })
-        .then(() => triggerActivity())
-        .catch(() => triggerActivity(true));
-};
+        embeds: [{description, color, footer: {text: "MySpeed"}, timestamp: new Date().toISOString()}]
+    }, {activity});
 
 export default (registerEvent) => {
-    registerEvent('testFinished', async (integration, data, activity) => {
-        if (integration.data.send_finished)
-            await postWebhook(integration.data.url, integration.data.display_name || "MySpeed", 4572762,
-                replaceVariables(integration.data.finished_message || defaults.finished, data), activity)
+    registerEvent('testFinished', async ({data: c}, data, activity) => {
+        if (c.send_finished) await send(c.url, c.display_name || "MySpeed", 4572762,
+            replaceVariables(c.finished_message || defaults.finished, data), activity);
     });
 
-    registerEvent('testFailed', async (integration, error, activity) => {
-        if (integration.data.send_failed)
-            await postWebhook(integration.data.url, integration.data.display_name || "MySpeed", 12993861,
-                replaceVariables(integration.data.failed_message || defaults.failed, {error}), activity)
+    registerEvent('testFailed', async ({data: c}, error, activity) => {
+        if (c.send_failed) await send(c.url, c.display_name || "MySpeed", 12993861,
+            replaceVariables(c.failed_message || defaults.failed, {error}), activity);
     });
 
     return {

@@ -16,7 +16,7 @@
 
 ## 🤔 Was ist MySpeed?
 
-MySpeed ist eine Speedtest-Analyse-Software, welche die Geschwindigkeit deines Internets bis zu 30 Tage lang speichert.
+MySpeed ist eine Speedtest-Analyse-Software, welche die Geschwindigkeit deines Internets über einen frei konfigurierbaren Zeitraum speichert.
 
 ### ⭐ Features
 
@@ -24,7 +24,7 @@ MySpeed ist eine Speedtest-Analyse-Software, welche die Geschwindigkeit deines I
 - ⏰ MySpeed automatisiert Speedtests und lässt dich mithilfe von Cron-Expressions die Zeit zwischen den Tests festlegen
 - 🗄️ Füge mehrere Server direkt zu einer MySpeed-Instanz hinzu
 - 🩺 Es lassen sich Healthchecks konfigurieren, welche dich bei Fehlern oder Ausfällen über E-Mail, Signal, WhatsApp oder Telegram benachrichtigen können
-- 📆 Testergebnisse lassen sich bis zu 30 Tage lang speichern
+- 📆 Testergebnisse lassen sich beliebig lange speichern - die Aufbewahrungsdauer ist frei konfigurierbar
 - 🔥 Unterstützung für Prometheus und Grafana
 - 🗳️ Wähle zwischen Ookla, LibreSpeed und Cloudflare Speedtest-Servern
 - 💁 Erfahre mehr zu MySpeed auf unserer [Website](https://myspeed.dev)

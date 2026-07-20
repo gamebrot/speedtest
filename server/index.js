@@ -2,7 +2,6 @@ import express from 'express';
 import path from 'node:path';
 import fs from 'node:fs';
 import https from 'node:https';
-import { fileURLToPath } from 'node:url';
 import * as timerTask from './tasks/timer.js';
 import * as integrationTask from './tasks/integrations.js';
 import './util/createFolders.js';
@@ -19,16 +18,22 @@ import integrationsRoutes from './routes/integrations.js';
 import prometheusRoutes from './routes/prometheus.js';
 import opengraphRoutes from './routes/opengraph.js';
 import db from './config/database.js';
+import { runMigrations } from './util/migrationRunner.js';
 import * as config from './controller/config.js';
 import { initialize as initializeIntegrations } from './controller/integrations.js';
 import { requestInterfaces } from './util/loadInterfaces.js';
 import { load as loadCli } from './util/loadCli.js';
 import { removeOld } from './tasks/speedtest.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const devModeHtmlPath = path.join(process.cwd(), 'server', 'templates', 'env.html');
+const devModeHtml = fs.existsSync(devModeHtmlPath) ? fs.readFileSync(devModeHtmlPath, 'utf-8') : '';
 
-const devModeHtml = fs.readFileSync(path.join(__dirname, 'templates', 'env.html'), 'utf-8');
+let embeddedClient = null;
+try {
+    embeddedClient = await import('./clientEmbed.js');
+} catch {
+
+}
 
 const app = express();
 
@@ -59,23 +64,21 @@ app.use("/api/prometheus", prometheusRoutes);
 app.use('/api/opengraph', opengraphRoutes);
 app.use("/api*all", (req, res) => res.status(404).json({message: "Route not found"}));
 
-let buildPath = path.join(__dirname, '..', 'build');
+let buildPath = path.join(process.cwd(), 'build');
 let buildExists = fs.existsSync(buildPath);
-
-if (!buildExists) {
-    buildPath = path.join(process.cwd(), 'build');
-    buildExists = fs.existsSync(buildPath);
-}
 
 if (buildExists) {
     app.use(express.static(buildPath));
     app.get('*all', (req, res) => res.sendFile(path.join(buildPath, 'index.html')));
+} else if (embeddedClient) {
+    app.use(embeddedClient.createEmbeddedMiddleware());
+    app.get('*all', embeddedClient.createEmbeddedFallback());
 } else {
     app.get("*all", (req, res) => res.status(500).type('html').send(devModeHtml));
 }
 
 const run = async () => {
-    await db.sync({alter: true, force: false});
+    await runMigrations();
 
     await initializeIntegrations();
 

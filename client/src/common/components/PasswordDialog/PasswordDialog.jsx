@@ -18,6 +18,7 @@ import {baseRequest, patchRequest} from "@/common/utils/RequestUtil";
 import {ConfigContext} from "@/common/contexts/Config";
 import {ToastNotificationContext} from "@/common/contexts/ToastNotification";
 import {NodeContext} from "@/common/contexts/Node";
+import SelectableOption, {SelectableList} from "@/common/components/SelectableOption";
 
 export const PasswordDialog = ({open, onClose}) => {
     const [config, reloadConfig] = useContext(ConfigContext);
@@ -122,28 +123,18 @@ export const PasswordDialog = ({open, onClose}) => {
                                     <FontAwesomeIcon icon={faShieldHalved}/>
                                     <h3>{t("update.level_title")}</h3>
                                 </div>
-                                <div className="access-options">
-                                    <button
-                                        className={`access-option${accessLevel === "none" ? " access-active" : ""}`}
-                                        onClick={() => setAccessLevel("none")}
-                                    >
-                                        <FontAwesomeIcon icon={faLock}/>
-                                        <div className="access-text">
-                                            <span className="access-title">{t("options.level.no_access")}</span>
-                                            <span className="access-desc">{t("password.no_access_desc")}</span>
-                                        </div>
-                                    </button>
-                                    <button
-                                        className={`access-option${accessLevel === "read" ? " access-active" : ""}`}
-                                        onClick={() => setAccessLevel("read")}
-                                    >
-                                        <FontAwesomeIcon icon={faBookOpen}/>
-                                        <div className="access-text">
-                                            <span className="access-title">{t("options.level.read_access")}</span>
-                                            <span className="access-desc">{t("password.read_access_desc")}</span>
-                                        </div>
-                                    </button>
-                                </div>
+                                <SelectableList>
+                                    <SelectableOption icon={faLock}
+                                                      title={t("options.level.no_access")}
+                                                      description={t("password.no_access_desc")}
+                                                      active={accessLevel === "none"}
+                                                      onClick={() => setAccessLevel("none")}/>
+                                    <SelectableOption icon={faBookOpen}
+                                                      title={t("options.level.read_access")}
+                                                      description={t("password.read_access_desc")}
+                                                      active={accessLevel === "read"}
+                                                      onClick={() => setAccessLevel("read")}/>
+                                </SelectableList>
                             </div>
                         </div>
                     </DialogBody>

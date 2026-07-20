@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 export const en = defineConfig({
   lang: "en-US",
-  description: "MySpeed is a self-hosted speedtest analysis software that stores the speed of your internet for up to 30 days.",
+  description: "MySpeed is a self-hosted speedtest analysis software that stores the speed of your internet over a configurable retention period.",
   themeConfig: {
     nav: [
       { text: 'Frequently Asked Questions', link: 'faq' },

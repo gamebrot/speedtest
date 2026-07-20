@@ -34,10 +34,10 @@ Hier beschreiben wir die Einrichtung für Windows.
 Dieser Prozess installiert die neueste Entwicklungsversion von MySpeed. Fehler können auftreten.
 :::
 
-1. Deno herunterladen  
-   Um MySpeed aus dem Quellcode zu bauen, benötigst du **Deno**. Öffne PowerShell und führe aus:
+1. Bun herunterladen  
+   Um MySpeed aus dem Quellcode zu bauen, benötigst du **Bun**. Öffne PowerShell und führe aus:
    ```powershell
-   irm https://deno.land/install.ps1 | iex
+   powershell -c "irm bun.sh/install.ps1 | iex"
    ```
 
 2. MySpeed-Quellcode herunterladen  
@@ -45,11 +45,11 @@ Dieser Prozess installiert die neueste Entwicklungsversion von MySpeed. Fehler k
 
 3. Abhängigkeiten installieren und bauen
    ```powershell
-   deno install
+   bun install
    cd client && npm install && npm run build && cd .. && move client\build build
    ```
 
 4. MySpeed starten
    ```powershell
-   deno run --allow-all server/index.js
+   bun run server/index.js
    ```

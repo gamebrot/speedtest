@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize';
+import sqlite3Shim from '../util/bun-sqlite-shim.js';
 
 const STORAGE_PATH = `data/storage${process.env.PREVIEW_MODE === "true" ? "_preview" : ""}.db`;
 
@@ -20,7 +21,13 @@ if (process.env.DB_TYPE === "mysql") {
         query: {raw: true}
     });
 } else if (!process.env.DB_TYPE || process.env.DB_TYPE === "sqlite") {
-    db = new Sequelize({dialect: 'sqlite', storage: STORAGE_PATH, logging: false, query: {raw: true}});
+    db = new Sequelize({
+        dialect: 'sqlite',
+        dialectModule: sqlite3Shim,
+        storage: STORAGE_PATH,
+        logging: false,
+        query: {raw: true}
+    });
 } else {
     throw new Error("Invalid database type");
 }

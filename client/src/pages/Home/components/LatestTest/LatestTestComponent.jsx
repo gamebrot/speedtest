@@ -11,6 +11,8 @@ import "./styles.sass";
 import {getIconBySpeed} from "@/common/utils/TestUtil";
 import {downloadInfo, jitterInfo, latestTestInfo, pingInfo, uploadInfo} from "@/pages/Home/components/LatestTest/utils/dialogs";
 import {t} from "i18next";
+import {PreferencesContext} from "@/common/contexts/Preferences";
+import {convertSpeed, getSpeedUnit} from "@/common/utils/FormatUtil";
 
 const LoadingValue = ({ children }) => {
     return (
@@ -25,6 +27,8 @@ const LatestTestComponent = () => {
     const alert = useAlert();
     const {speedtests} = useContext(SpeedtestContext);
     const config = useContext(ConfigContext)[0];
+    const [preferences] = useContext(PreferencesContext);
+    const speedUnit = getSpeedUnit(preferences);
 
     useEffect(() => {
         setLatest(speedtests.length !== 0 ? speedtests[0] : {ping: "N/A", download: "N/A", upload: "N/A"});
@@ -66,7 +70,7 @@ const LatestTestComponent = () => {
     };
 
     const showLatestTestInfo = () => {
-        const info = latestTestInfo(latest);
+        const info = latestTestInfo(latest, preferences);
         alert.openAlert(info.title, info.description, {buttonText: info.buttonText});
     };
 
@@ -101,14 +105,14 @@ const LatestTestComponent = () => {
                     <FontAwesomeIcon onClick={showDownloadInfo} icon={faArrowDown}
                                      className={"container-icon help-icon icon-" + getIconBySpeed(latest.download, config.download, true)}/>
                     <h2 className="container-text">{t("latest.down")}<span
-                        className="container-subtext">{t("latest.speed_unit")}</span></h2>
+                        className="container-subtext">{speedUnit}</span></h2>
                 </div>
                 <div className="container-main">
                     <h2>
                         {status.running ? (
-                            <LoadingValue>{latest.download === -1 ? "N/A" : latest.download}</LoadingValue>
+                            <LoadingValue>{latest.download === -1 ? "N/A" : convertSpeed(latest.download, preferences)}</LoadingValue>
                         ) : (
-                            latest.download === -1 ? "N/A" : latest.download
+                            latest.download === -1 ? "N/A" : convertSpeed(latest.download, preferences)
                         )}
                     </h2>
                 </div>
@@ -121,14 +125,14 @@ const LatestTestComponent = () => {
                     <FontAwesomeIcon onClick={showUploadInfo} icon={faArrowUp}
                                      className={"container-icon help-icon icon-" + getIconBySpeed(latest.upload, config.upload, true)}/>
                     <h2 className="container-text">{t("latest.up")}<span
-                        className="container-subtext">{t("latest.speed_unit")}</span></h2>
+                        className="container-subtext">{speedUnit}</span></h2>
                 </div>
                 <div className="container-main">
                     <h2>
                         {status.running ? (
-                            <LoadingValue>{latest.upload === -1 ? "N/A" : latest.upload}</LoadingValue>
+                            <LoadingValue>{latest.upload === -1 ? "N/A" : convertSpeed(latest.upload, preferences)}</LoadingValue>
                         ) : (
-                            latest.upload === -1 ? "N/A" : latest.upload
+                            latest.upload === -1 ? "N/A" : convertSpeed(latest.upload, preferences)
                         )}
                     </h2>
                 </div>

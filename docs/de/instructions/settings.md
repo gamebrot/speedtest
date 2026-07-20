@@ -82,6 +82,15 @@ interface clearer.
 
 Do you want to be sure and download your tests to your computer? Then you can export your tests here.
 
+### 🗄️ Datenspeicherung
+
+Unter **Speicher verwalten → Speedtests → Datenspeicherung** kannst du festlegen, wie lange MySpeed
+deinen Speedtest-Verlauf aufbewahrt, bevor alte Einträge automatisch gelöscht werden. Standard ist
+**1 Jahr (365 Tage)**. Du kannst aus den Voreinstellungen 7, 30, 90 oder 180 Tage wählen, eine beliebige
+Anzahl an Tagen eingeben oder **Für immer behalten** auswählen, um die automatische Bereinigung
+vollständig zu deaktivieren. Die Änderung wird beim nächsten Bereinigungsdurchlauf (innerhalb einer
+Minute) wirksam und gilt sowohl für neue als auch für bereits vorhandene Daten.
+
 ### 🌍 Change language
 
 MySpeed is currently available in English and German languages. With this option you can change the language. Do you

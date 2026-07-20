@@ -13,6 +13,7 @@ import {ConfigProvider} from "./common/contexts/Config";
 import {StatusProvider} from "./common/contexts/Status";
 import {AlertProvider} from "@/common/contexts/Alert";
 import {ThemeProvider} from "@/common/contexts/Theme";
+import {PreferencesProvider} from "@/common/contexts/Preferences";
 import i18n from './i18n';
 import Loading from "@/pages/Loading";
 import Error from "@/pages/Error";
@@ -32,19 +33,21 @@ library.add(PushOverIcon);
 
 const Providers = ({children}) => (
     <ThemeProvider>
-        <AlertProvider>
-            <ToastNotificationProvider>
-                <ConfigProvider>
-                    <NodeProvider>
-                        <SpeedtestProvider>
-                            <StatusProvider>
-                                {children}
-                            </StatusProvider>
-                        </SpeedtestProvider>
-                    </NodeProvider>
-                </ConfigProvider>
-            </ToastNotificationProvider>
-        </AlertProvider>
+        <PreferencesProvider>
+            <AlertProvider>
+                <ToastNotificationProvider>
+                    <ConfigProvider>
+                        <NodeProvider>
+                            <SpeedtestProvider>
+                                <StatusProvider>
+                                    {children}
+                                </StatusProvider>
+                            </SpeedtestProvider>
+                        </NodeProvider>
+                    </ConfigProvider>
+                </ToastNotificationProvider>
+            </AlertProvider>
+        </PreferencesProvider>
     </ThemeProvider>
 );
 

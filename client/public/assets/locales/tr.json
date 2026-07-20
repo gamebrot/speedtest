@@ -363,6 +363,31 @@
         "url_placeholder": "https://hc-ping.com/<uuid>"
       }
     },
+    "ntfy": {
+      "title": "ntfy",
+      "fields": {
+        "url": "Sunucu URL",
+        "url_placeholder": "https://ntfy.sh",
+        "topic": "Konu",
+        "topic_placeholder": "myspeed-alerts",
+        "token": "Erişim Token'ı",
+        "token_placeholder": "tk_... (opsiyonel, korumalı sunucular için)",
+        "title": "Bildirim başlığı",
+        "title_placeholder": "MySpeed (opsiyonel)",
+        "tags": "Etiketler",
+        "tags_placeholder": "warning,satellite (virgülle ayrılmış)",
+        "priority": "Varsayılan öncelik (1-5)",
+        "priority_placeholder": "3",
+        "error_priority": "Hata önceliği (1-5)",
+        "error_priority_placeholder": "5",
+        "error_message": "Hata mesajı",
+        "error_message_placeholder": "Hata: %error%",
+        "send_failed": "Hata mesajlarını gönder",
+        "send_finished": "Tamamlanan mesajları gönder",
+        "finished_message": "Tamamlanma mesajı",
+        "finished_message_placeholder": "%ping% ms, %download% Mbps, %upload% Mbps"
+      }
+    },
     "telegram": {
       "title": "Telegram",
       "fields": {

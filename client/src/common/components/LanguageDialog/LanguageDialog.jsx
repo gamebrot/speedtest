@@ -5,6 +5,7 @@ import "./styles.sass";
 import {languages} from "@/i18n";
 import {useContext, useState} from "react";
 import {ToastNotificationContext} from "@/common/contexts/ToastNotification";
+import SelectableOption, {SelectableList} from "@/common/components/SelectableOption";
 
 export const LanguageDialog = ({open, onClose}) => {
     const updateToast = useContext(ToastNotificationContext);
@@ -23,18 +24,17 @@ export const LanguageDialog = ({open, onClose}) => {
                     <DialogHeader onClose={close}>{t("update.language")}</DialogHeader>
                     <DialogBody>
                         <div className="language-content">
-                            <div className="language-list">
+                            <SelectableList className="language-list">
                                 {languages.map((language) => (
-                                    <div 
+                                    <SelectableOption
                                         key={language.code}
-                                        className={`language-item${selectedLanguage === language.code ? " language-item-active" : ""}`}
+                                        image={{src: language.flag, alt: language.name}}
+                                        title={language.name}
+                                        active={selectedLanguage === language.code}
                                         onClick={() => setSelectedLanguage(language.code)}
-                                    >
-                                        <img src={language.flag} alt={language.name} className="language-flag"/>
-                                        <span className="language-name">{language.name}</span>
-                                    </div>
+                                    />
                                 ))}
-                            </div>
+                            </SelectableList>
                         </div>
                     </DialogBody>
                     <DialogFooter>

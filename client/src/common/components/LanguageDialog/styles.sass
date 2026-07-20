@@ -11,9 +11,6 @@
   user-select: none
 
 .language-list
-  display: flex
-  flex-direction: column
-  gap: 0.5rem
   max-height: 22rem
   overflow-y: auto
   padding-right: 0.25rem
@@ -31,42 +28,6 @@
     &:hover
       background: $subtext
 
-.language-item
-  display: flex
-  align-items: center
-  gap: 1rem
-  padding: 0.875rem 1.125rem
-  border-radius: 0.75rem
-  border: 1px solid $light-gray
-  cursor: pointer
-  transition: all 0.15s ease
-
-  &:hover
-    background-color: $darker-gray
-
-.language-item-active
-  background-color: $light-gray
-  border-color: $accent-primary
-
-  .language-name
-    color: $white
-
-  &:hover
-    background-color: $light-gray
-
-.language-flag
-  width: 2.25rem
-  height: auto
-  border-radius: 0.25rem
-  flex-shrink: 0
-
-.language-name
-  flex: 1
-  font-size: 1.05rem
-  font-weight: 500
-  color: $subtext
-  margin: 0
-
 @media screen and (max-height: 500px)
   .language-list
     max-height: 14rem
@@ -74,6 +35,3 @@
 @media screen and (max-width: 425px)
   .language-dialog
     width: 90vw
-
-  .language-item
-    padding: 0.75rem 1rem

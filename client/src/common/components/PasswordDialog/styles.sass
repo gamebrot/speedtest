@@ -90,62 +90,6 @@
     color: $subtext
     margin: 0
 
-.access-options
-  display: flex
-  flex-direction: column
-  gap: 0.5rem
-
-.access-option
-  display: flex
-  align-items: center
-  gap: 1rem
-  padding: 0.875rem 1.125rem
-  background: transparent
-  border: 1px solid $light-gray
-  border-radius: 0.75rem
-  cursor: pointer
-  transition: all 0.15s ease
-  text-align: left
-
-  &:hover
-    background-color: $darker-gray
-
-  svg
-    font-size: 1.25rem
-    color: $subtext
-    width: 1.5rem
-    flex-shrink: 0
-
-  &.access-active
-    background-color: $light-gray
-    border-color: $accent-primary
-
-    svg
-      color: $white
-
-    .access-title
-      color: $white
-
-    &:hover
-      background-color: $light-gray
-
-.access-text
-  display: flex
-  flex-direction: column
-  flex: 1
-
-.access-title
-  font-size: 1.05rem
-  font-weight: 500
-  color: $subtext
-  margin: 0
-
-.access-desc
-  font-size: 0.85rem
-  color: $subtext
-  opacity: 0.7
-  margin-top: 0.15rem
-
 @media screen and (max-width: 520px)
   .password-section
     flex-direction: column

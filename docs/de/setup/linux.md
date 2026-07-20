@@ -89,26 +89,26 @@ Dieser Prozess installiert die neuste Entwicklungsversion von MySpeed. Fehler k�
 :::
 
 ```sh
-sudo apt-get install git curl npm -y #(1)
+sudo apt-get install git curl unzip -y #(1)
 
-# Deno installieren
-curl -fsSL https://deno.land/install.sh | sh
-export DENO_INSTALL="$HOME/.deno"
-export PATH="$DENO_INSTALL/bin:$PATH" #(2)
+# Bun installieren
+curl -fsSL https://bun.sh/install | bash
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH" #(2)
 
 mkdir /opt/myspeed && cd /opt/myspeed #(3)
 
 git clone https://github.com/gnmyt/myspeed.git . #(4)
 
-deno install #(5)
+bun install #(5)
 
 cd client && npm install && npm run build && cd .. && mv client/build . #(6)
 
-deno run --allow-all server/index.js #(7)
+bun run server/index.js #(7)
 ```
 
 1. Hier installierst du alle notwendigen Pakete, um das Projekt zu installieren.
-2. Dieser Schritt installiert die Deno Runtime.
+2. Dieser Schritt installiert die Bun Runtime.
 3. Erstelle nun den Ordner, in welchen du MySpeed installieren möchtest. In diesem Fall ist das der Ordner `/opt/myspeed`.
 4. Klone nun das MySpeed Repository, um Zugriff auf den Code zu erhalten.
 5. Installiere nun alle Abhängigkeiten des Servers.

@@ -12,46 +12,12 @@
   user-select: none
 
 .provider-list
-  display: grid
-  grid-template-columns: repeat(3, 1fr)
-  gap: 0.5rem
   margin-bottom: 1.25rem
 
-.provider-item
-  display: flex
-  align-items: center
-  justify-content: center
-  gap: 0.4rem
-  padding: 0.5rem 0.5rem
-  border-radius: 0.6rem
-  border: 1px solid $light-gray
-  cursor: pointer
-  transition: all 0.15s ease
-
-  &:hover
-    background-color: $darker-gray
-
-  img
-    width: 1.5rem
-    height: 1.5rem
+  .selectable-option-image
+    width: 1.75rem
+    height: 1.75rem
     border-radius: 0.3rem
-    flex-shrink: 0
-
-  h3
-    margin: 0
-    font-size: 0.85rem
-    font-weight: 500
-    color: $subtext
-
-.provider-item-active
-  background-color: $light-gray
-  border-color: $accent-primary
-
-  h3
-    color: $white
-
-  &:hover
-    background-color: $light-gray
 
 .provider-settings
   margin-top: 1.25rem

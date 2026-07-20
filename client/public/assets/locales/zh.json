@@ -363,6 +363,31 @@
         "url_placeholder": "https://hc-ping.com/<uuid>"
       }
     },
+    "ntfy": {
+      "title": "ntfy",
+      "fields": {
+        "url": "服务器 URL",
+        "url_placeholder": "https://ntfy.sh",
+        "topic": "主题",
+        "topic_placeholder": "myspeed-alerts",
+        "token": "访问令牌",
+        "token_placeholder": "tk_...（可选，用于受保护的服务器）",
+        "title": "通知标题",
+        "title_placeholder": "MySpeed（可选）",
+        "tags": "标签",
+        "tags_placeholder": "warning,satellite（用逗号分隔）",
+        "priority": "默认优先级 (1-5)",
+        "priority_placeholder": "3",
+        "error_priority": "错误优先级 (1-5)",
+        "error_priority_placeholder": "5",
+        "error_message": "错误消息",
+        "error_message_placeholder": "错误：%error%",
+        "send_failed": "发送错误消息",
+        "send_finished": "发送完成消息",
+        "finished_message": "完成消息",
+        "finished_message_placeholder": "%ping% ms, %download% Mbps, %upload% Mbps"
+      }
+    },
     "telegram": {
       "title": "Telegram",
       "fields": {
