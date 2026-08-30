@@ -21,14 +21,14 @@ import RouteError from "@/pages/RouteError";
 import {ToastNotificationProvider} from "@/common/contexts/ToastNotification";
 import {NodeProvider} from "@/common/contexts/Node";
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {fas} from '@fortawesome/free-solid-svg-icons';
-import {fab} from "@fortawesome/free-brands-svg-icons";
+import {faBell, faBellConcierge, faDatabase, faGlobe, faHeartPulse} from '@fortawesome/free-solid-svg-icons';
+import {faDiscord, faTelegram} from "@fortawesome/free-brands-svg-icons";
 import {PushOverIcon} from "@/common/assets/icons/pushover";
 import Nodes from "@/pages/Nodes";
 import Statistics from "@/pages/Statistics";
 import Home from "@/pages/Home";
 
-library.add(fas, fab);
+library.add(faBell, faBellConcierge, faDatabase, faGlobe, faHeartPulse, faDiscord, faTelegram);
 library.add(PushOverIcon);
 
 const Providers = ({children}) => (

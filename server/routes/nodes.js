@@ -1,6 +1,7 @@
 import express from 'express';
 import * as nodes from '../controller/node.js';
 import password from '../middlewares/password.js';
+import { passwordHeaderNames, writePasswordHeaders } from '../util/passwordHeader.js';
 
 const app = express.Router();
 
@@ -78,7 +79,8 @@ app.all("/:nodeId/*route", password(false), async (req, res) => {
 
     const url = node.url + req.originalUrl.replace("/api/nodes/" + req.params.nodeId, "/api");
 
-    req.headers['password'] = node.password;
+    passwordHeaderNames.forEach(name => delete req.headers[name]);
+    Object.assign(req.headers, writePasswordHeaders(node.password));
     delete req.headers['host'];
 
     await nodes.proxyRequest(url, req, res);

@@ -1,5 +1,6 @@
 import * as config from '../controller/config.js';
 import bcrypt from 'bcryptjs';
+import { readPasswords } from '../util/passwordHeader.js';
 
 export default (allowViewAccess) => async (req, res, next) => {
     if (process.env.PREVIEW_MODE === "true") return next();
@@ -12,7 +13,7 @@ export default (allowViewAccess) => async (req, res, next) => {
         return next();
     }
 
-    if (req.headers.password && bcrypt.compareSync(req.headers.password, passwordHash)) {
+    if (readPasswords(req).some(candidate => bcrypt.compareSync(candidate, passwordHash))) {
         req.viewMode = false;
         return next();
     }

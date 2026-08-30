@@ -2,27 +2,42 @@ import fs from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
 import moment from 'moment-timezone';
 import * as tests from './speedtests.js';
-import { html } from 'satori-html';
+import htm from 'htm';
 import satori from 'satori';
 
-async function generateOpenGraphImage(req) {
-  const today = new Date();
+const html = htm.bind((type, props, ...children) => ({type, props: {...props, children: children.flat()}}));
+
+const hasValues = (test) => Boolean(test?.download.avg && test?.upload.avg && test?.ping.avg);
+
+const readStatistics = async () => {
+  const formatDate = (d) => d.toISOString().split('T')[0];
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  
-  const formatDate = (d) => d.toISOString().split('T')[0];
-  const test = await tests.listStatistics(formatDate(yesterday), formatDate(today));
 
-  if (!test.download.avg || !test.upload.avg || !test.ping.avg) {
-    throw new Error("Error fetching OpenGraph data");
-  }
+  const stats = await tests.listStatistics(formatDate(yesterday), formatDate(new Date()));
+  if (hasValues(stats)) return stats;
 
-  const fontPath = "/assets/fonts/inter-v12-latin-regular.ttf";
-  const localFontPath = `client/public${fontPath}`;
+  const latest = await tests.getLatest();
+  if (!latest || latest.error || latest.ping === -1) return null;
 
-  const font = fs.existsSync(localFontPath)
-    ? await fs.promises.readFile(localFontPath)
-    : await fetch(`${req.protocol}://${req.hostname}${fontPath}`).then(res => res.arrayBuffer());
+  return {ping: {avg: latest.ping}, download: {avg: latest.download}, upload: {avg: latest.upload}};
+};
+
+const readAsset = async (req, path) => {
+  const local = [`build${path}`, `client/public${path}`].find(candidate => fs.existsSync(candidate));
+  if (local) return fs.promises.readFile(local);
+
+  const url = `${req.protocol}://${req.headers.host || req.hostname}${path}`;
+  return Buffer.from(await fetch(url).then(res => res.arrayBuffer()));
+};
+
+async function generateOpenGraphImage(req) {
+  const test = await readStatistics();
+
+  if (!hasValues(test)) return null;
+
+  const font = await readAsset(req, "/assets/fonts/inter-v12-latin-regular.ttf");
+  const logo = await readAsset(req, "/assets/img/logo192.png");
 
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const date = moment().tz(timeZone).format("MM/DD/YYYY");
@@ -64,9 +79,9 @@ async function generateOpenGraphImage(req) {
           <div tw="flex h-[100px] w-[100px] mr-[50px]">
             <img
               tw="-mt-[50px]"
-              height="200"
-              width="200"
-              src="https://i.imgur.com/aCmA6rH.png"
+              height=${200}
+              width=${200}
+              src="data:image/png;base64,${logo.toString("base64")}"
             />
           </div>
         </div>

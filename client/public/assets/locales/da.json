@@ -23,6 +23,8 @@
     "unset": "Fjern",
     "retry": "Prøv igen",
     "login": "Log ind",
+    "save": "Gem",
+    "saving": "Gemmer...",
     "password": {
       "title": "Adgangskode påkrævet",
       "placeholder": "Din adgangskode",
@@ -37,8 +39,14 @@
       "interface": "Grænseflade",
       "server": "Server",
       "server_id": "Server-ID",
+      "custom_url": "Brugerdefineret URL",
+      "custom_url_placeholder": "https://speed.test/backend/",
       "choose_automatically": "Vælg automatisk",
-      "ookla_license": "Jeg har læst og accepterer <Eula>EULA</Eula>, <GDPR>privatlivspolitik</GDPR> og <TOS>servicevilkår</TOS> fra Ookla."
+      "ookla_license": "Jeg har læst og accepterer <Eula>EULA</Eula>, <GDPR>privatlivspolitik</GDPR> og <TOS>servicevilkår</TOS> fra Ookla.",
+      "ookla_notice": "Ved at bruge Ookla, accepterer du deres <Eula>EULA</Eula>, <GDPR>privacy policy</GDPR> og <TOS>vilkår for service</TOS>.",
+      "ookla_desc": "Populær udbyder med globalt servernetværk",
+      "libre_desc": "Open-source, selv-hostable speedtest",
+      "cloudflare_desc": "Hurtig CDN-baseret test"
     }
   },
   "dropdown": {
@@ -52,6 +60,7 @@
     "upload": "Optimal upload-hastighed",
     "download": "Optimal download-hastighed",
     "recommendations": "Anbefalinger",
+    "optimal_values": "Optimale værdier",
     "change_provider": "Skift udbyder",
     "password": "Skift adgangskode",
     "cron": "Indstil frekvens",
@@ -64,22 +73,51 @@
     "dark_mode": "Mørk tilstand",
     "theme_switched_light": "Skiftet til lys tilstand",
     "theme_switched_dark": "Skiftet til mørk tilstand",
-    "info": "Om projektet",
+    "preferences": "Præferencer",
     "provider": "Om udbyderen",
     "integrations": "Integrationer"
+  },
+  "about": {
+    "title": "Om MySpeed",
+    "description": "MySpeed er en open source speedtest analyse software, der registrerer din internet hastighed over en konfigurerbar periode.",
+    "github": "GitHub",
+    "website": "Hjemmeside",
+    "donate": "Donér",
+    "translate": "Oversæt",
+    "made_by": "Lavet med"
   },
   "options": {
     "cron": {
       "continuous": "Kontinuerlig (hvert minut)",
+      "continuous_desc": "Hvert minut - højt ressourceforbrug",
       "frequent": "Meget ofte (hvert 30. minut)",
+      "frequent_desc": "Hvert 30. minut",
       "default": "Standard (hver time)",
+      "default_desc": "Hver time - anbefalet",
       "rare": "Sjældent (hver 3. time)",
-      "really_rare": "Meget sjældent (hver 6. time)"
+      "rare_desc": "Hver 3. time",
+      "really_rare": "Meget sjældent (hver 6. time)",
+      "really_rare_desc": "Hver 6. time"
     },
     "level": {
       "no_access": "Ingen adgang",
       "read_access": "Læseadgang"
     }
+  },
+  "password": {
+    "no_access_desc": "Besøgende skal indtaste adgangskoden for at se noget",
+    "read_access_desc": "Besøgende kan se data, men kan ikke ændre indstillinger"
+  },
+  "pause": {
+    "manual": "Pause Uendeligt",
+    "manual_desc": "Sæt på pause indtil manuelt genoptaget",
+    "short": "Kort Pause",
+    "short_desc": "Pause i 1 time",
+    "medium": "Mellemstor Bryd",
+    "medium_desc": "Pause i 6 timer",
+    "long": "Langt Bryd",
+    "long_desc": "Pause i 12 timer",
+    "custom": "Brugerdefineret Varighed"
   },
   "page": {
     "overview": "Oversigt",
@@ -104,11 +142,16 @@
     "cron_title": "Indstil testfrekvens",
     "cron_rules": "Cron-regel",
     "cron_next_test": "Næste test:",
+    "custom_cron": "Tilpasset cron udtryk",
+    "schedule_offset": "Forskydnings tidsplan",
+    "schedule_offset_desc": "Tilføjer en lille forsinkelse for at forhindre test i at starte på nøjagtige tidspunkter",
+    "advanced": "Avanceret",
     "time_title": "Vis tests fra de sidste...",
     "download": "Download",
     "pause_title": "Sæt speedtests på pause i...",
     "hours": "Timer",
     "pause": "Pause",
+    "pause_manual_hint": "Lad være tom for at holde pause på ubestemt tid",
     "release_manually": "Frigiv manuelt",
     "language": "Skift sprog",
     "view_title": "Skift visning"
@@ -116,22 +159,23 @@
   "header": {
     "title": "MySpeed",
     "running_tooltip": "Speedtest kører",
-    "start_tooltip": "Start speedtest",
+    "start_tooltip": "Start hastighedstest",
     "new_update": "Opdatering tilgængelig",
     "download": "Download",
     "paused": "Speedtests er sat på pause. Fortsæt dem venligst, hvis du vil udføre en.",
     "running": "En speedtest kører allerede. Vent venligst et øjeblik.",
     "admin_login": "Admin-login",
+    "servers": "Servere",
     "beta": {
       "title": "Beta-version",
       "description": "Denne funktion er stadig i beta. Hvis du finder fejl, bedes du rapportere dem <Link>her</Link>."
     }
   },
   "storage": {
-    "speedtests": "Speedtests",
+    "speedtests": "Hastighedstest",
     "configuration": "Konfiguration",
     "stored_tests": "Gemte tests",
-    "tests": "Tests",
+    "tests": "Test",
     "export_tests": "Eksporter tests",
     "tests_exported": "Testene er blevet eksporteret",
     "csv": "CSV",
@@ -153,19 +197,36 @@
     "reset": "Nulstil",
     "confirm_reset": "Ja, nulstil",
     "settings_exported": "Indstillingerne er blevet eksporteret",
-    "settings_imported": "Indstillingerne er blevet importeret"
+    "settings_imported": "Indstillingerne er blevet importeret",
+    "retention": "Opbevaring af data",
+    "retention_desc": "Hvor lange hastighedstestresultater bevares, før de automatisk slettes.",
+    "retention_saved": "Tilbageholdelsesperiode opdateret",
+    "retention_days_placeholder": "365",
+    "retention_days_suffix": "dage",
+    "retention_back": "Tilbage til forudindstillinger",
+    "retention_options": {
+      "week": "7 dage",
+      "month": "30 dage",
+      "quarter": "90 dage",
+      "half_year": "180 dage",
+      "year": "1 år (standard)",
+      "forever": "Behold for evigt",
+      "custom": "Brugerdefineret..."
+    }
   },
   "latest": {
     "ping": "Ping",
     "ping_unit": "ms",
+    "jitter": "Jitter",
+    "jitter_unit": "ms",
     "down": "Download",
-    "speed_unit": "Mbps",
+    "speed_unit": "Mbit/s",
+    "byte_speed_unit": "MB/s",
     "up": "Upload",
     "latest": "Sidste test",
     "before": "før"
   },
   "info": {
-    "credits": "<MSpeed>MySpeed</MSpeed> er et open source-projekt leveret af GNMYT. Giv en stjerne på <Github>GitHub</Github> eller <Donate>donér</Donate> for at støtte projektet.",
     "recommendations_error": "Du skal udføre mindst 10 tests for at få et gennemsnit. Det er underordnet, om testene er udført manuelt eller automatisk.",
     "recommendations_info": "Baseret på de sidste 10 tests er det konstateret, at den optimale ping var <Bold>{{ping}} ms</Bold>, download på <Bold>{{down}} Mbps</Bold> og upload på <Bold>{{up}} Mbps</Bold>. Det er bedst at orientere sig efter din internetkontrakt og kun overtage værdierne, hvis de matcher denne.",
     "update": "En opdatering til version {{version}} er tilgængelig. Se <Changes>ændringerne</Changes> og <DLLink>download opdateringen</DLLink>.",
@@ -176,6 +237,10 @@
     "ping": {
       "title": "Ping",
       "description": "Ping viser dig, hvor hurtigt den pågældende udbyder svarer. Jo kortere tid, jo bedre."
+    },
+    "jitter": {
+      "title": "Jitter",
+      "description": "Jitter er variationen i ping responstider. Lavere jitter betyder en mere stabil forbindelse, som er vigtig for real-time applikationer som videoopkald og spil."
     },
     "up": {
       "title": "Upload-hastighed",
@@ -193,6 +258,8 @@
     "minutes": "{{minutes}} minutter",
     "hour": "1 time",
     "hours": "{{hours}} timer",
+    "day": "1 day",
+    "days": "{{days}} days",
     "on": "Den",
     "at": "Kl."
   },
@@ -213,15 +280,12 @@
     "result": {
       "title": "Testresultat",
       "description": "<Link>Denne test</Link> opnåede en maksimal download-hastighed på <Bold>{{down}} Mbps</Bold> og en maksimal upload-hastighed på <Bold>{{up}} Mbps</Bold>. Den blev oprettet <Bold>{{type}}</Bold> og tog <Bold>{{duration}} sekunder</Bold>.",
+      "jitter": " Forbindelsen jitter var <Bold>{{jitter}} ms</Bold>.",
       "from_you": "af dig",
       "automatic": "automatisk"
     },
     "overview": {
-      "title": "Testoversigt over de sidste {{amount}}",
-      "1": "24 timer",
-      "2": "2 dage",
-      "3": "7 dage",
-      "4": "30 dage"
+      "title_range": "Test oversigt fra {{from}} til {{to}}"
     }
   },
   "errors": {
@@ -236,6 +300,10 @@
     "invalid_view": "Ugyldig visning"
   },
   "statistics": {
+    "average": "Gennemsnit",
+    "export": {
+      "button": "Eksporter"
+    },
     "overview": {
       "total_title": "Antal tests",
       "total_description": "Antallet af udførte tests",
@@ -248,7 +316,7 @@
       "title": "Mislykkede tests",
       "success": "Vellykkede",
       "failed": "Mislykkede",
-      "label": "Tests"
+      "label": "Test"
     },
     "speed": {
       "title": "Hastighed"
@@ -263,12 +331,43 @@
       "label": "Antal"
     },
     "values": {
-      "min": "Minimum",
+      "min": "Laveste",
       "max": "Maksimum",
       "avg": "Gennemsnit",
       "down": "Download-værdier",
       "up": "Upload-værdier"
+    },
+    "failed_test": "Mislykket test",
+    "hourly": {
+      "title": "Hastighed efter tid på dagen",
+      "sample_count": "Prøvninger"
+    },
+    "consistency": {
+      "title": "Forbindelses Stabilitet",
+      "excellent": "Fremragende",
+      "good": "God",
+      "fair": "Fint",
+      "poor": "Dårlig",
+      "ping_variance": "Ping varians"
     }
+  },
+  "calendar": {
+    "select_range": "Vælg datointerval",
+    "select_start": "Vælg startdato",
+    "select_end": "Vælg slutdato",
+    "from": "Fra",
+    "to": "Til",
+    "last_7_days": "Seneste 7 dage",
+    "last_30_days": "Seneste 30 dage",
+    "last_90_days": "Seneste 90 dage",
+    "last_year": "Sidste år",
+    "mon": "Mon",
+    "tue": "Tir",
+    "wed": "Ons",
+    "thu": "Thu",
+    "fri": "Fre",
+    "sat": "Lør",
+    "sun": "Søn"
   },
   "nodes": {
     "add": "Tilføj server",
@@ -293,6 +392,11 @@
       "description": "Serveren <Bold>{{name}}</Bold> (#{{id}}) vil blive slettet. Denne handling kan ikke fortrydes. Vil du fortsætte?",
       "yes": "Ja, slet",
       "success": "Serveren er blevet slettet"
+    },
+    "rename": {
+      "title": "Omdøb server",
+      "placeholder": "Nyt servernavn",
+      "success": "Serveren er blevet omdøbt"
     },
     "messages": {
       "not_reachable": "Serveren kan ikke kontaktes",
@@ -322,11 +426,11 @@
         "display_name": "Visningsnavn",
         "display_name_placeholder": "MySpeed-notifikation",
         "error_message": "Fejlmeddelelse",
-        "error_message_placeholder": "Fejl: %error%",
+        "error_message_placeholder": "[%year%-%month%-%day% %hour%:%minute%] Fejl: %error%",
         "send_failed": "Send fejlmeddelelser",
         "send_finished": "Send færdig-meddelelser",
         "finished_message": "Færdig-meddelelse",
-        "finished_message_placeholder": "%ping% ms, %download% Mbps, %upload% Mbps"
+        "finished_message_placeholder": "%year%-%month%-%day% %hour%:%minute% — %ping% ms, %download% Mbps, %upload% Mbps"
       }
     },
     "gotify": {
@@ -336,11 +440,11 @@
         "key": "App-token",
         "priority": "Prioritet",
         "error_message": "Fejlmeddelelse",
-        "error_message_placeholder": "Fejl: %error%",
+        "error_message_placeholder": "[%year%-%month%-%day% %hour%:%minute%] Fejl: %error%",
         "send_failed": "Send fejlmeddelelser",
         "send_finished": "Send færdig-meddelelser",
         "finished_message": "Færdig-meddelelse",
-        "finished_message_placeholder": "%ping% ms, %download% Mbps, %upload% Mbps"
+        "finished_message_placeholder": "%year%-%month%-%day% %hour%:%minute% — %ping% ms, %download% Mbps, %upload% Mbps"
       }
     },
     "pushover": {
@@ -349,18 +453,36 @@
         "token": "App-token",
         "user_key": "Bruger-nøgle",
         "error_message": "Fejlmeddelelse",
-        "error_message_placeholder": "Fejl: %error%",
+        "error_message_placeholder": "[%year%-%month%-%day% %hour%:%minute%] Fejl: %error%",
         "send_failed": "Send fejlmeddelelser",
         "send_finished": "Send færdig-meddelelser",
         "finished_message": "Færdig-meddelelse",
-        "finished_message_placeholder": "%ping% ms, %download% Mbps, %upload% Mbps"
+        "finished_message_placeholder": "%year%-%month%-%day% %hour%:%minute% — %ping% ms, %download% Mbps, %upload% Mbps"
       }
     },
     "healthChecks": {
       "title": "HealthChecks",
       "fields": {
-        "url": "HealthChecks-URL",
-        "url_placeholder": "https://hc-ping.com/<uuid>"
+        "url": "HealthChecks URL",
+        "url_placeholder": "https://hc-ping.com/<uuid>",
+        "interval": "Ping interval (minutter)",
+        "interval_placeholder": "1"
+      }
+    },
+    "influxdb": {
+      "title": "InfluxDB",
+      "fields": {
+        "url": "Server-URL",
+        "url_placeholder": "http://localhost:8086",
+        "org": "Organisation",
+        "bucket": "Spand",
+        "token": "API token",
+        "measurement": "Målingens navn",
+        "measurement_placeholder": "hastighedsprøvninger (standard)",
+        "host": "Vært tag",
+        "host_placeholder": "Standard til maskinens værtsnavn",
+        "tags": "Yderligere tags",
+        "tags_placeholder": "region=eu,role=primær (komma-separeret)"
       }
     },
     "ntfy": {
@@ -369,36 +491,36 @@
         "url": "Server-URL",
         "url_placeholder": "https://ntfy.sh",
         "topic": "Emne",
-        "topic_placeholder": "myspeed-alerts",
-        "token": "Adgangstoken",
-        "token_placeholder": "tk_... (valgfrit, til beskyttede servere)",
-        "title": "Notifikationstitel",
+        "topic_placeholder": "minspeed-advarsler",
+        "token": "Adgang til token",
+        "token_placeholder": "tk_... (valgfri, for beskyttede servere)",
+        "title": "Notifikations titel",
         "title_placeholder": "MySpeed (valgfrit)",
-        "tags": "Tags",
-        "tags_placeholder": "warning,satellite (kommasepareret)",
-        "priority": "Standardprioritet (1-5)",
+        "tags": "Mærker",
+        "tags_placeholder": "advarsel,satellit (kommasepareret)",
+        "priority": "Standard prioritet (1-5)",
         "priority_placeholder": "3",
-        "error_priority": "Fejlprioritet (1-5)",
+        "error_priority": "Fejl prioritet (1-5)",
         "error_priority_placeholder": "5",
-        "error_message": "Fejlbesked",
-        "error_message_placeholder": "Fejl: %error%",
-        "send_failed": "Send fejlbeskeder",
+        "error_message": "Fejlmeddelelse",
+        "error_message_placeholder": "[%year%-%month%-%day% %hour%:%minute%] Fejl: %error%",
+        "send_failed": "Send fejlmeddelelser",
         "send_finished": "Send færdige beskeder",
-        "finished_message": "Færdigbesked",
-        "finished_message_placeholder": "%ping% ms, %download% Mbit/s, %upload% Mbit/s"
+        "finished_message": "Afsluttet besked",
+        "finished_message_placeholder": "%year%-%month%-%day% %hour%:%minute% — %ping% ms, %download% Mbps, %upload% Mbps"
       }
     },
     "telegram": {
       "title": "Telegram",
       "fields": {
-        "token": "Bot-token",
+        "token": "Bot Token",
         "chat_id": "Chat-ID",
         "error_message": "Fejlmeddelelse",
-        "error_message_placeholder": "Fejl: %error%",
+        "error_message_placeholder": "[%year%-%month%-%day% %hour%:%minute%] Fejl: %error%",
         "send_failed": "Send fejlmeddelelser",
         "send_finished": "Send færdig-meddelelser",
         "finished_message": "Færdig-meddelelse",
-        "finished_message_placeholder": "%ping% ms, %download% Mbps, %upload% Mbps"
+        "finished_message_placeholder": "%year%-%month%-%day% %hour%:%minute% — %ping% ms, %download% Mbps, %upload% Mbps"
       }
     },
     "webhook": {
@@ -411,11 +533,55 @@
         "send_finished": "Send færdig-meddelelser",
         "send_alive": "Send Keep-Alive-beskeder",
         "send_recommendations": "Send anbefalinger",
-        "send_config_updates": "Send konfigurationsopdateringer"
+        "send_config_updates": "Send konfigurationsopdateringer",
+        "interval": "Hold-Alive interval (minutter)",
+        "interval_placeholder": "1"
       }
     }
   },
   "common": {
     "back_to_top": "Tilbage til toppen"
+  },
+  "not_found": {
+    "title": "Siden blev ikke fundet",
+    "description": "Den side, du leder efter, eksisterer ikke eller er blevet flyttet.",
+    "back_home": "Tilbage til startside"
+  },
+  "route_error": {
+    "title": "Ups!",
+    "subtitle": "Noget gik galt",
+    "description": "En uventet fejl opstod. Prøv igen eller gå tilbage til startsiden.",
+    "reload": "Genindlæs Side"
+  },
+  "optimal_values": {
+    "title": "Optimale Værdier",
+    "use_recommended": "Brug anbefalet"
+  },
+  "preferences": {
+    "title": "Præferencer",
+    "theme": {
+      "title": "Udseende",
+      "description": "Skift mellem mørk og lys grænseflade.",
+      "dark": "Mørk",
+      "dark_desc": "Lettere på øjnene i svagt lys",
+      "light": "Lys",
+      "light_desc": "Lysere udseende til dagbrug"
+    },
+    "time_format": {
+      "title": "Tid format",
+      "description": "Hvordan ur gange vises i hele appen.",
+      "h24": "24-timers",
+      "h24_desc": "Vis tider som 14:30",
+      "h12": "12-timers",
+      "h12_desc": "Vis tider som 2:30 PM"
+    },
+    "speed_unit": {
+      "title": "Hastighed enhed",
+      "description": "Vælg hvordan hastigheder vises. Værdier konverteres automatisk.",
+      "mbps": "Mbps (Megabits per sekund)",
+      "mbps_desc": "Standard ISP / hastighedstestenhed",
+      "mbytes": "MB/s (Megabytes per sekund)",
+      "mbytes_desc": "Almindelig i browsere og download ledere"
+    }
   }
 }

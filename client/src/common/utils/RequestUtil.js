@@ -6,7 +6,8 @@ const getApiRoot = () => {
 
 // Get the default headers of the request
 const getHeaders = () => {
-    let headers = localStorage.getItem("password") ? {password: localStorage.getItem("password")} : {};
+    const password = localStorage.getItem("password");
+    let headers = password ? {"x-password": encodeURIComponent(password)} : {};
     headers['content-type'] = 'application/json';
 
     return headers;

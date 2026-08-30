@@ -35,17 +35,15 @@
     transform: rotate(180deg)
 
 .dropdown-select-menu
-  position: absolute
-  top: auto
-  bottom: calc(100% + 0.5rem)
-  right: 0
+  position: fixed
   min-width: 13rem
   background-color: $darker-gray
   border: 1px solid $light-gray
   border-radius: 0.6rem
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3)
   z-index: 1000
-  overflow: hidden
+  overflow-x: hidden
+  overflow-y: auto
 
 .dropdown-select-item
   display: flex

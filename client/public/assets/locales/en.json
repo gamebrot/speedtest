@@ -258,6 +258,8 @@
     "minutes": "{{minutes}} minutes",
     "hour": "1 hour",
     "hours": "{{hours}} hours",
+    "day": "1 day",
+    "days": "{{days}} days",
     "on": "On",
     "at": "At"
   },

@@ -23,6 +23,8 @@
     "unset": "Entfernen",
     "retry": "Erneut versuchen",
     "login": "Anmelden",
+    "save": "Speichern",
+    "saving": "Speichern...",
     "password": {
       "title": "Passwort erforderlich",
       "placeholder": "Dein Passwort",
@@ -37,10 +39,14 @@
       "interface": "Schnittstelle",
       "server": "Server",
       "server_id": "Server-ID",
-      "custom_url": "Eigene URL",
+      "custom_url": "Benutzerdefinierte URL",
       "custom_url_placeholder": "https://speed.test/backend/",
       "choose_automatically": "Automatisch wählen",
-      "ookla_license": "Ich habe die <Eula>EULA</Eula>, die <GDPR>Datenschutzrichtlinie</GDPR> und die <TOS>Nutzungsbedingungen</TOS> von Ookla gelesen und akzeptiere sie."
+      "ookla_license": "Ich habe die <Eula>EULA</Eula>, die <GDPR>Datenschutzrichtlinie</GDPR> und die <TOS>Nutzungsbedingungen</TOS> von Ookla gelesen und akzeptiere sie.",
+      "ookla_notice": "Durch die Nutzung von Ookla erklären Sie sich mit deren <Eula>EULA</Eula>, <GDPR>Datenschutzrichtlinie</GDPR> und <TOS>Nutzungsbedingungen</TOS> einverstanden.",
+      "ookla_desc": "Beliebter Anbieter mit globalem Servernetzwerk",
+      "libre_desc": "Open-Source, selbst-hostbarer Speedtest",
+      "cloudflare_desc": "Schnelle CDN-basierte Tests"
     }
   },
   "dropdown": {
@@ -54,6 +60,7 @@
     "upload": "Optimaler Up-Speed",
     "download": "Optimaler Down-Speed",
     "recommendations": "Optimale Werte",
+    "optimal_values": "Optimale Werte",
     "change_provider": "Anbieter wechseln",
     "password": "Passwort ändern",
     "cron": "Häufigkeit einstellen",
@@ -67,22 +74,50 @@
     "theme_switched_light": "In den hellen Modus geschaltet",
     "theme_switched_dark": "In den dunklen Modus geschaltet",
     "preferences": "Einstellungen",
-    "info": "Infos zum Projekt",
     "provider": "Über den Anbieter",
     "integrations": "Integrationen"
   },
+  "about": {
+    "title": "Über MySpeed",
+    "description": "MySpeed ist eine Open-Source Speedtest Analyse-Software, die Ihre Internetgeschwindigkeit über einen konfigurierbaren Zeitraum aufzeichnet.",
+    "github": "GitHub",
+    "website": "Webseite",
+    "donate": "Spenden",
+    "translate": "Übersetzen",
+    "made_by": "Gemacht mit"
+  },
   "options": {
     "cron": {
-      "continuous": "Durchgehend (jede Minute)",
-      "frequent": "Sehr häufig (alle 30 Minuten)",
-      "default": "Standard (jede Stunde)",
-      "rare": "Selten (alle 3 Stunden)",
-      "really_rare": "Sehr selten (alle 6 Stunden)"
+      "continuous": "Kontinuierlich",
+      "continuous_desc": "Jede Minute - hohe Ressourcennutzung",
+      "frequent": "Sehr oft",
+      "frequent_desc": "Alle 30 Minuten",
+      "default": "Standard",
+      "default_desc": "Jede Stunde - empfohlen",
+      "rare": "Selten",
+      "rare_desc": "Alle 3 Stunden",
+      "really_rare": "Sehr selten",
+      "really_rare_desc": "Alle 6 Stunden"
     },
     "level": {
       "no_access": "Kein Zugriff",
       "read_access": "Nur Lesezugriff"
     }
+  },
+  "password": {
+    "no_access_desc": "Besucher müssen das Passwort eingeben um irgendetwas zu sehen",
+    "read_access_desc": "Besucher können Daten ansehen, können aber Einstellungen nicht ändern"
+  },
+  "pause": {
+    "manual": "Auf unbestimmte Zeit pausieren",
+    "manual_desc": "Pause bis manuell fortgesetzt",
+    "short": "Kurze Pause",
+    "short_desc": "1 Stunde pausieren",
+    "medium": "Mittlere Pause",
+    "medium_desc": "6 Stunden pausieren",
+    "long": "Lange Pause",
+    "long_desc": "12 Stunden pausieren",
+    "custom": "Eigene Dauer"
   },
   "page": {
     "overview": "Übersicht",
@@ -107,11 +142,16 @@
     "cron_title": "Test-Häufigkeit einstellen",
     "cron_rules": "Cron-Regel",
     "cron_next_test": "Nächster Test:",
+    "custom_cron": "Eigener Cron-Ausdruck",
+    "schedule_offset": "Versatz Zeitplan",
+    "schedule_offset_desc": "Fügt eine kleine Verzögerung hinzu, um zu verhindern, dass Tests zu exakten Zeiten starten können",
+    "advanced": "Erweitert",
     "time_title": "Zeige Tests der letzten ...",
     "download": "Herunterladen",
     "pause_title": "Speedtests pausieren für...",
     "hours": "Stunden",
     "pause": "Pausieren",
+    "pause_manual_hint": "Leer lassen um unbegrenzt zu pausieren",
     "release_manually": "Manuell freigeben",
     "language": "Sprache ändern",
     "view_title": "Ansicht wechseln"
@@ -125,6 +165,7 @@
     "paused": "Speedtests sind aktuell pausiert. Bitte setze sie fort, wenn du einen machen möchtest.",
     "running": "Es läuft bereits ein Speedtest. Bitte warte noch einen Moment.",
     "admin_login": "Admin-Login",
+    "servers": "Server",
     "beta": {
       "title": "Beta-Version",
       "description": "Diese Funktion befindet sich noch in der Beta-Phase. Wenn du Fehler findest, melde sie bitte <Link>hier</Link>."
@@ -157,10 +198,12 @@
     "confirm_reset": "Ja, zurücksetzen",
     "settings_exported": "Die Einstellungen wurden exportiert",
     "settings_imported": "Die Einstellungen wurden importiert",
-    "retention": "Datenspeicherung",
-    "retention_desc": "Wie lange Speedtest-Ergebnisse aufbewahrt werden, bevor sie automatisch gelöscht werden.",
-    "retention_saved": "Speicherdauer aktualisiert",
+    "retention": "Vorratsdatenspeicherung",
+    "retention_desc": "Wie lange die Geschwindigkeitstest-Ergebnisse beibehalten werden, bevor sie automatisch gelöscht werden.",
+    "retention_saved": "Speicherzeitraum aktualisiert",
     "retention_days_placeholder": "365",
+    "retention_days_suffix": "tage",
+    "retention_back": "Zurück zu den Voreinstellungen",
     "retention_options": {
       "week": "7 Tage",
       "month": "30 Tage",
@@ -169,15 +212,13 @@
       "year": "1 Jahr (Standard)",
       "forever": "Für immer behalten",
       "custom": "Benutzerdefiniert..."
-    },
-    "retention_days_suffix": "Tage",
-    "retention_back": "Zurück zu Voreinstellungen"
+    }
   },
   "latest": {
     "ping": "Ping",
     "ping_unit": "ms",
     "jitter": "Jitter",
-    "jitter_unit": "ms",
+    "jitter_unit": "M",
     "down": "Download",
     "speed_unit": "Mbit/s",
     "byte_speed_unit": "MB/s",
@@ -186,7 +227,6 @@
     "before": "vor"
   },
   "info": {
-    "credits": "<MSpeed>MySpeed</MSpeed> ist ein Open-Source-Projekt von GNMYT. Hinterlasse einen Stern auf <Github>GitHub</Github> oder <Donate>spende</Donate>, um das Projekt zu unterstützen.",
     "recommendations_error": "Du musst mindestens 10 Tests machen, damit ein Durchschnitt ermittelt werden kann. Ob die Tests manuell oder automatisch durchgeführt wurden ist egal.",
     "recommendations_info": "Anhand der letzten 10 Testergebnisse wurde festgestellt, dass der optimale Ping bei <Bold>{{ping}} ms</Bold>, der Download bei <Bold>{{down}} Mbit/s</Bold> und der Upload bei <Bold>{{up}} Mbit/s</Bold> liegt. Orientiere dich am besten an deinem Internetvertrag und übernehme es nur, wenn es mit dem übereinstimmt.",
     "update": "Ein Update auf die Version {{version}} ist verfügbar. Sieh dir <Changes>die Änderungen an</Changes> und <DLLink>lade dir das Update herunter</DLLink>.",
@@ -200,7 +240,7 @@
     },
     "jitter": {
       "title": "Jitter",
-      "description": "Der Jitter ist die Schwankung der Ping-Antwortzeiten. Ein niedriger Jitter bedeutet eine stabilere Verbindung, was wichtig ist für Echtzeitanwendungen wie Videoanrufe und Gaming."
+      "description": "Jitter ist die Variation in Ping-Reaktionszeiten. Niedrigere Jitter bedeutet eine stabilere Verbindung, was für Echtzeitanwendungen wie Videoanrufe und Gaming wichtig ist."
     },
     "up": {
       "title": "Upload-Geschwindigkeit",
@@ -218,6 +258,8 @@
     "minutes": "{{minutes}} Minuten",
     "hour": "1 Stunde",
     "hours": "{{hours}} Stunden",
+    "day": "1 day",
+    "days": "{{days}} days",
     "on": "Am",
     "at": "Um"
   },
@@ -238,16 +280,12 @@
     "result": {
       "title": "Testergebnis",
       "description": "<Link>Bei diesem Test</Link> wurde eine maximale Download-Geschwindigkeit von <Bold>{{down}} Mbps</Bold> und eine maximale Upload-Geschwindigkeit von <Bold>{{up}} Mbps</Bold> erreicht. Er wurde erstellt <Bold>{{type}}</Bold> und dauerte <Bold>{{duration}} Sekunden</Bold>.",
-      "jitter": " Der Verbindungs-Jitter betrug <Bold>{{jitter}} ms</Bold>.",
+      "jitter": " Die Verbindung Jitter war <Bold>{{jitter}} ms</Bold>.",
       "from_you": "von dir",
       "automatic": "automatisch"
     },
     "overview": {
-      "title": "Test-Übersicht der letzten {{amount}}",
-      "1": "24 Stunden",
-      "2": "2 Tage",
-      "3": "7 Tage",
-      "4": "30 Tage"
+      "title_range": "Testübersicht von {{from}} bis {{to}}"
     }
   },
   "errors": {
@@ -262,6 +300,7 @@
     "invalid_view": "Ungültige Ansicht"
   },
   "statistics": {
+    "average": "Durchschnitt",
     "export": {
       "button": "Exportieren"
     },
@@ -297,7 +336,38 @@
       "avg": "Durchschnitt",
       "down": "Download-Werte",
       "up": "Upload-Werte"
+    },
+    "failed_test": "Fehlgeschlagener Test",
+    "hourly": {
+      "title": "Geschwindigkeit nach Tageszeit",
+      "sample_count": "Tests"
+    },
+    "consistency": {
+      "title": "Verbindungsstabilität",
+      "excellent": "Ausgezeichnet",
+      "good": "Gut",
+      "fair": "Faire",
+      "poor": "Arm",
+      "ping_variance": "Ping-Varianz"
     }
+  },
+  "calendar": {
+    "select_range": "Datumsbereich auswählen",
+    "select_start": "Startdatum auswählen",
+    "select_end": "Enddatum auswählen",
+    "from": "Von",
+    "to": "An",
+    "last_7_days": "Letzte 7 Tage",
+    "last_30_days": "Letzte 30 Tage",
+    "last_90_days": "Letzte 90 Tage",
+    "last_year": "Letztes Jahr",
+    "mon": "Mon",
+    "tue": "Di",
+    "wed": "Mi",
+    "thu": "Thu",
+    "fri": "Fr",
+    "sat": "Sa",
+    "sun": "Sonne"
   },
   "nodes": {
     "add": "Server hinzufügen",
@@ -356,11 +426,11 @@
         "display_name": "Anzeigename",
         "display_name_placeholder": "MySpeed Benachrichtigung",
         "error_message": "Fehlernachricht",
-        "error_message_placeholder": "Fehler: %error%",
+        "error_message_placeholder": "[%year%-%month%-%day% %hour%:%minute%] Fehler: %error%",
         "send_failed": "Fehlernachrichten senden",
         "send_finished": "Abgeschlossene senden",
         "finished_message": "Abgeschlossen-Nachricht",
-        "finished_message_placeholder": "%ping% ms, %download% Mbit/s, %upload% Mbit/s"
+        "finished_message_placeholder": "%year%-%month%-%day% %hour%:%minute% — %ping% ms, %download% Mbps, %upload% Mbps"
       }
     },
     "gotify": {
@@ -370,11 +440,11 @@
         "key": "Anwendungs-Token",
         "priority": "Priorität",
         "error_message": "Fehlernachricht",
-        "error_message_placeholder": "Fehler: %error%",
+        "error_message_placeholder": "[%year%-%month%-%day% %hour%:%minute%] Fehler: %error%",
         "send_failed": "Fehlernachrichten senden",
         "send_finished": "Abgeschlossene senden",
         "finished_message": "Abgeschlossen-Nachricht",
-        "finished_message_placeholder": "%ping% ms, %download% Mbit/s, %upload% Mbit/s"
+        "finished_message_placeholder": "%year%-%month%-%day% %hour%:%minute% — %ping% ms, %download% Mbps, %upload% Mbps"
       }
     },
     "pushover": {
@@ -383,11 +453,11 @@
         "token": "App-Token",
         "user_key": "Benutzerschlüssel",
         "error_message": "Fehlermeldung",
-        "error_message_placeholder": "Fehler: %error%",
+        "error_message_placeholder": "[%year%-%month%-%day% %hour%:%minute%] Fehler: %error%",
         "send_failed": "Fehlermeldungen senden",
         "send_finished": "Abgeschlossene senden",
         "finished_message": "Abgeschlossen-Nachricht",
-        "finished_message_placeholder": "%ping% ms, %download% Mbit/s, %upload% Mbit/s"
+        "finished_message_placeholder": "%year%-%month%-%day% %hour%:%minute% — %ping% ms, %download% Mbps, %upload% Mbps"
       }
     },
     "healthChecks": {
@@ -405,39 +475,39 @@
         "url": "Server-URL",
         "url_placeholder": "http://localhost:8086",
         "org": "Organisation",
-        "bucket": "Bucket",
-        "token": "API-Token",
-        "measurement": "Measurement-Name",
+        "bucket": "Eimer",
+        "token": "API token",
+        "measurement": "Name der Messung",
         "measurement_placeholder": "speedtests (Standard)",
         "host": "Host-Tag",
-        "host_placeholder": "Standard: Hostname des Geräts",
+        "host_placeholder": "Standardwerte für den Rechnernamen",
         "tags": "Zusätzliche Tags",
-        "tags_placeholder": "region=eu,role=primary (komma-getrennt)"
+        "tags_placeholder": "region=eu,role=primär (kommagetrennt)"
       }
     },
     "ntfy": {
-      "title": "ntfy",
+      "title": "nackt",
       "fields": {
         "url": "Server-URL",
         "url_placeholder": "https://ntfy.sh",
-        "topic": "Topic",
-        "topic_placeholder": "myspeed-alerts",
-        "token": "Zugriffstoken",
+        "topic": "Thema",
+        "topic_placeholder": "myspeed-Alarme",
+        "token": "Zugangs-Token",
         "token_placeholder": "tk_... (optional, für geschützte Server)",
-        "title": "Benachrichtigungstitel",
+        "title": "Benachrichtigungs-Titel",
         "title_placeholder": "MySpeed (optional)",
         "tags": "Tags",
-        "tags_placeholder": "warning,satellite (kommagetrennt)",
+        "tags_placeholder": "Warnung,Satellit (kommagetrennt)",
         "priority": "Standardpriorität (1-5)",
         "priority_placeholder": "3",
         "error_priority": "Fehlerpriorität (1-5)",
         "error_priority_placeholder": "5",
-        "error_message": "Fehlernachricht",
-        "error_message_placeholder": "Fehler: %error%",
-        "send_failed": "Fehlernachrichten senden",
-        "send_finished": "Abgeschlossene senden",
-        "finished_message": "Abgeschlossen-Nachricht",
-        "finished_message_placeholder": "%ping% ms, %download% Mbit/s, %upload% Mbit/s"
+        "error_message": "Fehlermeldung",
+        "error_message_placeholder": "[%year%-%month%-%day% %hour%:%minute%] Fehler: %error%",
+        "send_failed": "Fehlermeldungen senden",
+        "send_finished": "Fertige Nachrichten senden",
+        "finished_message": "Abgeschlossene Nachricht",
+        "finished_message_placeholder": "%year%-%month%-%day% %hour%:%minute% — %ping% ms, %download% Mbps, %upload% Mbps"
       }
     },
     "telegram": {
@@ -446,11 +516,11 @@
         "token": "Bot Token",
         "chat_id": "Chat ID",
         "error_message": "Fehlernachricht",
-        "error_message_placeholder": "Fehler: %error%",
+        "error_message_placeholder": "[%year%-%month%-%day% %hour%:%minute%] Fehler: %error%",
         "send_failed": "Fehlernachrichten senden",
         "send_finished": "Abgeschlossene senden",
         "finished_message": "Abgeschlossen-Nachricht",
-        "finished_message_placeholder": "%ping% ms, %download% Mbit/s, %upload% Mbit/s"
+        "finished_message_placeholder": "%year%-%month%-%day% %hour%:%minute% — %ping% ms, %download% Mbps, %upload% Mbps"
       }
     },
     "webhook": {
@@ -464,7 +534,7 @@
         "send_alive": "Lebendig-Nachrichten senden",
         "send_recommendations": "Empfehlungen senden",
         "send_config_updates": "Konfigurations-Updates senden",
-        "interval": "Keep-Alive-Intervall (Minuten)",
+        "interval": "Laufendes Intervall (Minuten)",
         "interval_placeholder": "1"
       }
     }
@@ -472,31 +542,46 @@
   "common": {
     "back_to_top": "Zurück zum Anfang"
   },
+  "not_found": {
+    "title": "Seite nicht gefunden",
+    "description": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
+    "back_home": "Zurück zur Startseite"
+  },
+  "route_error": {
+    "title": "Hoppla!",
+    "subtitle": "Etwas ist schief gelaufen",
+    "description": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut oder gehen Sie zur Startseite zurück.",
+    "reload": "Seite neu laden"
+  },
+  "optimal_values": {
+    "title": "Optimale Werte",
+    "use_recommended": "Empfohlen verwenden"
+  },
   "preferences": {
     "title": "Einstellungen",
     "theme": {
-      "title": "Erscheinungsbild",
-      "description": "Wechsle zwischen dunklem und hellem Design.",
+      "title": "Erscheinung",
+      "description": "Zwischen dunkler und heller Schnittstelle wechseln.",
       "dark": "Dunkel",
-      "dark_desc": "Augenschonender bei wenig Licht",
+      "dark_desc": "Einfacher an den Augen bei niedrigem Licht",
       "light": "Hell",
-      "light_desc": "Hellere Darstellung für tagsüber"
+      "light_desc": "Hellere Suche nach Tageszeit"
     },
     "time_format": {
       "title": "Zeitformat",
       "description": "Wie Uhrzeiten in der gesamten App angezeigt werden.",
-      "h24": "24-Stunden",
-      "h24_desc": "Anzeige im Format 14:30",
-      "h12": "12-Stunden",
-      "h12_desc": "Anzeige im Format 2:30 PM"
+      "h24": "24 Stunden",
+      "h24_desc": "Zeige Zeiten wie 14:30",
+      "h12": "12 Stunden",
+      "h12_desc": "Zeige Zeiten wie 14:30 Uhr"
     },
     "speed_unit": {
       "title": "Geschwindigkeitseinheit",
-      "description": "Lege fest, wie Geschwindigkeiten angezeigt werden. Werte werden automatisch umgerechnet.",
-      "mbps": "Mbit/s (Megabit pro Sekunde)",
-      "mbps_desc": "Standardeinheit von Anbietern und Speedtests",
-      "mbytes": "MB/s (Megabyte pro Sekunde)",
-      "mbytes_desc": "Üblich in Browsern und Download-Managern"
+      "description": "Wählen Sie, wie Geschwindigkeit angezeigt wird. Werte werden automatisch konvertiert.",
+      "mbps": "Mbps (Megabits pro Sekunde)",
+      "mbps_desc": "Standard ISP / Speedtest Einheit",
+      "mbytes": "MB/s (Megabytes pro Sekunde)",
+      "mbytes_desc": "Häufig in Browsern und Download-Managern"
     }
   }
 }

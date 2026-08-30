@@ -1,4 +1,7 @@
 import nodes from '../models/Node.js';
+import { writePasswordHeaders } from '../util/passwordHeader.js';
+
+const STATUS_TIMEOUT = 8000;
 
 export const listAll = async () => await nodes.findAll()
     .then((result) => result.map((node) => ({...node, password: node.password !== null})));
@@ -15,8 +18,10 @@ export const updatePassword = async (nodeId, password) => await nodes.update({pa
 
 export const checkStatus = async (url, password) => {
     try {
-        const headers = password && password !== "none" ? {password} : {};
-        const res = await fetch(url + "/api/config", {headers});
+        const res = await fetch(url + "/api/config", {
+            headers: writePasswordHeaders(password),
+            signal: AbortSignal.timeout(STATUS_TIMEOUT)
+        });
 
         if (res.status === 401) return "PASSWORD_REQUIRED";
         if (!res.ok) return "INVALID_URL";

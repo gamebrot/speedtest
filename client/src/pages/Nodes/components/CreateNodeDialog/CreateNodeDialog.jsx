@@ -4,7 +4,7 @@ import React, {useContext, useState} from "react";
 import "./styles.sass";
 import {t} from "i18next";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCircleInfo, faServer} from "@fortawesome/free-solid-svg-icons";
+import {faCircleInfo, faServer, faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {baseRequest} from "@/common/utils/RequestUtil";
 import {ToastNotificationContext} from "@/common/contexts/ToastNotification";
 import {NodeContext} from "@/common/contexts/Node";
@@ -16,6 +16,7 @@ export const CreateNodeDialog = ({open, onClose}) => {
     const [invalidUrl, setInvalidUrl] = useState(false);
     const [serverName, setServerName] = useState("");
     const [serverUrl, setServerUrl] = useState("");
+    const [checking, setChecking] = useState(false);
 
     const runPasswordProcess = async (wrong = false) => {
         const password = await alert.openInput(t("dialog.password.title"), {
@@ -37,15 +38,23 @@ export const CreateNodeDialog = ({open, onClose}) => {
     };
 
     const createNode = async (close) => {
-        const response = await (await baseRequest("/nodes", "PUT", {name: serverName, url: serverUrl})).json();
-        if (response.type === "INVALID_URL") setInvalidUrl(true);
-        else if (response.type === "PASSWORD_REQUIRED") {
-            close();
-            runPasswordProcess();
-        } else if (response.type === "NODE_CREATED") {
-            updateNodes();
-            close();
-            updateToast(t("nodes.created"), "green", faServer);
+        setChecking(true);
+
+        try {
+            const response = await (await baseRequest("/nodes", "PUT", {name: serverName, url: serverUrl})).json();
+            if (response.type === "INVALID_URL") setInvalidUrl(true);
+            else if (response.type === "PASSWORD_REQUIRED") {
+                close();
+                runPasswordProcess();
+            } else if (response.type === "NODE_CREATED") {
+                updateNodes();
+                close();
+                updateToast(t("nodes.created"), "green", faServer);
+            }
+        } catch {
+            setInvalidUrl(true);
+        } finally {
+            setChecking(false);
         }
     };
 
@@ -75,7 +84,10 @@ export const CreateNodeDialog = ({open, onClose}) => {
                         </div>
                     </DialogBody>
                     <DialogFooter>
-                        <button className="dialog-btn" onClick={() => createNode(close)}>{t("nodes.create")}</button>
+                        <button className="dialog-btn" disabled={checking} onClick={() => createNode(close)}>
+                            {checking && <FontAwesomeIcon icon={faSpinner} spin/>}
+                            {t("nodes.create")}
+                        </button>
                     </DialogFooter>
                 </>
             )}

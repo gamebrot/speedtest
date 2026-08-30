@@ -6,6 +6,10 @@ export function generateRelativeTime(created) {
 
     const diff = (currentDate - date) / 1000;
 
+    if (isNaN(diff)) {
+        return "N/A";
+    }
+
     if (diff < 5) {
         return t("time.now");
     } else if (diff < 60) {
@@ -16,5 +20,6 @@ export function generateRelativeTime(created) {
         return Math.floor(diff / 3600) === 1 ? t("time.hour") : t("time.hours", {replace: {hours: Math.floor(diff / 3600)}});
     }
 
-    return "N/A"
+    const days = Math.floor(diff / 86400);
+    return days === 1 ? t("time.day") : t("time.days", {replace: {days: days}});
 }

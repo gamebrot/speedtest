@@ -13,20 +13,20 @@
     "@fortawesome/fontawesome-svg-core": "^7.3.1",
     "@fortawesome/free-brands-svg-icons": "^7.3.1",
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
-    "@fortawesome/react-fontawesome": "^3.4.0",
+    "@fortawesome/react-fontawesome": "^3.5.0",
     "react": "^19.2.6",
-    "react-dom": "^19.2.7",
-    "react-router-dom": "^7.18.1",
-    "sass": "^1.101.0"
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.2",
+    "sass": "^1.102.0"
   },
   "devDependencies": {
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.3",
-    "eslint": "^10.7.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "@vitejs/plugin-react": "^6.1.0",
+    "eslint": "^10.9.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.3",
-    "vite": "^8.1.5"
+    "eslint-plugin-react-refresh": "^0.5.4",
+    "vite": "^8.2.2"
   }
 }

@@ -4,21 +4,24 @@ import generateOpenGraphImage from '../controller/opengraph.js';
 
 const app = express.Router();
 
+const BANNER_URL = 'https://repository-images.githubusercontent.com/478222232/b5331514-aa27-4a56-af3e-c4b25446438d';
+
 app.get("/image", passwordWrapper(true, (req, res) => {
   // If there is a password set and the user does not want others to view their test data, return the project banner
-  res.redirect('https://repository-images.githubusercontent.com/478222232/b5331514-aa27-4a56-af3e-c4b25446438d');
+  res.redirect(BANNER_URL);
 }), async (req, res) => {
 
   try {
     const png = await generateOpenGraphImage(req);
 
     if (!png) {
-      return res.status(500).json({ message: "Error fetching test data" });
+      return res.redirect(BANNER_URL);
     }
 
     res.setHeader("Content-Type", "image/png").status(200).send(png);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(`Could not generate the OpenGraph image: ${error.message}`);
+    res.redirect(BANNER_URL);
   }
 });
 
